@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zalo Treo Text Pro - Hệ Thống Đa Tab 3D</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Three.js (Hạt 3D Không Gian Số) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP 3 & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- File CSS Tách Riêng -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Canvas hạt 3D lơ lửng toàn trang -->
+    <canvas id="canvas3dBg"></canvas>
+
+    <!-- ==============================================================
+         1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ (KHÔNG CÓ TÀI KHOẢN MẶC ĐỊNH)
+    ============================================================== -->
+    <div id="authBackdrop" class="auth-backdrop">
+        <div class="card-3d auth-box">
+            <div style="text-align: center; margin-bottom: 22px;">
+                <div class="logo-icon-3d" style="margin: 0 auto 12px;">
+                    <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h2 style="font-size: 1.45rem; font-weight: 800;" id="authTitle">Đăng Nhập Quản Trị</h2>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Zalo Treo Text Pro • Multi-Tab System</p>
+            </div>
+
+            <!-- Chuyển đổi Đăng nhập / Đăng ký -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab-btn active" id="tabBtnLogin" onclick="chuyenCheDoAuth('login')">Đăng Nhập</button>
+                <button type="button" class="auth-tab-btn" id="tabBtnRegister" onclick="chuyenCheDoAuth('register')">Đăng Ký Mới</button>
+            </div>
+
+            <form onsubmit="xuLyXacThuc(event)">
+                <div class="form-row">
+                    <label>Tên tài khoản:</label>
+                    <input type="text" id="authUsername" placeholder="Nhập tên tài khoản..." required autocomplete="username">
+                </div>
+                <div class="form-row">
+                    <label>Mật khẩu:</label>
+                    <input type="password" id="authPassword" placeholder="Nhập mật khẩu..." required autocomplete="current-password">
+                </div>
+                <div id="authNotice" style="font-size: 0.78rem; color: #60a5fa; margin-bottom: 20px;">
+                    💡 Sếp chưa có tài khoản? Nhấn "Đăng Ký Mới" ở trên để tạo acc ngay!
+                </div>
+                <button type="submit" class="btn-glow btn-primary" id="btnAuthSubmit" style="width: 100%; padding: 13px; font-size: 1rem;">
+                    <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+                    ĐĂNG NHẬP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==============================================================
+         2. OVERLAY & DRAWER MENU 3 GẠCH BÊN PHẢI
+    ============================================================== -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="dongMenu3Gach()"></div>
+    <aside class="drawer-menu" id="drawerMenu">
+        <div class="drawer-header">
+            <h3 style="font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="layers" style="color: var(--neon-cyan);"></i>
+                MENU HỆ THỐNG
+            </h3>
+            <button onclick="dongMenu3Gach()" style="background: none; border: none; color: #fff; cursor: pointer;">
+                <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+            </button>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; flex: 1;">
+            <div class="drawer-nav-item active" id="menuItemQuanLyTab" onclick="chuyenTrang('quan-ly-tab')">
+                <i data-lucide="layout-grid" style="width: 18px; height: 18px;"></i>
+                Quản lý tab
+            </div>
+            <div class="drawer-nav-item" id="menuItemTaoTab" onclick="chuyenTrang('tao-tab')">
+                <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+                Tạo tab
+            </div>
+            <div class="drawer-nav-item" id="menuItemLienHe" onclick="chuyenTrang('lien-he')">
+                <i data-lucide="headset" style="width: 18px; height: 18px;"></i>
+                Liên hệ
+            </div>
+
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);">
+                <button onclick="xuLyDangXuat()" class="btn-glow btn-outline" style="width: 100%; color: #f87171;">
+                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                    Đăng xuất
+                </button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- ==============================================================
+         3. KHUNG ỨNG DỤNG CHÍNH DASHBOARD
+    ============================================================== -->
+    <div class="main-wrapper" id="mainDashboard" style="display: none;">
+        <!-- HEADER TRÊN CÙNG -->
+        <header class="card-3d">
+            <a href="#" class="logo-box" onclick="chuyenTrang('quan-ly-tab')">
+                <div class="logo-icon-3d">
+                    <i data-lucide="zap" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>ZALO TREO TEXT PRO</h1>
+                    <p>MULTI-TAB EDITION • QUẢN LÝ ĐA TAB CHUYÊN NGHIỆP</p>
+                </div>
+            </a>
+            <!-- NÚT 3 GẠCH BÊN PHẢI -->
+            <button class="btn-hamburger" onclick="moMenu3Gach()" title="Mở menu 3 gạch">
+                <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
+            </button>
+        </header>
+
+        <!-- BANNER CHÀO MỪNG WELCOME SẾP -->
+        <div class="card-3d welcome-banner" id="bannerWelcome">
+            <div class="welcome-text">
+                <h2>Welcome, <span id="welcomeUsername" style="color: var(--neon-cyan);">Sếp</span>! 👋</h2>
+                <p>Hệ thống hỗ trợ chạy song song không giới hạn nhiều tab treo text cùng lúc.</p>
+            </div>
+            <button class="btn-glow btn-primary" onclick="chuyenTrang('tao-tab')">
+                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                Tạo Tab Mới
+            </button>
+        </div>
+
+        <!-- ==============================================================
+             MÀN HÌNH 1: QUẢN LÝ TAB (DANH SÁCH HÌNH NGANG)
+             ĐANG CHẠY: FULL VIỀN XANH LÁ
+             KHÔNG CHẠY: FULL VIỀN ĐỎ
+        ============================================================== -->
+        <div id="viewQuanLyTab">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="layers" style="color: var(--zalo-blue);"></i>
+                    Danh Sách Quản Lý Tab
+                </h2>
+                <button class="btn-glow btn-outline" onclick="taiDanhSachTabs()">
+                    <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i>
+                    Làm mới
+                </button>
+            </div>
+
+            <!-- VÙNG RENDER DANH SÁCH CÁC THẺ NGANG -->
+            <div id="vungDanhSachTabsNgang">
+                <!-- Render động bằng Javascript -->
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MÀN HÌNH 2: TẠO TAB MỚI (TỰ ĐỘNG CHUYỂN QUA QUẢN LÝ TAB)
+        ============================================================== -->
+        <div id="viewTaoTab" style="display: none;">
+            <div class="card-3d" style="max-width: 600px; margin: 0 auto; padding: 32px 28px;">
+                <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+                    <i data-lucide="plus-circle" style="color: var(--neon-cyan);"></i>
+                    Tạo Tab Treo Text Mới
+                </h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px;">
+                    Nhập tên gợi nhớ cho tab (ví dụ: Tab nhóm bạn bè, Tab war nhóm 1...)
+                </p>
+
+                <form onsubmit="xuLyTaoTabMoi(event)">
+                    <div class="form-row">
+                        <label>Tên tab:</label>
+                        <input type="text" id="inputTenTabMoi" placeholder="Nhập tên tab..." required autofocus>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button type="submit" class="btn-glow btn-primary" style="flex: 1; padding: 13px;">
+                            <i data-lucide="check" style="width: 18px; height: 18px;"></i>
+                            TẠO TAB & VỀ QUẢN LÝ TAB
+                        </button>
+                        <button type="button" class="btn-glow btn-outline" onclick="chuyenTrang('quan-ly-tab')">
+                            Hủy bỏ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MÀN HÌNH 3: LIÊN HỆ (CÁC NÚT BUTTON BÓNG BẨY)
+        ============================================================== -->
+        <div id="viewLienHe" style="display: none;">
+            <div class="card-3d" style="max-width: 620px; margin: 0 auto; padding: 36px 30px;">
+                <h2 style="font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 6px;">
+                    📞 THÔNG TIN LIÊN HỆ
+                </h2>
+                <p style="font-size: 0.88rem; color: var(--text-muted); text-align: center; margin-bottom: 30px;">
+                    Liên hệ trực tiếp hỗ trợ, cập nhật tính năng hoặc giải đáp thắc mắc:
+                </p>
+
+                <!-- NÚT TELEGRAM -->
+                <a href="https://t.me/ngbaodev" target="_blank" class="contact-btn tele">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <i data-lucide="send" style="width: 24px; height: 24px;"></i>
+                        <div>
+                            <div>Telegram</div>
+                            <div style="font-size: 0.78rem; font-weight: 500; opacity: 0.85;">https://t.me/ngbaodev</div>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
+                </a>
+
+                <!-- NÚT ZALO -->
+                <a href="https://zalo.me/84988467271" target="_blank" class="contact-btn zalo">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <i data-lucide="message-circle" style="width: 24px; height: 24px;"></i>
+                        <div>
+                            <div>Zalo Hỗ Trợ</div>
+                            <div style="font-size: 0.78rem; font-weight: 500; opacity: 0.85;">zalo.me/84988467271</div>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
+                </a>
+
+                <!-- NÚT DISCORD -->
+                <div class="contact-btn discord" style="cursor: pointer;" onclick="saoChepDiscord('_5p40')">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <i data-lucide="gamepad-2" style="width: 24px; height: 24px;"></i>
+                        <div>
+                            <div>Discord</div>
+                            <div style="font-size: 0.78rem; font-weight: 500; opacity: 0.85;">_5p40 (Bấm để copy)</div>
+                        </div>
+                    </div>
+                    <i data-lucide="copy" style="width: 20px; height: 20px;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MÀN HÌNH 4: CẤU HÌNH VÀ CHẠY TAB CỤ THỂ (GIAO DIỆN 3D NHƯ NÃY)
+        ============================================================== -->
+        <div id="viewChiTietTab" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn-glow btn-outline" onclick="chuyenTrang('quan-ly-tab')">
+                    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                    Quay lại Quản lý tab
+                </button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 1.1rem; font-weight: 800; color: #fff;" id="lblDangXemTabName">Tab Treo</span>
+                    <span id="badgeTabDangChay" class="btn-glow" style="padding: 4px 12px; font-size: 0.75rem; pointer-events: none;">ĐÃ DỪNG</span>
+                </div>
+            </div>
+
+            <!-- CỘT 1 & CỘT 2: CẤU HÌNH -->
+            <div class="grid-2col">
+                <!-- CỘT 1: CẤU HÌNH TÀI KHOẢN (IMEI & COOKIE) -->
+                <div class="card-3d" style="padding: 24px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="users" style="color: var(--zalo-blue);"></i>
+                        Bước 1: Cấu hình Tài khoản Zalo
+                    </h3>
+                    <div class="form-row">
+                        <label>Số lượng tài khoản muốn treo:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="inputTabSoLuongAcc" min="1" max="25" value="1" style="max-width: 120px;">
+                            <button type="button" class="btn-glow btn-primary" onclick="renderTabFormAccs()">
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                    <div id="vungTabDanhSachAccs" style="margin-top: 14px;"></div>
+                    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--card-border);">
+                        <button type="button" class="btn-glow btn-outline" style="width: 100%;" id="btnTabLayNhom" onclick="tabLayDanhSachNhom()">
+                            <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
+                            Lấy danh sách nhóm từ Acc #1
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CỘT 2: NHÓM, FILE NGÔN TXT, DELAY & MÀU SẮC -->
+                <div class="card-3d" style="padding: 24px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="sliders" style="color: var(--neon-cyan);"></i>
+                        Bước 2: Nhóm, File Ngôn & Màu Sắc
+                    </h3>
+                    <div class="form-row">
+                        <label>Chọn nhóm Zalo muốn treo:</label>
+                        <select id="selectTabNhomZalo">
+                            <option value="">-- Bấm "Lấy danh sách nhóm từ Acc #1" trước --</option>
+                        </select>
+                        <input type="text" id="inputTabManualGroupId" placeholder="Hoặc tự gõ ID nhóm Zalo vào đây..." style="margin-top: 6px;">
+                    </div>
+                    <div class="form-row">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="margin-bottom: 0;">Nội dung File Ngôn (.txt):</label>
+                            <label for="tabUploadNgonTxt" class="btn-glow btn-outline" style="padding: 4px 10px; font-size: 0.76rem; cursor: pointer;">
+                                <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                                Chọn File Ngôn (.txt)
+                            </label>
+                            <input type="file" id="tabUploadNgonTxt" accept=".txt" style="display: none;" onchange="tabDocFileNgon(event)">
+                        </div>
+                        <textarea id="textareaTabNoiDungNgon" placeholder="Nội dung ngôn... Hệ thống sẽ gửi TẤT CẢ ngôn có trong file này trong 1 tin nhắn mỗi lượt lặp (không gửi từng dòng)!"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" class="form-row">
+                        <div>
+                            <label>Delay gửi (giây):</label>
+                            <input type="number" id="inputTabDelay" value="5" min="1" max="3600">
+                        </div>
+                        <div>
+                            <label>Size chữ (tối đa 500):</label>
+                            <input type="number" id="inputTabFontSize" value="500" min="10" max="500">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>Chọn màu muốn treo (Bảng màu tool gốc):</label>
+                        <div class="palette-grid" id="vungTabBangMau"></div>
+                        <input type="hidden" id="tabColorMode" value="random_line">
+                        <input type="hidden" id="tabColorHex" value="#DB342E">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">Tùy chỉnh:</span>
+                            <input type="color" id="tabColorPicker" value="#0084FF" style="width: 38px; height: 30px; padding: 2px; border-radius: 6px; cursor: pointer;" onchange="tabChonMauPicker(this.value)">
+                            <span id="lblTabMauDangChon" style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--neon-cyan);">Mỗi dòng 1 màu ngẫu nhiên</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BƯỚC 3: ĐIỀU KHIỂN & ĐỒNG HỒ THỜI GIAN THỰC CỦA TAB NÀY -->
+            <div class="card-3d" style="padding: 24px; margin-top: 22px;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">THỜI GIAN CHẠY</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--neon-cyan); margin-top: 4px;" id="lblTabTimerDisplay">00:00:00</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">ĐÃ GỬI THÀNH CÔNG</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #34d399; margin-top: 4px;" id="lblTabSentDisplay">0</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">GỬI THẤT BẠI</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #f87171; margin-top: 4px;" id="lblTabFailedDisplay">0</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">ACC ĐANG CHẠY</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #c084fc; margin-top: 4px;" id="lblTabAccCountDisplay">0</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 14px; margin-bottom: 20px;">
+                    <button type="button" class="btn-glow btn-success" style="flex: 1; padding: 14px; font-size: 1.05rem;" id="btnTabStart" onclick="tabBatDauTreo()">
+                        <i data-lucide="play" style="width: 22px; height: 22px;"></i>
+                        BẮT ĐẦU TREO TAB NÀY
+                    </button>
+                    <button type="button" class="btn-glow btn-danger" style="flex: 1; padding: 14px; font-size: 1.05rem;" id="btnTabStop" onclick="tabDungTreo()" disabled style="opacity: 0.5;">
+                        <i data-lucide="square" style="width: 22px; height: 22px;"></i>
+                        DỪNG TAB NÀY
+                    </button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="margin-bottom: 0;">Nhật ký hoạt động (Console Logs) của Tab:</label>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Cuộn tự động</span>
+                </div>
+                <div class="terminal-screen" id="tabTerminalLogs">
+                    <div class="log-row">
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-info">Sẵn sàng chạy tiến trình cho tab này...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Javascript Tách Riêng -->
+    <script src="script.js"></script>
+</body>
+</html>
