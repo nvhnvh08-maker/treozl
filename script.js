@@ -483,8 +483,11 @@ function renderTabFormAccs(presetAccs) {
                     <input type="text" id="tab_acc_imei_${i}" value="${escapeHtml(imeiVal)}" placeholder="IMEI Acc #${i + 1}..." required>
                 </div>
                 <div>
-                    <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">Cookie (JSON hoặc chuỗi):</label>
-                    <textarea id="tab_acc_cookie_${i}" style="min-height: 48px; font-size: 0.76rem;" placeholder="Cookie Acc #${i + 1}..." required>${escapeHtml(cookieVal)}</textarea>
+                    <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">Cookie (JSON, chuỗi cookie hoặc token zpw_sek):</label>
+                    <textarea id="tab_acc_cookie_${i}" style="min-height: 48px; font-size: 0.76rem;" placeholder='Dán Cookie hoặc token zpw_sek (VD: {"zpw_sek": "tzao..."} hoặc chuỗi cookie)...' required>${escapeHtml(cookieVal)}</textarea>
+                    <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">
+                        💡 <em>Lưu ý: Cookie phải còn hạn đăng nhập trên web chat.zalo.me</em>
+                    </div>
                 </div>
 
                 <!-- CẤU HÌNH NHÓM RIÊNG CHO ACC NÀY -->

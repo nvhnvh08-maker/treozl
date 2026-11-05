@@ -46,38 +46,60 @@ def normalize_ttl_value(ttl):
     return t
 
 def parse_cookies_input(cookie_raw: Any) -> Dict[str, str]:
-    """Phân tích linh hoạt mọi định dạng Cookie"""
+    """Phân tích linh hoạt mọi định dạng Cookie và tự động chuẩn hóa token Zalo"""
     if not cookie_raw:
         return {}
+
+    res = {}
     if isinstance(cookie_raw, dict):
-        return {str(k).strip(): str(v).strip() for k, v in cookie_raw.items()}
-    if isinstance(cookie_raw, list):
+        res = {str(k).strip(): str(v).strip() for k, v in cookie_raw.items()}
+    elif isinstance(cookie_raw, list):
         res = {}
         for item in cookie_raw:
             if isinstance(item, dict) and "name" in item and "value" in item:
                 res[str(item["name"]).strip()] = str(item["value"]).strip()
-        return res
+    else:
+        cookie_str = str(cookie_raw).strip()
+        if not cookie_str:
+            return {}
 
-    cookie_str = str(cookie_raw).strip()
-    if not cookie_str:
-        return {}
+        # Dạng JSON object hoặc JSON array
+        if (cookie_str.startswith("{") and cookie_str.endswith("}")) or (cookie_str.startswith("[") and cookie_str.endswith("]")):
+            try:
+                parsed = json.loads(cookie_str)
+                res = parse_cookies_input(parsed)
+            except Exception:
+                pass
 
-    if (cookie_str.startswith("{") and cookie_str.endswith("}")) or (cookie_str.startswith("[") and cookie_str.endswith("]")):
-        try:
-            parsed = json.loads(cookie_str)
-            return parse_cookies_input(parsed)
-        except Exception:
-            pass
+        if not res:
+            # Dạng chuỗi cookie: k=v; k2=v2
+            for part in cookie_str.split(";"):
+                part = part.strip()
+                if "=" in part:
+                    k, v = part.split("=", 1)
+                    k = k.strip()
+                    v = v.strip()
+                    if k:
+                        res[k] = v
 
-    res = {}
-    for part in cookie_str.split(";"):
-        part = part.strip()
-        if "=" in part:
-            k, v = part.split("=", 1)
-            k = k.strip()
-            v = v.strip()
-            if k:
-                res[k] = v
+            # Nếu người dùng chỉ dán trực tiếp token session thuần (chuỗi dài bắt đầu bằng tzao hoặc token dài)
+            if not res and len(cookie_str) > 20 and "=" not in cookie_str:
+                res["zpw_sek"] = cookie_str
+
+    # TỰ ĐỘNG THUẬT TOÁN CHUẨN HÓA TOKEN ZALO (zpw_sek):
+    # Rất nhiều trường hợp người dùng copy từ localStorage bị lưu dưới dạng hash key: {"146b6e...": "tzao..."}
+    # hoặc copy chỉ 1 cookie nhưng tên key bị sai. Hệ thống tự động nhận diện và gán key chuẩn 'zpw_sek'.
+    if "zpw_sek" not in res:
+        for k, v in list(res.items()):
+            val_str = str(v).strip()
+            if val_str.startswith("tzao") or (len(res) == 1 and len(val_str) > 25):
+                res["zpw_sek"] = val_str
+                break
+
+    # Nếu key là zpw_sek nhưng dán cả ngoặc kép
+    if "zpw_sek" in res:
+        res["zpw_sek"] = str(res["zpw_sek"]).strip('"\'')
+
     return res
 
 def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
@@ -92,13 +114,27 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
     if not cookies:
         raise ValueError("Cookie không hợp lệ hoặc để trống")
 
-    bot = ZaloAPI("api", "secret", imei, cookies)
+    try:
+        bot = ZaloAPI("api", "secret", imei, cookies)
+    except Exception as e:
+        err_msg = str(e)
+        if "NoneType" in err_msg or "logging in" in err_msg or "secret key" in err_msg:
+            raise RuntimeError(
+                "Phiên đăng nhập Zalo không hợp lệ hoặc đã hết hạn!\n"
+                "👉 Nguyên nhân: Cookie bị hết hạn (do đã đăng xuất hoặc đổi thiết bị), "
+                "hoặc IMEI không khớp với phiên đăng nhập chat.zalo.me.\n"
+                "👉 Khắc phục: Vào lại chat.zalo.me trên trình duyệt, lấy lại Cookie mới (token zpw_sek) và IMEI (z_uuid) tương ứng."
+            )
+        raise RuntimeError(f"Lỗi đăng nhập Zalo: {err_msg}")
+
     groups = []
-    
     try:
         all_groups = bot.fetchAllGroups()
     except Exception as e:
-        raise RuntimeError(f"Lỗi kết nối Zalo khi lấy danh sách nhóm: {str(e)}")
+        err_msg = str(e)
+        if "NoneType" in err_msg:
+            raise RuntimeError("Phiên đăng nhập Zalo đã hết hạn. Vui lòng lấy lại Cookie mới từ chat.zalo.me")
+        raise RuntimeError(f"Lỗi kết nối Zalo khi lấy danh sách nhóm: {err_msg}")
 
     grid_map = getattr(all_groups, "gridVerMap", None)
     if not grid_map and isinstance(all_groups, dict):
@@ -203,7 +239,14 @@ class SingleTabRunner:
             bot = ZaloAPI("api", "secret", imei, cookies)
             self.add_log(f"[{acc_label}] Khởi tạo bot Zalo thành công. Mục tiêu: {group_name} ({group_id})", "info")
         except Exception as e:
-            self.add_log(f"[{acc_label}] Lỗi khởi tạo ZaloAPI: {e}", "error")
+            err_msg = str(e)
+            if "NoneType" in err_msg or "logging in" in err_msg or "secret key" in err_msg:
+                self.add_log(
+                    f"[{acc_label}] Lỗi đăng nhập: Cookie/IMEI không hợp lệ hoặc phiên đăng nhập đã hết hạn! Vui lòng lấy lại Cookie (zpw_sek) mới trên chat.zalo.me",
+                    "error"
+                )
+            else:
+                self.add_log(f"[{acc_label}] Lỗi khởi tạo ZaloAPI: {err_msg}", "error")
             return
 
         lines = [ln for ln in message_text.splitlines() if ln]
