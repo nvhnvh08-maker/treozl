@@ -270,10 +270,14 @@
                         </div>
                     </div>
                     <div id="vungTabDanhSachAccs" style="margin-top: 14px;"></div>
-                    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--card-border);">
-                        <button type="button" class="btn-glow btn-outline" style="width: 100%;" id="btnTabLayNhom" onclick="tabLayDanhSachNhom()">
+                    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--card-border); display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="btn-glow btn-outline" style="width: 100%;" id="btnTabLayNhom" onclick="tabLayDanhSachNhomTheoAcc(0)">
                             <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
                             Lấy danh sách nhóm từ Acc #1
+                        </button>
+                        <button type="button" class="btn-glow btn-outline" style="width: 100%; color: var(--neon-cyan); border-color: rgba(0, 240, 255, 0.35);" onclick="dongBoNhomChoTatCaAcc()">
+                            <i data-lucide="copy-check" style="width: 15px; height: 15px;"></i>
+                            ⚡ Dùng nhóm của Acc #1 cho tất cả các Acc
                         </button>
                     </div>
                 </div>
@@ -285,11 +289,11 @@
                         Bước 2: Nhóm, File Ngôn & Màu Sắc
                     </h3>
                     <div class="form-row">
-                        <label>Chọn nhóm Zalo muốn treo:</label>
-                        <select id="selectTabNhomZalo">
-                            <option value="">-- Bấm "Lấy danh sách nhóm từ Acc #1" trước --</option>
+                        <label>Nhóm Zalo mặc định chung (hoặc chọn riêng từng Acc bên trái):</label>
+                        <select id="selectTabNhomZalo" onchange="doiNhomChung(this.value)">
+                            <option value="">-- Bấm "Lấy danh sách nhóm" hoặc nhập ID --</option>
                         </select>
-                        <input type="text" id="inputTabManualGroupId" placeholder="Hoặc tự gõ ID nhóm Zalo vào đây..." style="margin-top: 6px;">
+                        <input type="text" id="inputTabManualGroupId" placeholder="Hoặc tự gõ ID nhóm Zalo chung vào đây..." style="margin-top: 6px;" oninput="nhapTayNhomChung(this.value)">
                     </div>
                     <div class="form-row">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -308,8 +312,8 @@
                             <input type="number" id="inputTabDelay" value="5" min="1" max="3600">
                         </div>
                         <div>
-                            <label>Size chữ (tối đa 500):</label>
-                            <input type="number" id="inputTabFontSize" value="500" min="10" max="500">
+                            <label>Size chữ (tùy chỉnh không giới hạn):</label>
+                            <input type="number" id="inputTabFontSize" value="500" min="1" placeholder="Ví dụ: 500, 1000, 5000, 10000...">
                         </div>
                     </div>
                     <div class="form-row">

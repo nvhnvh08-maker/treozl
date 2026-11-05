@@ -196,12 +196,26 @@ async def api_start_tab(tab_id: str, payload: Dict[str, Any], user: Dict[str, An
 
     if not accounts:
         return JSONResponse(status_code=400, content={"success": False, "message": "Vui lòng cấu hình ít nhất 1 tài khoản"})
-    if not group_id:
-        return JSONResponse(status_code=400, content={"success": False, "message": "Vui lòng chọn nhóm Zalo để treo"})
+
+    # Kiểm tra xem có nhóm chung hoặc bất kỳ tài khoản nào đã chọn nhóm chưa
+    has_any_group = bool(group_id) or any(bool(str(acc.get("group_id", "")).strip()) for acc in accounts)
+    if not has_any_group:
+        return JSONResponse(status_code=400, content={"success": False, "message": "Vui lòng chọn hoặc nhập nhóm Zalo để treo"})
+
+    # Nếu không có group_id chung, lấy nhóm của tài khoản đầu tiên làm đại diện
+    if not group_id and accounts:
+        for acc in accounts:
+            if acc.get("group_id"):
+                group_id = str(acc["group_id"]).strip()
+                group_name = str(acc.get("group_name", "")).strip() or f"Nhóm {group_id}"
+                break
+
     if not message_text:
         return JSONResponse(status_code=400, content={"success": False, "message": "Vui lòng nhập hoặc tải file ngôn (.txt)"})
     if delay < 1:
         delay = 1
+    if font_size < 1:
+        font_size = 500
 
     new_cfg = {
         "accounts": accounts,

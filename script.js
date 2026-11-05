@@ -457,40 +457,82 @@ function renderTabFormAccs(presetAccs) {
 
     let html = "";
     for (let i = 0; i < count; i++) {
-        const imeiVal = (presetAccs && presetAccs[i]) ? presetAccs[i].imei : (document.getElementById(`tab_acc_imei_${i}`)?.value || "");
-        const cookieVal = (presetAccs && presetAccs[i]) ? presetAccs[i].cookie : (document.getElementById(`tab_acc_cookie_${i}`)?.value || "");
+        const accData = (presetAccs && presetAccs[i]) ? presetAccs[i] : null;
+        const imeiVal = accData ? (accData.imei || "") : (document.getElementById(`tab_acc_imei_${i}`)?.value || "");
+        const cookieVal = accData ? (accData.cookie || "") : (document.getElementById(`tab_acc_cookie_${i}`)?.value || "");
+        const groupIdVal = accData ? (accData.group_id || "") : (document.getElementById(`tab_acc_group_id_${i}`)?.value || "");
+        const groupNameVal = accData ? (accData.group_name || "") : (document.getElementById(`tab_acc_group_name_${i}`)?.value || "");
 
         html += `
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; margin-bottom: 10px;">
-            <div style="font-size: 0.82rem; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">
-                Tài khoản #${i + 1} ${i === 0 ? '<span style="font-size: 0.7rem; background: rgba(0,132,255,0.2); padding: 2px 6px; border-radius: 4px; margin-left: 6px;">Acc chính lấy nhóm</span>' : ''}
+        <div class="acc-config-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="user-check" style="width: 16px; height: 16px;"></i>
+                    Tài khoản #${i + 1}
+                </div>
+                ${i === 0 ? `
+                <button type="button" class="btn-glow btn-outline" style="padding: 3px 8px; font-size: 0.72rem; color: var(--neon-cyan); border-color: rgba(0, 240, 255, 0.35);" onclick="dongBoNhomChoTatCaAcc()" title="Sao chép nhóm của Acc #1 cho tất cả các Acc còn lại">
+                    ⚡ Dùng nhóm này cho tất cả Acc
+                </button>
+                ` : ''}
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-                <input type="text" id="tab_acc_imei_${i}" value="${imeiVal}" placeholder="IMEI Acc #${i + 1}..." required>
-                <textarea id="tab_acc_cookie_${i}" style="min-height: 50px; font-size: 0.78rem;" placeholder="Cookie Acc #${i + 1} (dạng JSON hoặc chuỗi cookie)..." required>${cookieVal}</textarea>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div>
+                    <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">IMEI:</label>
+                    <input type="text" id="tab_acc_imei_${i}" value="${escapeHtml(imeiVal)}" placeholder="IMEI Acc #${i + 1}..." required>
+                </div>
+                <div>
+                    <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">Cookie (JSON hoặc chuỗi):</label>
+                    <textarea id="tab_acc_cookie_${i}" style="min-height: 48px; font-size: 0.76rem;" placeholder="Cookie Acc #${i + 1}..." required>${escapeHtml(cookieVal)}</textarea>
+                </div>
+
+                <!-- CẤU HÌNH NHÓM RIÊNG CHO ACC NÀY -->
+                <div class="acc-group-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 0.76rem; font-weight: 600; color: var(--neon-cyan);">🎯 Nhóm của Acc #${i + 1}:</span>
+                        <button type="button" class="btn-glow btn-outline" id="btnLayNhomAcc_${i}" style="padding: 3px 8px; font-size: 0.72rem;" onclick="tabLayDanhSachNhomTheoAcc(${i})">
+                            <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i>
+                            Lấy nhóm của Acc #${i + 1}
+                        </button>
+                    </div>
+                    <select id="tab_acc_select_group_${i}" onchange="doiNhomAcc(${i})" style="margin-bottom: 6px; font-size: 0.8rem;">
+                        <option value="">${groupIdVal ? (escapeHtml(groupNameVal) || ('Nhóm ' + escapeHtml(groupIdVal))) : '-- Bấm nút "Lấy nhóm" hoặc nhập ID bên dưới --'}</option>
+                    </select>
+                    <input type="text" id="tab_acc_group_id_${i}" value="${escapeHtml(groupIdVal)}" placeholder="ID nhóm Zalo của Acc #${i + 1}..." style="font-size: 0.8rem;" oninput="nhapTayNhomAcc(${i})">
+                    <input type="hidden" id="tab_acc_group_name_${i}" value="${escapeHtml(groupNameVal)}">
+                </div>
             </div>
         </div>
         `;
     }
     container.innerHTML = html;
+    lucide.createIcons();
 }
 
-async function tabLayDanhSachNhom() {
-    const imeiEl = document.getElementById("tab_acc_imei_0");
-    const cookieEl = document.getElementById("tab_acc_cookie_0");
-    const btn = document.getElementById("btnTabLayNhom");
+async function tabLayDanhSachNhomTheoAcc(accIndex) {
+    const imeiEl = document.getElementById(`tab_acc_imei_${accIndex}`);
+    const cookieEl = document.getElementById(`tab_acc_cookie_${accIndex}`);
+    const btn = document.getElementById(`btnLayNhomAcc_${accIndex}`);
+    const btnChung = (accIndex === 0) ? document.getElementById("btnTabLayNhom") : null;
 
     if (!imeiEl || !imeiEl.value.trim()) {
-        alert("Vui lòng nhập IMEI của Acc #1!");
+        alert(`Vui lòng nhập IMEI của Acc #${accIndex + 1}!`);
         return;
     }
     if (!cookieEl || !cookieEl.value.trim()) {
-        alert("Vui lòng nhập Cookie của Acc #1!");
+        alert(`Vui lòng nhập Cookie của Acc #${accIndex + 1}!`);
         return;
     }
 
-    btn.disabled = true;
-    btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Đang tải nhóm từ Zalo...`;
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 12px; height: 12px;"></i> Đang tải...`;
+    }
+    if (btnChung) {
+        btnChung.disabled = true;
+        btnChung.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 15px; height: 15px;"></i> Đang tải nhóm...`;
+    }
     lucide.createIcons();
 
     try {
@@ -508,27 +550,114 @@ async function tabLayDanhSachNhom() {
 
         const data = await res.json();
         if (data.success && data.groups) {
-            const selectEl = document.getElementById("selectTabNhomZalo");
+            const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
             if (data.groups.length === 0) {
-                selectEl.innerHTML = `<option value="">Không tìm thấy nhóm nào</option>`;
-                alert("Acc #1 không tham gia nhóm nào");
+                if (selectEl) selectEl.innerHTML = `<option value="">Acc #${accIndex + 1} không tham gia nhóm nào</option>`;
+                alert(`Acc #${accIndex + 1} không tham gia nhóm nào!`);
             } else {
-                let optHtml = `<option value="">-- Chọn 1 nhóm trong danh sách (${data.groups.length} nhóm) --</option>`;
+                let optHtml = `<option value="">-- Chọn 1 nhóm (${data.groups.length} nhóm tìm thấy) --</option>`;
                 data.groups.forEach(g => {
-                    optHtml += `<option value="${g.id}">${g.name} (ID: ${g.id})</option>`;
+                    optHtml += `<option value="${escapeHtml(g.id)}" data-name="${escapeHtml(g.name)}">${escapeHtml(g.name)} (ID: ${escapeHtml(g.id)})</option>`;
                 });
-                selectEl.innerHTML = optHtml;
-                alert(`Đã tải thành công ${data.groups.length} nhóm Zalo!`);
+                if (selectEl) selectEl.innerHTML = optHtml;
+
+                // Nếu là Acc 0, cập nhật cả select nhóm chung
+                if (accIndex === 0) {
+                    const selectChung = document.getElementById("selectTabNhomZalo");
+                    if (selectChung) selectChung.innerHTML = optHtml;
+                }
+
+                alert(`Đã tải thành công ${data.groups.length} nhóm của Acc #${accIndex + 1}!`);
             }
         } else {
-            alert(data.message || "Không thể tải nhóm Zalo");
+            alert(data.message || `Không thể tải nhóm của Acc #${accIndex + 1}`);
         }
     } catch(e) {
         alert("Lỗi kết nối Zalo: " + e);
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i> Lấy danh sách nhóm từ Acc #1`;
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Lấy nhóm của Acc #${accIndex + 1}`;
+        }
+        if (btnChung) {
+            btnChung.disabled = false;
+            btnChung.innerHTML = `<i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i> Lấy danh sách nhóm từ Acc #1`;
+        }
         lucide.createIcons();
+    }
+}
+
+function doiNhomAcc(accIndex) {
+    const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
+    const inputId = document.getElementById(`tab_acc_group_id_${accIndex}`);
+    const inputName = document.getElementById(`tab_acc_group_name_${accIndex}`);
+    if (!selectEl || !inputId) return;
+
+    const val = selectEl.value;
+    if (val) {
+        inputId.value = val;
+        const opt = selectEl.options[selectEl.selectedIndex];
+        const gName = opt?.getAttribute("data-name") || opt?.text || ("Nhóm " + val);
+        if (inputName) inputName.value = gName;
+
+        if (accIndex === 0) {
+            const manualChung = document.getElementById("inputTabManualGroupId");
+            if (manualChung) manualChung.value = val;
+            const selectChung = document.getElementById("selectTabNhomZalo");
+            if (selectChung) selectChung.value = val;
+        }
+    }
+}
+
+function nhapTayNhomAcc(accIndex) {
+    const inputId = document.getElementById(`tab_acc_group_id_${accIndex}`);
+    const inputName = document.getElementById(`tab_acc_group_name_${accIndex}`);
+    if (inputId && inputName) {
+        inputName.value = "Nhóm " + inputId.value.trim();
+    }
+}
+
+function dongBoNhomChoTatCaAcc() {
+    const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
+    const gid0 = document.getElementById("tab_acc_group_id_0")?.value.trim() || document.getElementById("inputTabManualGroupId")?.value.trim() || document.getElementById("selectTabNhomZalo")?.value.trim();
+    const gname0 = document.getElementById("tab_acc_group_name_0")?.value.trim() || ("Nhóm " + gid0);
+
+    if (!gid0) {
+        alert("Vui lòng chọn hoặc nhập ID nhóm cho Acc #1 trước khi đồng bộ!");
+        return;
+    }
+
+    for (let i = 1; i < count; i++) {
+        const inputId = document.getElementById(`tab_acc_group_id_${i}`);
+        const inputName = document.getElementById(`tab_acc_group_name_${i}`);
+        const selectEl = document.getElementById(`tab_acc_select_group_${i}`);
+        if (inputId) inputId.value = gid0;
+        if (inputName) inputName.value = gname0;
+        if (selectEl) {
+            selectEl.innerHTML = `<option value="${escapeHtml(gid0)}" selected>${escapeHtml(gname0)} (ID: ${escapeHtml(gid0)})</option>`;
+        }
+    }
+    alert(`Đã áp dụng nhóm [${gname0}] cho tất cả ${count} tài khoản!`);
+}
+
+function doiNhomChung(val) {
+    const manualChung = document.getElementById("inputTabManualGroupId");
+    if (manualChung) manualChung.value = val;
+    // Đồng bộ sang Acc #0 nếu Acc #0 chưa có nhóm
+    const gid0 = document.getElementById("tab_acc_group_id_0");
+    if (gid0 && !gid0.value.trim()) {
+        gid0.value = val;
+        const selectChung = document.getElementById("selectTabNhomZalo");
+        const gName = selectChung?.options[selectChung.selectedIndex]?.text || ("Nhóm " + val);
+        const name0 = document.getElementById("tab_acc_group_name_0");
+        if (name0) name0.value = gName;
+    }
+}
+
+function nhapTayNhomChung(val) {
+    const gid0 = document.getElementById("tab_acc_group_id_0");
+    if (gid0 && !gid0.value.trim()) {
+        gid0.value = val;
     }
 }
 
@@ -609,10 +738,38 @@ async function tabBatDauTreo() {
 
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const accounts = [];
+
+    // Nhóm mặc định chung (nếu có)
+    let defaultGroupId = (document.getElementById("inputTabManualGroupId")?.value || "").trim() || (document.getElementById("selectTabNhomZalo")?.value || "").trim();
+    let defaultGroupName = "";
+    const selectChung = document.getElementById("selectTabNhomZalo");
+    if (selectChung && selectChung.selectedIndex >= 0 && selectChung.options[selectChung.selectedIndex]) {
+        defaultGroupName = selectChung.options[selectChung.selectedIndex].getAttribute("data-name") || selectChung.options[selectChung.selectedIndex].text;
+    }
+    if (!defaultGroupName && defaultGroupId) {
+        defaultGroupName = "Nhóm " + defaultGroupId;
+    }
+
     for (let i = 0; i < count; i++) {
         const imei = (document.getElementById(`tab_acc_imei_${i}`)?.value || "").trim();
         const cookie = (document.getElementById(`tab_acc_cookie_${i}`)?.value || "").trim();
-        if (imei && cookie) accounts.push({ imei, cookie });
+        let accGid = (document.getElementById(`tab_acc_group_id_${i}`)?.value || "").trim();
+        let accGname = (document.getElementById(`tab_acc_group_name_${i}`)?.value || "").trim();
+
+        // Nếu acc này chưa chọn nhóm riêng, fallback về nhóm mặc định chung
+        if (!accGid && defaultGroupId) {
+            accGid = defaultGroupId;
+            accGname = defaultGroupName;
+        }
+
+        if (imei && cookie) {
+            accounts.push({
+                imei,
+                cookie,
+                group_id: accGid,
+                group_name: accGname || (accGid ? ("Nhóm " + accGid) : "")
+            });
+        }
     }
 
     if (accounts.length === 0) {
@@ -620,21 +777,10 @@ async function tabBatDauTreo() {
         return;
     }
 
-    let groupId = document.getElementById("selectTabNhomZalo").value;
-    let groupName = "";
-    const selectEl = document.getElementById("selectTabNhomZalo");
-    if (selectEl.selectedIndex >= 0 && selectEl.options[selectEl.selectedIndex]) {
-        groupName = selectEl.options[selectEl.selectedIndex].text;
-    }
-
-    const manualId = document.getElementById("inputTabManualGroupId").value.trim();
-    if (manualId) {
-        groupId = manualId;
-        groupName = "Nhóm " + manualId;
-    }
-
-    if (!groupId) {
-        alert("Vui lòng chọn 1 nhóm từ danh sách hoặc nhập ID nhóm vào ô bên dưới!");
+    // Kiểm tra xem đã có nhóm nào được chọn hay chưa
+    const coNhom = accounts.some(a => Boolean(a.group_id)) || Boolean(defaultGroupId);
+    if (!coNhom) {
+        alert("Vui lòng chọn hoặc nhập nhóm Zalo cho các tài khoản!");
         return;
     }
 
@@ -661,8 +807,8 @@ async function tabBatDauTreo() {
             },
             body: JSON.stringify({
                 accounts,
-                group_id: groupId,
-                group_name: groupName,
+                group_id: defaultGroupId || accounts[0].group_id,
+                group_name: defaultGroupName || accounts[0].group_name,
                 message_text: messageText,
                 delay,
                 color_mode: colorMode,

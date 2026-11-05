@@ -195,13 +195,13 @@ class SingleTabRunner:
         self.stop_event.set()
         self.add_log("⏹️ Đã phát lệnh dừng tiến trình treo text của tab này.", "warning")
 
-    def _worker(self, acc_index: int, imei: str, cookies: dict, group_id: str,
+    def _worker(self, acc_index: int, imei: str, cookies: dict, group_id: str, group_name: str,
                 message_text: str, delay: int, color_mode: str, chosen_color: str,
                 font_size: int, ttl: Optional[int]):
         acc_label = f"Acc #{acc_index + 1}"
         try:
             bot = ZaloAPI("api", "secret", imei, cookies)
-            self.add_log(f"[{acc_label}] Khởi tạo bot Zalo thành công.", "info")
+            self.add_log(f"[{acc_label}] Khởi tạo bot Zalo thành công. Mục tiêu: {group_name} ({group_id})", "info")
         except Exception as e:
             self.add_log(f"[{acc_label}] Lỗi khởi tạo ZaloAPI: {e}", "error")
             return
@@ -253,13 +253,13 @@ class SingleTabRunner:
                 self.stats["total_sent"] += 1
                 preview = lines[0][:26] + ("..." if len(lines[0]) > 26 else "")
                 self.add_log(
-                    f"[{acc_label}] Lượt #{loop_count}: Đã gửi toàn bộ ngôn ({len(lines)} dòng) vào nhóm {group_id} [Màu: {line_color}] - \"{preview}\"",
+                    f"[{acc_label}] Lượt #{loop_count}: Đã gửi toàn bộ ngôn ({len(lines)} dòng) vào {group_name} ({group_id}) [Size: {font_size} | Màu: {line_color}] - \"{preview}\"",
                     "success"
                 )
 
             except Exception as e:
                 self.stats["total_failed"] += 1
-                self.add_log(f"[{acc_label}] Gửi thất bại lượt #{loop_count}: {e}", "error")
+                self.add_log(f"[{acc_label}] Gửi thất bại lượt #{loop_count} (Nhóm: {group_id}): {e}", "error")
 
             # Delay giữa các lần gửi (ngắt quãng để dừng ngay khi người dùng bấm Stop)
             sleep_chunks = max(int(delay * 10), 1)
@@ -270,7 +270,7 @@ class SingleTabRunner:
 
         self.add_log(f"[{acc_label}] Luồng đã dừng hoàn toàn.", "warning")
 
-    def start(self, accounts: List[Dict[str, str]], group_id: str, group_name: str,
+    def start(self, accounts: List[Dict[str, Any]], group_id: str, group_name: str,
               message_text: str, delay: int = 5, color_mode: str = "random_line",
               chosen_color: str = "#DB342E", font_size: int = 500, ttl: Optional[int] = None) -> bool:
         if self.is_running:
@@ -282,8 +282,6 @@ class SingleTabRunner:
 
         if not accounts:
             raise ValueError("Không có tài khoản nào được cấu hình")
-        if not group_id:
-            raise ValueError("Chưa chọn nhóm Zalo để treo")
         if not message_text.strip():
             raise ValueError("Nội dung ngôn không được để trống")
 
@@ -296,15 +294,16 @@ class SingleTabRunner:
             "acc_count": len(accounts),
             "target_group": group_id,
             "target_group_name": group_name or group_id,
-            "color_info": f"{color_mode} ({chosen_color if color_mode == 'fixed' else 'Ngẫu nhiên'})"
+            "color_info": f"{color_mode} ({chosen_color if color_mode == 'fixed' else 'Ngẫu nhiên'}) | Size: {font_size}"
         }
         self.active_threads = []
 
         self.add_log(
-            f"🚀 BẮT ĐẦU TAB: [{self.name}] | {len(accounts)} Acc -> Nhóm: {self.stats['target_group_name']} | Delay: {delay}s",
+            f"🚀 BẮT ĐẦU TAB: [{self.name}] | {len(accounts)} Acc | Size chữ: {font_size} | Delay: {delay}s",
             "info"
         )
 
+        valid_thread_count = 0
         for idx, acc in enumerate(accounts):
             imei = acc.get("imei", "").strip()
             cookies = parse_cookies_input(acc.get("cookie", ""))
@@ -312,13 +311,26 @@ class SingleTabRunner:
                 self.add_log(f"[Acc #{idx+1}] Bỏ qua vì thiếu IMEI hoặc Cookie hợp lệ", "warning")
                 continue
 
+            # Ưu tiên nhóm cấu hình riêng cho tài khoản này, nếu không có mới dùng nhóm chung
+            acc_gid = str(acc.get("group_id") or "").strip() or group_id
+            acc_gname = str(acc.get("group_name") or "").strip() or (group_name if acc_gid == group_id else f"Nhóm {acc_gid}")
+
+            if not acc_gid:
+                self.add_log(f"[Acc #{idx+1}] Bỏ qua vì chưa cấu hình nhóm Zalo", "warning")
+                continue
+
             t = threading.Thread(
                 target=self._worker,
-                args=(idx, imei, cookies, group_id, message_text, delay, color_mode, chosen_color, font_size, ttl),
+                args=(idx, imei, cookies, acc_gid, acc_gname, message_text, delay, color_mode, chosen_color, font_size, ttl),
                 daemon=True
             )
             t.start()
             self.active_threads.append(t)
+            valid_thread_count += 1
+
+        if valid_thread_count == 0:
+            self.is_running = False
+            raise ValueError("Không có tài khoản nào đủ điều kiện khởi chạy (kiểm tra lại IMEI, Cookie hoặc nhóm chọn)")
 
         return True
 
