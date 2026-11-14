@@ -20,8 +20,32 @@
 </head>
 <body>
 
+    <!-- Các quả cầu ánh sáng nền lỏng PinUI Ambient Glow -->
+    <div class="pinui-ambient-orb pinui-orb-1"></div>
+    <div class="pinui-ambient-orb pinui-orb-2"></div>
+    <div class="pinui-ambient-orb pinui-orb-3"></div>
+
     <!-- Canvas hạt 3D lơ lửng toàn trang -->
     <canvas id="canvas3dBg"></canvas>
+
+    <!-- ==============================================================
+         MODAL THÔNG BÁO GLASS LIQUID CAO CẤP (PINUI DIALOG)
+    ============================================================== -->
+    <div id="glassModalAlert" class="glass-modal-backdrop" style="display: none;" onclick="dongGlassModal(event)">
+        <div class="glass-modal-card" onclick="event.stopPropagation()">
+            <div class="glass-modal-icon" id="glassModalIcon">
+                <i data-lucide="info" style="width: 28px; height: 28px;"></i>
+            </div>
+            <h3 id="glassModalTitle" class="glass-modal-title">Thông Báo Hệ Thống</h3>
+            <div id="glassModalMessage" class="glass-modal-message"></div>
+            <div class="glass-modal-actions">
+                <button type="button" class="btn-glow btn-primary" onclick="dongGlassModal()" style="min-width: 130px; padding: 11px 22px;">
+                    <i data-lucide="check-circle-2" style="width: 17px; height: 17px;"></i>
+                    ĐÃ HIỂU
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- ==============================================================
          1. MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ (KHÔNG CÓ TÀI KHOẢN MẶC ĐỊNH)

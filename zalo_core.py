@@ -14,10 +14,81 @@ import threading
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
+import os
+import sys
+import time
+import json
+import random
+import threading
+from datetime import datetime
+from typing import List, Dict, Any, Optional
+
 try:
+    import requests
+    import zlapi
     from zlapi import ZaloAPI, ThreadType, Message
     from zlapi.models import MessageStyle, MultiMsgStyle
+    import zlapi._state
+    import zlapi._exception
+    import zlapi._util
     ZALO_AVAILABLE = True
+
+    # ==============================================================
+    # VÁ LỖI AN TOÀN CHO ZLAPI (TRÁNH CRASH 'NONETYPE' KHI COOKIE HẾT HẠN)
+    # ==============================================================
+    def _safe_state_login(self, phone, password, imei, session_cookies=None, user_agent=None):
+        if user_agent:
+            self._headers["User-Agent"] = user_agent
+
+        cookies = getattr(self, "_cookies", None)
+        if not cookies and session_cookies:
+            self.set_cookies(session_cookies)
+            cookies = getattr(self, "_cookies", None)
+
+        if cookies:
+            try:
+                url = f"https://wpa.chat.zalo.me/api/login/getLoginInfo?imei={imei}&type=30&client_version=645&computer_name=Web&ts={zlapi._util.now()}"
+                req_headers = getattr(self, "_headers", getattr(zlapi._util, "HEADERS", {}))
+                response = requests.get(url, headers=req_headers, cookies=cookies, timeout=15)
+                data = response.json()
+
+                login_data = data.get("data")
+                if not login_data or not isinstance(login_data, dict):
+                    err_code = data.get("error_code", "102")
+                    err_msg = data.get("error_message", "Phiên đăng nhập không hợp lệ hoặc đã hết hạn")
+                    raise zlapi._exception.ZaloLoginError(
+                        f"Phiên Zalo hết hạn hoặc IMEI/Cookie không khớp (Mã {err_code}: {err_msg}). "
+                        f"Sếp vui lòng vào chat.zalo.me lấy lại token zpw_sek và IMEI mới!"
+                    )
+
+                zpw = login_data.get("zpw_ws")
+                uid = login_data.get("uid")
+                phone = login_data.get("phone_number")
+                key = login_data.get("zpw_enk")
+
+                self._config = {
+                    "phone_number": str(phone or ""),
+                    "secret_key": str(key or ""),
+                    "send2me_id": str(uid or ""),
+                    "zpw_ws": zpw,
+                }
+
+                if self._config.get("secret_key"):
+                    self._loggedin = True
+                    self.cloud_id = self._config.get("send2me_id")
+                    self.user_imei = imei
+                else:
+                    self._loggedin = False
+                    raise zlapi._exception.ZaloLoginError("Không thể trích xuất secret_key từ Zalo. Vui lòng kiểm tra lại Cookie.")
+            except zlapi._exception.ZaloLoginError:
+                raise
+            except Exception as e:
+                raise zlapi._exception.ZaloLoginError(f"Lỗi phản hồi máy chủ Zalo: {str(e)}")
+        else:
+            raise zlapi._exception.LoginMethodNotSupport("Chưa cung cấp Cookie phiên làm việc hợp lệ")
+
+    zlapi._state.State.login = _safe_state_login
+
 except ImportError:
     ZALO_AVAILABLE = False
 
@@ -45,7 +116,7 @@ def normalize_ttl_value(ttl):
         return t * 1000
     return t
 
-def parse_cookies_input(cookie_raw: Any) -> Dict[str, str]:
+def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str, str]:
     """Phân tích linh hoạt mọi định dạng Cookie và tự động chuẩn hóa token Zalo"""
     if not cookie_raw:
         return {}
@@ -67,7 +138,7 @@ def parse_cookies_input(cookie_raw: Any) -> Dict[str, str]:
         if (cookie_str.startswith("{") and cookie_str.endswith("}")) or (cookie_str.startswith("[") and cookie_str.endswith("]")):
             try:
                 parsed = json.loads(cookie_str)
-                res = parse_cookies_input(parsed)
+                res = parse_cookies_input(parsed, imei=imei)
             except Exception:
                 pass
 
@@ -100,6 +171,10 @@ def parse_cookies_input(cookie_raw: Any) -> Dict[str, str]:
     if "zpw_sek" in res:
         res["zpw_sek"] = str(res["zpw_sek"]).strip('"\'')
 
+    # Tự động đồng bộ cookie z_uuid theo imei nếu thiếu
+    if imei and str(imei).strip() and "z_uuid" not in res:
+        res["z_uuid"] = str(imei).strip()
+
     return res
 
 def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
@@ -108,7 +183,7 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
         raise RuntimeError("Thư viện zlapi chưa được cài đặt. Vui lòng cài: pip install zlapi")
 
     imei = str(imei).strip()
-    cookies = parse_cookies_input(cookie_raw)
+    cookies = parse_cookies_input(cookie_raw, imei=imei)
     if not imei:
         raise ValueError("IMEI không được để trống")
     if not cookies:
@@ -349,7 +424,7 @@ class SingleTabRunner:
         valid_thread_count = 0
         for idx, acc in enumerate(accounts):
             imei = acc.get("imei", "").strip()
-            cookies = parse_cookies_input(acc.get("cookie", ""))
+            cookies = parse_cookies_input(acc.get("cookie", ""), imei=imei)
             if not imei or not cookies:
                 self.add_log(f"[Acc #{idx+1}] Bỏ qua vì thiếu IMEI hoặc Cookie hợp lệ", "warning")
                 continue

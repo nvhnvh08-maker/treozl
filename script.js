@@ -113,6 +113,42 @@ function khoiTao3DParticles() {
 }
 
 // ==========================================
+// THÔNG BÁO GLASS MODAL CAO CẤP PINUI
+// ==========================================
+function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
+    const modal = document.getElementById("glassModalAlert");
+    if (!modal) {
+        alert(noiDung);
+        return;
+    }
+    const titleEl = document.getElementById("glassModalTitle");
+    const msgEl = document.getElementById("glassModalMessage");
+    const iconEl = document.getElementById("glassModalIcon");
+
+    if (titleEl) titleEl.textContent = tieuDe || "Thông Báo Hệ Thống";
+    if (msgEl) msgEl.textContent = noiDung || "";
+
+    if (iconEl) {
+        iconEl.className = "glass-modal-icon " + loai;
+        let iconName = "info";
+        if (loai === "error") iconName = "alert-triangle";
+        else if (loai === "success") iconName = "check-circle-2";
+        iconEl.innerHTML = `<i data-lucide="${iconName}" style="width: 28px; height: 28px;"></i>`;
+    }
+
+    modal.style.display = "flex";
+    lucide.createIcons();
+}
+
+function dongGlassModal(e) {
+    if (e && e.target && e.target.closest && e.target.closest(".glass-modal-card") && e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
+        return;
+    }
+    const modal = document.getElementById("glassModalAlert");
+    if (modal) modal.style.display = "none";
+}
+
+// ==========================================
 // 2. AUTHENTICATION (SQLITE DATABASE)
 // ==========================================
 function chuyenCheDoAuth(mode) {
@@ -180,10 +216,14 @@ async function xuLyXacThuc(e) {
             localStorage.setItem("zalo_web_user", tenNguoiDung);
             hienThiAppChinh();
         } else {
-            alert(data.message || "Xác thực thất bại");
+            hienThiThongBaoGlass(
+                cheDoAuth === "login" ? "Đăng Nhập Thất Bại" : "Đăng Ký Thất Bại",
+                data.message || "Tài khoản hoặc mật khẩu không hợp lệ",
+                "error"
+            );
         }
     } catch (err) {
-        alert("Lỗi kết nối máy chủ: " + err);
+        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể kết nối máy chủ: " + err, "error");
     } finally {
         btn.disabled = false;
         chuyenCheDoAuth(cheDoAuth);
@@ -251,11 +291,11 @@ function chuyenTrang(trang) {
 
 function saoChepDiscord(text) {
     navigator.clipboard.writeText(text);
-    alert(`Đã sao chép Discord username: ${text} vào bộ nhớ tạm!`);
+    hienThiThongBaoGlass("Đã Sao Chép", `Đã sao chép Discord: "${text}" vào bộ nhớ tạm!`, "success");
 }
 
 // ==============================================================
-// 4. QUẢN LÝ TAB DẠNG HÌNH NGANG (FULL VIỀN XANH / ĐỎ)
+// 4. QUẢN LÝ TAB DẠNG HÌNH NGANG (PINUI LIQUID GLASS)
 // ==============================================================
 async function taiDanhSachTabs() {
     if (!maToken) return;
@@ -280,12 +320,16 @@ function renderDanhSachTabsNgang(tabs) {
 
     if (tabs.length === 0) {
         container.innerHTML = `
-            <div class="card-3d" style="text-align: center; padding: 50px 20px;">
-                <i data-lucide="layers" style="width: 48px; height: 48px; color: #64748b; margin-bottom: 12px;"></i>
-                <h3 style="font-size: 1.15rem; color: #fff;">Chưa có tab nào được tạo</h3>
-                <p style="color: var(--text-muted); margin-top: 6px; margin-bottom: 20px;">Sếp bấm vào nút bên dưới để tạo tab mới nhé!</p>
-                <button class="btn-glow btn-primary" onclick="chuyenTrang('tao-tab')">
-                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+            <div class="card-3d" style="text-align: center; padding: 50px 24px;">
+                <div class="logo-icon-3d" style="margin: 0 auto 16px; width: 56px; height: 56px;">
+                    <i data-lucide="layers" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff;">Chưa Có Tab Treo Text Nào</h3>
+                <p style="color: var(--text-muted); margin-top: 6px; margin-bottom: 24px; font-size: 0.9rem;">
+                    Hệ thống sẵn sàng chạy song song nhiều tab không giới hạn. Sếp bấm nút bên dưới để tạo tab mới nhé!
+                </p>
+                <button class="btn-glow btn-primary" onclick="chuyenTrang('tao-tab')" style="padding: 12px 24px; font-size: 0.95rem;">
+                    <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
                     Tạo Tab Mới Ngay
                 </button>
             </div>
@@ -296,21 +340,39 @@ function renderDanhSachTabsNgang(tabs) {
 
     let html = "";
     tabs.forEach(t => {
-        // QUY TẮC CỦA SẾP:
-        // ĐANG CHẠY -> FULL VIỀN NGANG MÀU XANH LÁ (.running)
-        // KHÔNG CHẠY -> FULL VIỀN NGANG MÀU ĐỎ (.stopped)
+        // ==============================================================
+        // QUY TẮC CỦA SẾP (TUYỆT ĐỐI CHÍNH XÁC):
+        // ĐANG CHẠY: FULL VIỀN NGANG MÀU XANH LÁ (.running)
+        // KHÔNG CHẠY: FULL VIỀN NGANG MÀU ĐỎ (.stopped)
+        // ==============================================================
         const classVien = t.is_running ? "running" : "stopped";
+
         const badgeTrangThai = t.is_running 
-            ? `<span style="color: #34d399; font-weight: 700; font-size: 0.8rem;">⚡ ĐANG CHẠY (${t.runtime_formatted || '00:00:00'})</span>`
-            : `<span style="color: #f87171; font-weight: 700; font-size: 0.8rem;">⏹ ĐÃ DỪNG</span>`;
+            ? `<span class="tab-meta-pill" style="color: #34d399; border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.14);">
+                 <i data-lucide="zap" style="width: 13px; height: 13px;"></i>
+                 ĐANG CHẠY (${t.runtime_formatted || '00:00:00'})
+               </span>`
+            : `<span class="tab-meta-pill" style="color: #f87171; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.1);">
+                 <i data-lucide="stop-circle" style="width: 13px; height: 13px;"></i>
+                 ĐÃ DỪNG
+               </span>`;
 
         const iconTrangThai = t.is_running
-            ? `<i data-lucide="activity" style="width: 22px; height: 22px;"></i>`
-            : `<i data-lucide="pause-circle" style="width: 22px; height: 22px;"></i>`;
+            ? `<div style="position: relative;">
+                 <i data-lucide="activity" style="width: 24px; height: 24px;"></i>
+                 <span class="pulse-radar-dot"></span>
+               </div>`
+            : `<i data-lucide="pause-circle" style="width: 24px; height: 24px;"></i>`;
 
         const btnBatDungNhanh = t.is_running
-            ? `<button class="btn-glow btn-danger" onclick="dungNhanhTab('${t.id}')" title="Dừng tab này"><i data-lucide="square" style="width: 14px; height: 14px;"></i> Dừng</button>`
-            : `<button class="btn-glow btn-success" onclick="moChiTietTab('${t.id}')" title="Chạy tab này"><i data-lucide="play" style="width: 14px; height: 14px;"></i> Chạy</button>`;
+            ? `<button class="btn-glow btn-danger" onclick="dungNhanhTab('${t.id}')" title="Dừng tab này ngay">
+                 <i data-lucide="square" style="width: 14px; height: 14px;"></i>
+                 Dừng
+               </button>`
+            : `<button class="btn-glow btn-success" onclick="moChiTietTab('${t.id}')" title="Chạy tab này ngay">
+                 <i data-lucide="play" style="width: 14px; height: 14px;"></i>
+                 Chạy
+               </button>`;
 
         html += `
         <div class="tab-horizontal-card ${classVien}">
@@ -319,12 +381,23 @@ function renderDanhSachTabsNgang(tabs) {
                     ${iconTrangThai}
                 </div>
                 <div>
-                    <div class="tab-name-title">${escapeHtml(t.name)}</div>
+                    <div class="tab-name-title">
+                        <span>${escapeHtml(t.name)}</span>
+                    </div>
                     <div class="tab-meta-desc">
                         ${badgeTrangThai}
-                        <span>👥 ${t.acc_count || 1} Acc</span>
-                        <span>📤 Đã gửi: <strong style="color: #fff;">${t.total_sent || 0}</strong></span>
-                        <span>🎯 Nhóm: <strong style="color: #fff;">${escapeHtml(t.target_group_name || 'Chưa chọn')}</strong></span>
+                        <span class="tab-meta-pill">
+                            <i data-lucide="users" style="width: 13px; height: 13px;"></i>
+                            ${t.acc_count || 1} Acc
+                        </span>
+                        <span class="tab-meta-pill">
+                            <i data-lucide="send" style="width: 13px; height: 13px; color: #38bdf8;"></i>
+                            Đã gửi: <strong style="color: #fff; margin-left: 2px;">${t.total_sent || 0}</strong>
+                        </span>
+                        <span class="tab-meta-pill">
+                            <i data-lucide="message-square" style="width: 13px; height: 13px; color: #a78bfa;"></i>
+                            Nhóm: <strong style="color: #fff; margin-left: 2px;">${escapeHtml(t.target_group_name || 'Chưa chọn')}</strong>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -351,7 +424,7 @@ async function xuLyTaoTabMoi(e) {
     e.preventDefault();
     const tenTab = document.getElementById("inputTenTabMoi").value.trim();
     if (!tenTab) {
-        alert("Vui lòng nhập tên tab");
+        hienThiThongBaoGlass("Lỗi", "Vui lòng nhập tên tab mới!", "error");
         return;
     }
 
@@ -366,14 +439,14 @@ async function xuLyTaoTabMoi(e) {
         });
         const data = await res.json();
         if (data.success) {
-            alert(`Đã tạo tab "${tenTab}" thành công!`);
+            hienThiThongBaoGlass("Tạo Tab Thành Công", `Đã tạo tab "${tenTab}" thành công!`, "success");
             // TỰ ĐỘNG CHUYỂN QUA QUẢN LÝ TAB ĐÚNG YÊU CẦU CỦA SẾP
             chuyenTrang('quan-ly-tab');
         } else {
-            alert(data.message || "Lỗi tạo tab");
+            hienThiThongBaoGlass("Lỗi Tạo Tab", data.message || "Lỗi tạo tab", "error");
         }
     } catch (err) {
-        alert("Lỗi kết nối: " + err);
+        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể tạo tab: " + err, "error");
     }
 }
 
@@ -398,7 +471,7 @@ async function xoaTab(tabId) {
         if (data.success) {
             taiDanhSachTabs();
         } else {
-            alert(data.message || "Không thể xóa tab");
+            hienThiThongBaoGlass("Lỗi Xóa Tab", data.message || "Không thể xóa tab này", "error");
         }
     } catch(e) {}
 }
@@ -421,7 +494,7 @@ async function moChiTietTab(tabId) {
             napDuLieuVaoTabForm(data.tab, data.status);
         }
     } catch(e) {
-        alert("Lỗi khi mở tab: " + e);
+        hienThiThongBaoGlass("Lỗi Mở Tab", "Không thể tải chi tiết tab: " + e, "error");
     }
 }
 
@@ -520,11 +593,11 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
     const btnChung = (accIndex === 0) ? document.getElementById("btnTabLayNhom") : null;
 
     if (!imeiEl || !imeiEl.value.trim()) {
-        alert(`Vui lòng nhập IMEI của Acc #${accIndex + 1}!`);
+        hienThiThongBaoGlass("Thiếu Thông Tin", `Vui lòng nhập IMEI của Acc #${accIndex + 1}!`, "error");
         return;
     }
     if (!cookieEl || !cookieEl.value.trim()) {
-        alert(`Vui lòng nhập Cookie của Acc #${accIndex + 1}!`);
+        hienThiThongBaoGlass("Thiếu Thông Tin", `Vui lòng nhập Cookie của Acc #${accIndex + 1}!`, "error");
         return;
     }
 
@@ -556,7 +629,7 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
             const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
             if (data.groups.length === 0) {
                 if (selectEl) selectEl.innerHTML = `<option value="">Acc #${accIndex + 1} không tham gia nhóm nào</option>`;
-                alert(`Acc #${accIndex + 1} không tham gia nhóm nào!`);
+                hienThiThongBaoGlass("Thông Báo", `Acc #${accIndex + 1} hiện không tham gia nhóm Zalo nào!`, "info");
             } else {
                 let optHtml = `<option value="">-- Chọn 1 nhóm (${data.groups.length} nhóm tìm thấy) --</option>`;
                 data.groups.forEach(g => {
@@ -570,13 +643,13 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
                     if (selectChung) selectChung.innerHTML = optHtml;
                 }
 
-                alert(`Đã tải thành công ${data.groups.length} nhóm của Acc #${accIndex + 1}!`);
+                hienThiThongBaoGlass("Thành Công", `Đã tải thành công ${data.groups.length} nhóm Zalo của Acc #${accIndex + 1}!`, "success");
             }
         } else {
-            alert(data.message || `Không thể tải nhóm của Acc #${accIndex + 1}`);
+            hienThiThongBaoGlass("Lỗi Tải Nhóm Zalo", data.message || `Không thể tải danh sách nhóm của Acc #${accIndex + 1}`, "error");
         }
     } catch(e) {
-        alert("Lỗi kết nối Zalo: " + e);
+        hienThiThongBaoGlass("Lỗi Kết Nối", "Lỗi kết nối tới Zalo hoặc máy chủ: " + e, "error");
     } finally {
         if (btn) {
             btn.disabled = false;
@@ -626,7 +699,7 @@ function dongBoNhomChoTatCaAcc() {
     const gname0 = document.getElementById("tab_acc_group_name_0")?.value.trim() || ("Nhóm " + gid0);
 
     if (!gid0) {
-        alert("Vui lòng chọn hoặc nhập ID nhóm cho Acc #1 trước khi đồng bộ!");
+        hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập ID nhóm Zalo cho Acc #1 trước khi đồng bộ!", "error");
         return;
     }
 
@@ -640,7 +713,7 @@ function dongBoNhomChoTatCaAcc() {
             selectEl.innerHTML = `<option value="${escapeHtml(gid0)}" selected>${escapeHtml(gname0)} (ID: ${escapeHtml(gid0)})</option>`;
         }
     }
-    alert(`Đã áp dụng nhóm [${gname0}] cho tất cả ${count} tài khoản!`);
+    hienThiThongBaoGlass("Đồng Bộ Thành Công", `Đã đồng bộ nhóm [${gname0}] cho tất cả ${count} tài khoản!`, "success");
 }
 
 function doiNhomChung(val) {
@@ -670,7 +743,7 @@ function tabDocFileNgon(e) {
     const reader = new FileReader();
     reader.onload = function(evt) {
         document.getElementById("textareaTabNoiDungNgon").value = evt.target.result;
-        alert(`Đã tải file: ${file.name} (${evt.target.result.split('\n').length} dòng ngôn)`);
+        hienThiThongBaoGlass("Tải File Ngôn Thành Công", `Đã tải file: ${file.name}\nTổng cộng ${evt.target.result.split('\n').length} dòng ngôn sẵn sàng gửi!`, "success");
     };
     reader.readAsText(file, "UTF-8");
 }
@@ -776,20 +849,20 @@ async function tabBatDauTreo() {
     }
 
     if (accounts.length === 0) {
-        alert("Vui lòng nhập đầy đủ IMEI và Cookie của ít nhất 1 tài khoản!");
+        hienThiThongBaoGlass("Thiếu Tài Khoản", "Vui lòng nhập đầy đủ IMEI và Cookie của ít nhất 1 tài khoản!", "error");
         return;
     }
 
     // Kiểm tra xem đã có nhóm nào được chọn hay chưa
     const coNhom = accounts.some(a => Boolean(a.group_id)) || Boolean(defaultGroupId);
     if (!coNhom) {
-        alert("Vui lòng chọn hoặc nhập nhóm Zalo cho các tài khoản!");
+        hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập nhóm Zalo cho các tài khoản!", "error");
         return;
     }
 
     const messageText = document.getElementById("textareaTabNoiDungNgon").value.trim();
     if (!messageText) {
-        alert("Vui lòng nhập nội dung ngôn hoặc bấm 'Chọn File Ngôn (.txt)'!");
+        hienThiThongBaoGlass("Thiếu File Ngôn", "Vui lòng nhập nội dung ngôn hoặc bấm 'Chọn File Ngôn (.txt)'!", "error");
         return;
     }
 
@@ -821,12 +894,12 @@ async function tabBatDauTreo() {
         });
         const data = await res.json();
         if (data.success) {
-            alert("🚀 BẮT ĐẦU TREO TAB THÀNH CÔNG!");
+            hienThiThongBaoGlass("Thành Công", "🚀 BẮT ĐẦU TREO TAB THÀNH CÔNG!\nTiến trình đang chạy ngầm trong tab này.", "success");
         } else {
-            alert(data.message || "Lỗi khởi động tab");
+            hienThiThongBaoGlass("Lỗi Khởi Động Tab", data.message || "Không thể khởi động tab treo", "error");
         }
     } catch(e) {
-        alert("Lỗi kết nối: " + e);
+        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể kết nối máy chủ: " + e, "error");
     } finally {
         btnStart.disabled = false;
     }
@@ -839,7 +912,7 @@ async function tabDungTreo() {
             method: "POST",
             headers: { "Authorization": "Bearer " + maToken }
         });
-        alert("⏹ Đã gửi lệnh dừng tiến trình tab này.");
+        hienThiThongBaoGlass("Đã Dừng Tab", "⏹ Đã gửi lệnh dừng tiến trình treo text của tab này thành công.", "info");
     } catch(e) {}
 }
 
