@@ -90,7 +90,7 @@ function khoiTao3DParticles() {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 }
-function hienThiThongBaoGlassfunction hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
+function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
     const modal = document.getElementById("glassModalAlert");
     if (!modal) {
         alert(noiDung);
