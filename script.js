@@ -161,7 +161,8 @@ function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
         else if (loai === "success") iconName = "check-circle-2";
         iconEl.innerHTML = `<i data-lucide="${iconName}" style="width: 28px; height: 28px;"></i>`;
     }
-    modal.style.display = "flex";
+    modal.classList.add("show");
+    modal.style.setProperty("display", "flex", "important");
     lucide.createIcons();
 }
 function dongGlassModal(e) {
@@ -169,7 +170,11 @@ function dongGlassModal(e) {
         return;
     }
     const modal = document.getElementById("glassModalAlert");
-    if (modal) modal.style.display = "none";
+    if (modal) {
+        modal.classList.remove("show");
+        modal.style.setProperty("display", "none", "important");
+        modal.style.display = "none";
+    }
 }
 function anHienMatKhau() {
     const input = document.getElementById("authPassword");
@@ -207,14 +212,25 @@ function chuyenCheDoAuth(mode) {
     lucide.createIcons();
 }
 function hienThiAuth() {
-    document.getElementById("authBackdrop").style.display = "flex";
-    document.getElementById("mainDashboard").style.display = "none";
+    const authBackdrop = document.getElementById("authBackdrop");
+    if (authBackdrop) {
+        authBackdrop.classList.remove("hidden");
+        authBackdrop.style.setProperty("display", "flex", "important");
+    }
+    const mainDash = document.getElementById("mainDashboard");
+    if (mainDash) mainDash.style.display = "none";
     if (chuKyPolling) clearInterval(chuKyPolling);
 }
 function hienThiAppChinh() {
-    document.getElementById("authBackdrop").style.display = "none";
-    document.getElementById("mainDashboard").style.display = "block";
-    document.getElementById("welcomeUsername").textContent = tenNguoiDung || "Sếp";
+    const authBackdrop = document.getElementById("authBackdrop");
+    if (authBackdrop) {
+        authBackdrop.classList.add("hidden");
+        authBackdrop.style.setProperty("display", "none", "important");
+    }
+    const mainDash = document.getElementById("mainDashboard");
+    if (mainDash) mainDash.style.display = "block";
+    const welcomeUser = document.getElementById("welcomeUsername");
+    if (welcomeUser) welcomeUser.textContent = tenNguoiDung || "Sếp";
     lucide.createIcons();
     chuyenTrang('quan-ly-tab');
     batDauPolling();

@@ -115,12 +115,17 @@ html, body {
     width: 100vw !important;
     height: 100vh !important;
     z-index: 9999 !important;
-    display: flex !important;
+    display: flex;
     align-items: center !important;
     justify-content: center !important;
     padding: 20px !important;
     background: radial-gradient(circle at 50% 25%, rgba(14, 28, 64, 0.8) 0%, rgba(2, 4, 10, 0.95) 75%) !important;
     overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+.auth-backdrop.hidden {
+    display: none !important;
 }
 
 .auth-card-pinui {
@@ -386,14 +391,23 @@ html, body {
 .glass-modal-backdrop {
     position: fixed !important;
     inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
     z-index: 99999 !important;
-    background: rgba(2, 4, 10, 0.75) !important;
+    background: rgba(2, 4, 10, 0.78) !important;
     backdrop-filter: blur(28px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-    display: flex !important;
+    display: none;
     align-items: center !important;
     justify-content: center !important;
     padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+.glass-modal-backdrop.show {
+    display: flex !important;
 }
 
 .glass-modal-card {
