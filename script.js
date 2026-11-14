@@ -1,12 +1,3 @@
-/**
- * ==============================================================
- * ZALO TREO TEXT PRO - MULTI-TAB JAVASCRIPT
- * Tách riêng file logic sạch sẽ, chuẩn lập trình viên thực tế
- * ==============================================================
- */
-
-// Danh sách mã màu tool gốc dangkhiem_1.py:
-// COLOR_LIST = ["#DB342E","#15A85F","#F27806","#F7B503","#FFFFFF","#000000"]
 const TOOL_COLORS = [
     { id: "random_line", ten: "Ngẫu nhiên dòng", hex: "rainbow" },
     { id: "random_msg", ten: "Ngẫu nhiên tin", hex: "dice" },
@@ -17,66 +8,49 @@ const TOOL_COLORS = [
     { id: "#FFFFFF", ten: "Trắng tinh", hex: "#FFFFFF" },
     { id: "#000000", ten: "Đen huyền", hex: "#000000" }
 ];
-
 let maToken = localStorage.getItem("zalo_web_token") || null;
 let tenNguoiDung = localStorage.getItem("zalo_web_user") || "";
 let cheDoAuth = "login";
 let chuKyPolling = null;
-
-// Quản lý tab hiện tại đang mở cấu hình
 let currentEditingTabId = null;
 let currentTabConfig = null;
-
 window.onload = function() {
     lucide.createIcons();
     khoiTao3DParticles();
-
     if (maToken) {
         hienThiAppChinh();
     } else {
         hienThiAuth();
     }
 };
-
-// ==========================================
-// 1. KHỞI TẠO NỀN 3D PARTICLES BẰNG THREE.JS
-// ==========================================
 function khoiTao3DParticles() {
     const canvas = document.getElementById("canvas3dBg");
     if (!canvas || typeof THREE === "undefined") return;
-
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 120;
-
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
     const pCount = 650;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(pCount * 3);
     const cols = new Float32Array(pCount * 3);
-
     const c1 = new THREE.Color(0x0084FF);
     const c2 = new THREE.Color(0x00F0FF);
     const c3 = new THREE.Color(0xA855F7);
-
     for (let i = 0; i < pCount; i++) {
         pos[i * 3] = (Math.random() - 0.5) * 350;
         pos[i * 3 + 1] = (Math.random() - 0.5) * 350;
         pos[i * 3 + 2] = (Math.random() - 0.5) * 250;
-
         const r = Math.random();
         const picked = r < 0.4 ? c1 : (r < 0.75 ? c2 : c3);
         cols[i * 3] = picked.r;
         cols[i * 3 + 1] = picked.g;
         cols[i * 3 + 2] = picked.b;
     }
-
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-
     const mat = new THREE.PointsMaterial({
         size: 2.2,
         vertexColors: true,
@@ -84,16 +58,13 @@ function khoiTao3DParticles() {
         opacity: 0.65,
         blending: THREE.AdditiveBlending
     });
-
     const pts = new THREE.Points(geo, mat);
     scene.add(pts);
-
     let mX = 0, mY = 0;
     window.addEventListener("mousemove", (e) => {
         mX = (e.clientX - window.innerWidth / 2) * 0.0005;
         mY = (e.clientY - window.innerHeight / 2) * 0.0005;
     });
-
     function render() {
         requestAnimationFrame(render);
         pts.rotation.y += 0.0007;
@@ -104,17 +75,12 @@ function khoiTao3DParticles() {
         renderer.render(scene, camera);
     }
     render();
-
     window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 }
-
-// ==========================================
-// THÔNG BÁO GLASS MODAL CAO CẤP PINUI
-// ==========================================
 function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
     const modal = document.getElementById("glassModalAlert");
     if (!modal) {
@@ -124,10 +90,8 @@ function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
     const titleEl = document.getElementById("glassModalTitle");
     const msgEl = document.getElementById("glassModalMessage");
     const iconEl = document.getElementById("glassModalIcon");
-
     if (titleEl) titleEl.textContent = tieuDe || "Thông Báo Hệ Thống";
     if (msgEl) msgEl.textContent = noiDung || "";
-
     if (iconEl) {
         iconEl.className = "glass-modal-icon " + loai;
         let iconName = "info";
@@ -135,11 +99,9 @@ function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
         else if (loai === "success") iconName = "check-circle-2";
         iconEl.innerHTML = `<i data-lucide="${iconName}" style="width: 28px; height: 28px;"></i>`;
     }
-
     modal.style.display = "flex";
     lucide.createIcons();
 }
-
 function dongGlassModal(e) {
     if (e && e.target && e.target.closest && e.target.closest(".glass-modal-card") && e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
         return;
@@ -147,60 +109,62 @@ function dongGlassModal(e) {
     const modal = document.getElementById("glassModalAlert");
     if (modal) modal.style.display = "none";
 }
-
-// ==========================================
-// 2. AUTHENTICATION (SQLITE DATABASE)
-// ==========================================
+function anHienMatKhau() {
+    const input = document.getElementById("authPassword");
+    const icon = document.getElementById("authEyeIcon");
+    if (!input || !icon) return;
+    if (input.type === "password") {
+        input.type = "text";
+        icon.setAttribute("data-lucide", "eye-off");
+    } else {
+        input.type = "password";
+        icon.setAttribute("data-lucide", "eye");
+    }
+    lucide.createIcons();
+}
 function chuyenCheDoAuth(mode) {
     cheDoAuth = mode;
     const tabLogin = document.getElementById("tabBtnLogin");
     const tabReg = document.getElementById("tabBtnRegister");
     const title = document.getElementById("authTitle");
-    const btn = document.getElementById("btnAuthSubmit");
+    const btnText = document.getElementById("btnAuthText");
     const notice = document.getElementById("authNotice");
-
     if (mode === "login") {
-        tabLogin.classList.add("active");
-        tabReg.classList.remove("active");
-        title.textContent = "Đăng Nhập Quản Trị";
-        btn.innerHTML = `<i data-lucide="log-in" style="width: 18px; height: 18px;"></i> ĐĂNG NHẬP`;
-        notice.innerHTML = `💡 Sếp chưa có tài khoản? Nhấn "Đăng Ký Mới" ở trên để tạo acc ngay!`;
+        if (tabLogin) tabLogin.className = "auth-capsule-btn active";
+        if (tabReg) tabReg.className = "auth-capsule-btn";
+        if (title) title.textContent = "Đăng Nhập Quản Trị";
+        if (btnText) btnText.textContent = "ĐĂNG NHẬP";
+        if (notice) notice.innerHTML = 'Chưa có tài khoản? <a href="javascript:void(0)" onclick="chuyenCheDoAuth(\'register\')">Đăng ký mới ngay</a>';
     } else {
-        tabReg.classList.add("active");
-        tabLogin.classList.remove("active");
-        title.textContent = "Tạo Tài Khoản Mới";
-        btn.innerHTML = `<i data-lucide="user-plus" style="width: 18px; height: 18px;"></i> ĐĂNG KÝ NGAY`;
-        notice.innerHTML = `💡 Đăng ký xong hệ thống sẽ tự động đăng nhập và đưa sếp vào ngay!`;
+        if (tabReg) tabReg.className = "auth-capsule-btn active";
+        if (tabLogin) tabLogin.className = "auth-capsule-btn";
+        if (title) title.textContent = "Tạo Tài Khoản Mới";
+        if (btnText) btnText.textContent = "ĐĂNG KÝ NGAY";
+        if (notice) notice.innerHTML = 'Đã có tài khoản? <a href="javascript:void(0)" onclick="chuyenCheDoAuth(\'login\')">Đăng nhập tại đây</a>';
     }
     lucide.createIcons();
 }
-
 function hienThiAuth() {
     document.getElementById("authBackdrop").style.display = "flex";
     document.getElementById("mainDashboard").style.display = "none";
     if (chuKyPolling) clearInterval(chuKyPolling);
 }
-
 function hienThiAppChinh() {
     document.getElementById("authBackdrop").style.display = "none";
     document.getElementById("mainDashboard").style.display = "block";
     document.getElementById("welcomeUsername").textContent = tenNguoiDung || "Sếp";
     lucide.createIcons();
-
     chuyenTrang('quan-ly-tab');
     batDauPolling();
 }
-
 async function xuLyXacThuc(e) {
     e.preventDefault();
     const user = document.getElementById("authUsername").value.trim();
     const pass = document.getElementById("authPassword").value.trim();
     const btn = document.getElementById("btnAuthSubmit");
-
     btn.disabled = true;
-    btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Đang xử lý...`;
+    btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 18px; height: 18px;"></i> <span>Đang xử lý...</span>`;
     lucide.createIcons();
-
     const endpoint = cheDoAuth === "login" ? "/api/login" : "/api/register";
     try {
         const res = await fetch(endpoint, {
@@ -226,10 +190,11 @@ async function xuLyXacThuc(e) {
         hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể kết nối máy chủ: " + err, "error");
     } finally {
         btn.disabled = false;
+        btn.innerHTML = `<span id="btnAuthText">${cheDoAuth === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ NGAY'}</span><i data-lucide="arrow-right" class="auth-btn-arrow"></i>`;
+        lucide.createIcons();
         chuyenCheDoAuth(cheDoAuth);
     }
 }
-
 async function xuLyDangXuat() {
     if (maToken) {
         try {
@@ -246,30 +211,21 @@ async function xuLyDangXuat() {
     dongMenu3Gach();
     hienThiAuth();
 }
-
-// ==========================================
-// 3. MENU 3 GẠCH VÀ ĐIỀU HƯỚNG MÀN HÌNH
-// ==========================================
 function moMenu3Gach() {
     document.getElementById("drawerMenu").classList.add("open");
     document.getElementById("drawerOverlay").classList.add("show");
 }
-
 function dongMenu3Gach() {
     document.getElementById("drawerMenu").classList.remove("open");
     document.getElementById("drawerOverlay").classList.remove("show");
 }
-
 function chuyenTrang(trang) {
     dongMenu3Gach();
-
     document.getElementById("viewQuanLyTab").style.display = "none";
     document.getElementById("viewTaoTab").style.display = "none";
     document.getElementById("viewLienHe").style.display = "none";
     document.getElementById("viewChiTietTab").style.display = "none";
-
     document.querySelectorAll(".drawer-nav-item").forEach(el => el.classList.remove("active"));
-
     if (trang === "quan-ly-tab") {
         document.getElementById("viewQuanLyTab").style.display = "block";
         document.getElementById("menuItemQuanLyTab").classList.add("active");
@@ -285,18 +241,12 @@ function chuyenTrang(trang) {
     } else if (trang === "chi-tiet-tab") {
         document.getElementById("viewChiTietTab").style.display = "block";
     }
-
     lucide.createIcons();
 }
-
 function saoChepDiscord(text) {
     navigator.clipboard.writeText(text);
     hienThiThongBaoGlass("Đã Sao Chép", `Đã sao chép Discord: "${text}" vào bộ nhớ tạm!`, "success");
 }
-
-// ==============================================================
-// 4. QUẢN LÝ TAB DẠNG HÌNH NGANG (PINUI LIQUID GLASS)
-// ==============================================================
 async function taiDanhSachTabs() {
     if (!maToken) return;
     try {
@@ -313,11 +263,9 @@ async function taiDanhSachTabs() {
         }
     } catch(e) {}
 }
-
 function renderDanhSachTabsNgang(tabs) {
     const container = document.getElementById("vungDanhSachTabsNgang");
     if (!container) return;
-
     if (tabs.length === 0) {
         container.innerHTML = `
             <div class="card-3d" style="text-align: center; padding: 50px 24px;">
@@ -337,17 +285,10 @@ function renderDanhSachTabsNgang(tabs) {
         lucide.createIcons();
         return;
     }
-
     let html = "";
     tabs.forEach(t => {
-        // ==============================================================
-        // QUY TẮC CỦA SẾP (TUYỆT ĐỐI CHÍNH XÁC):
-        // ĐANG CHẠY: FULL VIỀN NGANG MÀU XANH LÁ (.running)
-        // KHÔNG CHẠY: FULL VIỀN NGANG MÀU ĐỎ (.stopped)
-        // ==============================================================
         const classVien = t.is_running ? "running" : "stopped";
-
-        const badgeTrangThai = t.is_running 
+        const badgeTrangThai = t.is_running
             ? `<span class="tab-meta-pill" style="color: #34d399; border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.14);">
                  <i data-lucide="zap" style="width: 13px; height: 13px;"></i>
                  ĐANG CHẠY (${t.runtime_formatted || '00:00:00'})
@@ -356,14 +297,12 @@ function renderDanhSachTabsNgang(tabs) {
                  <i data-lucide="stop-circle" style="width: 13px; height: 13px;"></i>
                  ĐÃ DỪNG
                </span>`;
-
         const iconTrangThai = t.is_running
             ? `<div style="position: relative;">
                  <i data-lucide="activity" style="width: 24px; height: 24px;"></i>
                  <span class="pulse-radar-dot"></span>
                </div>`
             : `<i data-lucide="pause-circle" style="width: 24px; height: 24px;"></i>`;
-
         const btnBatDungNhanh = t.is_running
             ? `<button class="btn-glow btn-danger" onclick="dungNhanhTab('${t.id}')" title="Dừng tab này ngay">
                  <i data-lucide="square" style="width: 14px; height: 14px;"></i>
@@ -373,7 +312,6 @@ function renderDanhSachTabsNgang(tabs) {
                  <i data-lucide="play" style="width: 14px; height: 14px;"></i>
                  Chạy
                </button>`;
-
         html += `
         <div class="tab-horizontal-card ${classVien}">
             <div class="tab-info-left">
@@ -414,12 +352,9 @@ function renderDanhSachTabsNgang(tabs) {
         </div>
         `;
     });
-
     container.innerHTML = html;
     lucide.createIcons();
 }
-
-// Tạo tab mới -> Tự động chuyển qua Quản lý tab
 async function xuLyTaoTabMoi(e) {
     e.preventDefault();
     const tenTab = document.getElementById("inputTenTabMoi").value.trim();
@@ -427,7 +362,6 @@ async function xuLyTaoTabMoi(e) {
         hienThiThongBaoGlass("Lỗi", "Vui lòng nhập tên tab mới!", "error");
         return;
     }
-
     try {
         const res = await fetch("/api/tabs/create", {
             method: "POST",
@@ -440,7 +374,6 @@ async function xuLyTaoTabMoi(e) {
         const data = await res.json();
         if (data.success) {
             hienThiThongBaoGlass("Tạo Tab Thành Công", `Đã tạo tab "${tenTab}" thành công!`, "success");
-            // TỰ ĐỘNG CHUYỂN QUA QUẢN LÝ TAB ĐÚNG YÊU CẦU CỦA SẾP
             chuyenTrang('quan-ly-tab');
         } else {
             hienThiThongBaoGlass("Lỗi Tạo Tab", data.message || "Lỗi tạo tab", "error");
@@ -449,7 +382,6 @@ async function xuLyTaoTabMoi(e) {
         hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể tạo tab: " + err, "error");
     }
 }
-
 async function dungNhanhTab(tabId) {
     try {
         await fetch(`/api/tabs/${tabId}/stop`, {
@@ -459,7 +391,6 @@ async function dungNhanhTab(tabId) {
         taiDanhSachTabs();
     } catch(e) {}
 }
-
 async function xoaTab(tabId) {
     if (!confirm("Sếp có chắc chắn muốn xóa tab này không?")) return;
     try {
@@ -475,10 +406,6 @@ async function xoaTab(tabId) {
         }
     } catch(e) {}
 }
-
-// ==============================================================
-// 5. CẤU HÌNH & CHẠY TAB CỤ THỂ (GIAO DIỆN 3D NHƯ NÃY)
-// ==============================================================
 async function moChiTietTab(tabId) {
     currentEditingTabId = tabId;
     try {
@@ -497,14 +424,11 @@ async function moChiTietTab(tabId) {
         hienThiThongBaoGlass("Lỗi Mở Tab", "Không thể tải chi tiết tab: " + e, "error");
     }
 }
-
 function napDuLieuVaoTabForm(tab, status) {
     const cfg = tab.config || {};
     const accs = cfg.accounts && cfg.accounts.length > 0 ? cfg.accounts : [{ imei: "", cookie: "" }];
-
     document.getElementById("inputTabSoLuongAcc").value = accs.length;
     renderTabFormAccs(accs);
-
     const selectNhom = document.getElementById("selectTabNhomZalo");
     if (cfg.group_id) {
         selectNhom.innerHTML = `<option value="${cfg.group_id}">${cfg.group_name || ('Nhóm ' + cfg.group_id)}</option>`;
@@ -512,22 +436,17 @@ function napDuLieuVaoTabForm(tab, status) {
         selectNhom.innerHTML = `<option value="">-- Bấm "Lấy danh sách nhóm từ Acc #1" trước --</option>`;
     }
     document.getElementById("inputTabManualGroupId").value = cfg.group_id || "";
-
     document.getElementById("textareaTabNoiDungNgon").value = cfg.message_text || "";
     document.getElementById("inputTabDelay").value = cfg.delay || 5;
     document.getElementById("inputTabFontSize").value = cfg.font_size || 500;
-
     const mode = cfg.color_mode || "random_line";
     const hex = cfg.chosen_color || "#DB342E";
     chonMauTab(mode, hex);
-
     capNhatStatusTabUI(status);
 }
-
 function renderTabFormAccs(presetAccs) {
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const container = document.getElementById("vungTabDanhSachAccs");
-
     let html = "";
     for (let i = 0; i < count; i++) {
         const accData = (presetAccs && presetAccs[i]) ? presetAccs[i] : null;
@@ -535,7 +454,6 @@ function renderTabFormAccs(presetAccs) {
         const cookieVal = accData ? (accData.cookie || "") : (document.getElementById(`tab_acc_cookie_${i}`)?.value || "");
         const groupIdVal = accData ? (accData.group_id || "") : (document.getElementById(`tab_acc_group_id_${i}`)?.value || "");
         const groupNameVal = accData ? (accData.group_name || "") : (document.getElementById(`tab_acc_group_name_${i}`)?.value || "");
-
         html += `
         <div class="acc-config-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -549,7 +467,6 @@ function renderTabFormAccs(presetAccs) {
                 </button>
                 ` : ''}
             </div>
-
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div>
                     <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">IMEI:</label>
@@ -562,7 +479,6 @@ function renderTabFormAccs(presetAccs) {
                         💡 <em>Lưu ý: Cookie phải còn hạn đăng nhập trên web chat.zalo.me</em>
                     </div>
                 </div>
-
                 <!-- CẤU HÌNH NHÓM RIÊNG CHO ACC NÀY -->
                 <div class="acc-group-box">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -585,13 +501,11 @@ function renderTabFormAccs(presetAccs) {
     container.innerHTML = html;
     lucide.createIcons();
 }
-
 async function tabLayDanhSachNhomTheoAcc(accIndex) {
     const imeiEl = document.getElementById(`tab_acc_imei_${accIndex}`);
     const cookieEl = document.getElementById(`tab_acc_cookie_${accIndex}`);
     const btn = document.getElementById(`btnLayNhomAcc_${accIndex}`);
     const btnChung = (accIndex === 0) ? document.getElementById("btnTabLayNhom") : null;
-
     if (!imeiEl || !imeiEl.value.trim()) {
         hienThiThongBaoGlass("Thiếu Thông Tin", `Vui lòng nhập IMEI của Acc #${accIndex + 1}!`, "error");
         return;
@@ -600,7 +514,6 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
         hienThiThongBaoGlass("Thiếu Thông Tin", `Vui lòng nhập Cookie của Acc #${accIndex + 1}!`, "error");
         return;
     }
-
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 12px; height: 12px;"></i> Đang tải...`;
@@ -610,7 +523,6 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
         btnChung.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 15px; height: 15px;"></i> Đang tải nhóm...`;
     }
     lucide.createIcons();
-
     try {
         const res = await fetch("/api/get-groups", {
             method: "POST",
@@ -623,7 +535,6 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
                 cookie: cookieEl.value.trim()
             })
         });
-
         const data = await res.json();
         if (data.success && data.groups) {
             const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
@@ -636,13 +547,10 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
                     optHtml += `<option value="${escapeHtml(g.id)}" data-name="${escapeHtml(g.name)}">${escapeHtml(g.name)} (ID: ${escapeHtml(g.id)})</option>`;
                 });
                 if (selectEl) selectEl.innerHTML = optHtml;
-
-                // Nếu là Acc 0, cập nhật cả select nhóm chung
                 if (accIndex === 0) {
                     const selectChung = document.getElementById("selectTabNhomZalo");
                     if (selectChung) selectChung.innerHTML = optHtml;
                 }
-
                 hienThiThongBaoGlass("Thành Công", `Đã tải thành công ${data.groups.length} nhóm Zalo của Acc #${accIndex + 1}!`, "success");
             }
         } else {
@@ -662,20 +570,17 @@ async function tabLayDanhSachNhomTheoAcc(accIndex) {
         lucide.createIcons();
     }
 }
-
 function doiNhomAcc(accIndex) {
     const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
     const inputId = document.getElementById(`tab_acc_group_id_${accIndex}`);
     const inputName = document.getElementById(`tab_acc_group_name_${accIndex}`);
     if (!selectEl || !inputId) return;
-
     const val = selectEl.value;
     if (val) {
         inputId.value = val;
         const opt = selectEl.options[selectEl.selectedIndex];
         const gName = opt?.getAttribute("data-name") || opt?.text || ("Nhóm " + val);
         if (inputName) inputName.value = gName;
-
         if (accIndex === 0) {
             const manualChung = document.getElementById("inputTabManualGroupId");
             if (manualChung) manualChung.value = val;
@@ -684,7 +589,6 @@ function doiNhomAcc(accIndex) {
         }
     }
 }
-
 function nhapTayNhomAcc(accIndex) {
     const inputId = document.getElementById(`tab_acc_group_id_${accIndex}`);
     const inputName = document.getElementById(`tab_acc_group_name_${accIndex}`);
@@ -692,17 +596,14 @@ function nhapTayNhomAcc(accIndex) {
         inputName.value = "Nhóm " + inputId.value.trim();
     }
 }
-
 function dongBoNhomChoTatCaAcc() {
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const gid0 = document.getElementById("tab_acc_group_id_0")?.value.trim() || document.getElementById("inputTabManualGroupId")?.value.trim() || document.getElementById("selectTabNhomZalo")?.value.trim();
     const gname0 = document.getElementById("tab_acc_group_name_0")?.value.trim() || ("Nhóm " + gid0);
-
     if (!gid0) {
         hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập ID nhóm Zalo cho Acc #1 trước khi đồng bộ!", "error");
         return;
     }
-
     for (let i = 1; i < count; i++) {
         const inputId = document.getElementById(`tab_acc_group_id_${i}`);
         const inputName = document.getElementById(`tab_acc_group_name_${i}`);
@@ -715,11 +616,9 @@ function dongBoNhomChoTatCaAcc() {
     }
     hienThiThongBaoGlass("Đồng Bộ Thành Công", `Đã đồng bộ nhóm [${gname0}] cho tất cả ${count} tài khoản!`, "success");
 }
-
 function doiNhomChung(val) {
     const manualChung = document.getElementById("inputTabManualGroupId");
     if (manualChung) manualChung.value = val;
-    // Đồng bộ sang Acc #0 nếu Acc #0 chưa có nhóm
     const gid0 = document.getElementById("tab_acc_group_id_0");
     if (gid0 && !gid0.value.trim()) {
         gid0.value = val;
@@ -729,14 +628,12 @@ function doiNhomChung(val) {
         if (name0) name0.value = gName;
     }
 }
-
 function nhapTayNhomChung(val) {
     const gid0 = document.getElementById("tab_acc_group_id_0");
     if (gid0 && !gid0.value.trim()) {
         gid0.value = val;
     }
 }
-
 function tabDocFileNgon(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -747,7 +644,6 @@ function tabDocFileNgon(e) {
     };
     reader.readAsText(file, "UTF-8");
 }
-
 function renderBangMauTab() {
     const grid = document.getElementById("vungTabBangMau");
     let html = "";
@@ -764,12 +660,10 @@ function renderBangMauTab() {
     });
     grid.innerHTML = html;
 }
-
 function tabChonMauClick(colorId, colorName, idx) {
     document.querySelectorAll(".palette-item").forEach(el => el.classList.remove("active"));
     const item = document.getElementById(`tabPal_${idx}`);
     if (item) item.classList.add("active");
-
     if (colorId === "random_line") {
         document.getElementById("tabColorMode").value = "random_line";
         document.getElementById("tabColorHex").value = "#DB342E";
@@ -785,14 +679,12 @@ function tabChonMauClick(colorId, colorName, idx) {
         document.getElementById("tabColorPicker").value = colorId;
     }
 }
-
 function tabChonMauPicker(hex) {
     document.querySelectorAll(".palette-item").forEach(el => el.classList.remove("active"));
     document.getElementById("tabColorMode").value = "fixed";
     document.getElementById("tabColorHex").value = hex;
     document.getElementById("lblTabMauDangChon").textContent = `Màu tùy chỉnh: ${hex}`;
 }
-
 function chonMauTab(mode, hex) {
     if (mode === "random_line") {
         tabChonMauClick("random_line", "Ngẫu nhiên dòng", 0);
@@ -807,15 +699,10 @@ function chonMauTab(mode, hex) {
         }
     }
 }
-
-// Bắt đầu chạy Tab
 async function tabBatDauTreo() {
     if (!currentEditingTabId) return;
-
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const accounts = [];
-
-    // Nhóm mặc định chung (nếu có)
     let defaultGroupId = (document.getElementById("inputTabManualGroupId")?.value || "").trim() || (document.getElementById("selectTabNhomZalo")?.value || "").trim();
     let defaultGroupName = "";
     const selectChung = document.getElementById("selectTabNhomZalo");
@@ -825,19 +712,15 @@ async function tabBatDauTreo() {
     if (!defaultGroupName && defaultGroupId) {
         defaultGroupName = "Nhóm " + defaultGroupId;
     }
-
     for (let i = 0; i < count; i++) {
         const imei = (document.getElementById(`tab_acc_imei_${i}`)?.value || "").trim();
         const cookie = (document.getElementById(`tab_acc_cookie_${i}`)?.value || "").trim();
         let accGid = (document.getElementById(`tab_acc_group_id_${i}`)?.value || "").trim();
         let accGname = (document.getElementById(`tab_acc_group_name_${i}`)?.value || "").trim();
-
-        // Nếu acc này chưa chọn nhóm riêng, fallback về nhóm mặc định chung
         if (!accGid && defaultGroupId) {
             accGid = defaultGroupId;
             accGname = defaultGroupName;
         }
-
         if (imei && cookie) {
             accounts.push({
                 imei,
@@ -847,33 +730,26 @@ async function tabBatDauTreo() {
             });
         }
     }
-
     if (accounts.length === 0) {
         hienThiThongBaoGlass("Thiếu Tài Khoản", "Vui lòng nhập đầy đủ IMEI và Cookie của ít nhất 1 tài khoản!", "error");
         return;
     }
-
-    // Kiểm tra xem đã có nhóm nào được chọn hay chưa
     const coNhom = accounts.some(a => Boolean(a.group_id)) || Boolean(defaultGroupId);
     if (!coNhom) {
         hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập nhóm Zalo cho các tài khoản!", "error");
         return;
     }
-
     const messageText = document.getElementById("textareaTabNoiDungNgon").value.trim();
     if (!messageText) {
         hienThiThongBaoGlass("Thiếu File Ngôn", "Vui lòng nhập nội dung ngôn hoặc bấm 'Chọn File Ngôn (.txt)'!", "error");
         return;
     }
-
     const delay = parseInt(document.getElementById("inputTabDelay").value) || 5;
     const fontSize = parseInt(document.getElementById("inputTabFontSize").value) || 500;
     const colorMode = document.getElementById("tabColorMode").value;
     const chosenColor = document.getElementById("tabColorHex").value;
-
     const btnStart = document.getElementById("btnTabStart");
     btnStart.disabled = true;
-
     try {
         const res = await fetch(`/api/tabs/${currentEditingTabId}/start`, {
             method: "POST",
@@ -904,7 +780,6 @@ async function tabBatDauTreo() {
         btnStart.disabled = false;
     }
 }
-
 async function tabDungTreo() {
     if (!currentEditingTabId) return;
     try {
@@ -915,13 +790,11 @@ async function tabDungTreo() {
         hienThiThongBaoGlass("Đã Dừng Tab", "⏹ Đã gửi lệnh dừng tiến trình treo text của tab này thành công.", "info");
     } catch(e) {}
 }
-
 function capNhatStatusTabUI(st) {
     if (!st) return;
     const badge = document.getElementById("badgeTabDangChay");
     const btnStart = document.getElementById("btnTabStart");
     const btnStop = document.getElementById("btnTabStop");
-
     if (st.is_running) {
         badge.textContent = `ĐANG TREO (${st.runtime_formatted || '00:00:00'})`;
         badge.style.background = "rgba(16, 185, 129, 0.2)";
@@ -941,12 +814,10 @@ function capNhatStatusTabUI(st) {
         btnStop.disabled = true;
         btnStop.style.opacity = "0.5";
     }
-
     document.getElementById("lblTabTimerDisplay").textContent = st.runtime_formatted || "00:00:00";
     document.getElementById("lblTabSentDisplay").textContent = st.total_sent || 0;
     document.getElementById("lblTabFailedDisplay").textContent = st.total_failed || 0;
     document.getElementById("lblTabAccCountDisplay").textContent = st.acc_count || 0;
-
     if (st.logs && st.logs.length > 0) {
         const term = document.getElementById("tabTerminalLogs");
         let logHtml = "";
@@ -962,25 +833,16 @@ function capNhatStatusTabUI(st) {
         term.scrollTop = term.scrollHeight;
     }
 }
-
-// ==========================================
-// 6. POLLING REALTIME CẬP NHẬT TRẠNG THÁI
-// ==========================================
 function batDauPolling() {
     if (chuKyPolling) clearInterval(chuKyPolling);
     chuKyPolling = setInterval(tickRealtime, 1000);
     tickRealtime();
 }
-
 async function tickRealtime() {
     if (!maToken) return;
-
-    // Cập nhật viền xanh / đỏ của Quản lý tab
     if (document.getElementById("viewQuanLyTab").style.display !== "none") {
         taiDanhSachTabs();
     }
-
-    // Cập nhật đồng hồ và logs của tab đang mở cấu hình
     if (document.getElementById("viewChiTietTab").style.display !== "none" && currentEditingTabId) {
         try {
             const res = await fetch(`/api/tabs/${currentEditingTabId}`, {
@@ -993,7 +855,6 @@ async function tickRealtime() {
         } catch(e) {}
     }
 }
-
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;

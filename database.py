@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Database SQLite quản lý Tài khoản & Đa Tab cho Zalo Treo Text Pro
 """
@@ -22,7 +20,7 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-    # Bảng người dùng (Không có tài khoản mặc định, người dùng tự đăng ký)
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +29,7 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
-    # Bảng các tab treo text độc lập
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS tabs (
         id TEXT PRIMARY KEY,
@@ -188,5 +186,4 @@ def delete_tab(tab_id: str, user_id: int) -> bool:
     finally:
         conn.close()
 
-# Khởi tạo bảng ngay khi import
 init_db()

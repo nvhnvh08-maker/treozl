@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 HỆ THỐNG ZALO TREO TEXT PRO - BACKEND FASTAPI & DATABASE SQLITE
 Phục vụ các file Web tách biệt: index.html, style.css, script.js
@@ -45,7 +43,6 @@ app.add_middleware(
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Quản lý phiên đăng nhập: token -> {"user_id": int, "username": str}
 ACTIVE_SESSIONS: Dict[str, Dict[str, Any]] = {}
 
 def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
@@ -57,9 +54,6 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, A
         raise HTTPException(status_code=401, detail="Phiên đăng nhập đã hết hạn hoặc không hợp lệ")
     return session
 
-# ==============================================================
-#                  API AUTHENTICATION (SQLITE)
-# ==============================================================
 @app.post("/api/register")
 async def api_register(payload: Dict[str, Any]):
     username = str(payload.get("username", "")).strip()
@@ -69,11 +63,9 @@ async def api_register(payload: Dict[str, Any]):
     if not success:
         return JSONResponse(status_code=400, content={"success": False, "message": msg})
 
-    # Tự động đăng nhập luôn sau khi đăng ký thành công
     token = secrets.token_hex(24)
     ACTIVE_SESSIONS[token] = {"user_id": user_id, "username": username}
 
-    # Tạo sẵn 1 tab mặc định cho người dùng mới
     create_tab(user_id, "Tab Treo #1")
 
     return {
@@ -114,9 +106,6 @@ async def api_logout(authorization: Optional[str] = Header(None)):
 async def api_me(user: Dict[str, Any] = Depends(get_current_user)):
     return {"success": True, "user": user}
 
-# ==============================================================
-#                  API QUẢN LÝ ĐA TAB (MULTI-TAB)
-# ==============================================================
 @app.get("/api/tabs")
 async def api_get_tabs(user: Dict[str, Any] = Depends(get_current_user)):
     tabs = get_user_tabs(user["user_id"])
@@ -197,12 +186,10 @@ async def api_start_tab(tab_id: str, payload: Dict[str, Any], user: Dict[str, An
     if not accounts:
         return JSONResponse(status_code=400, content={"success": False, "message": "Vui lòng cấu hình ít nhất 1 tài khoản"})
 
-    # Kiểm tra xem có nhóm chung hoặc bất kỳ tài khoản nào đã chọn nhóm chưa
     has_any_group = bool(group_id) or any(bool(str(acc.get("group_id", "")).strip()) for acc in accounts)
     if not has_any_group:
         return JSONResponse(status_code=400, content={"success": False, "message": "Vui lòng chọn hoặc nhập nhóm Zalo để treo"})
 
-    # Nếu không có group_id chung, lấy nhóm của tài khoản đầu tiên làm đại diện
     if not group_id and accounts:
         for acc in accounts:
             if acc.get("group_id"):
@@ -259,9 +246,6 @@ async def api_delete_tab(tab_id: str, user: Dict[str, Any] = Depends(get_current
     ok = delete_tab(tab_id, user["user_id"])
     return {"success": ok, "message": "Đã xóa tab thành công"}
 
-# ==============================================================
-#                  API LẤY NHÓM ZALO
-# ==============================================================
 @app.post("/api/get-groups")
 async def api_get_groups(payload: Dict[str, Any], user: Dict[str, Any] = Depends(get_current_user)):
     imei = str(payload.get("imei", "")).strip()
@@ -282,10 +266,6 @@ async def api_get_groups(payload: Dict[str, Any], user: Dict[str, Any] = Depends
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "message": f"Lỗi lấy nhóm: {str(e)}"})
 
-
-# ==============================================================
-#          PHỤC VỤ CÁC FILE WEB TÁCH RIÊNG (HTML, CSS, JS)
-# ==============================================================
 @app.get("/")
 async def serve_index():
     index_path = os.path.join(CURRENT_DIR, "index.html")

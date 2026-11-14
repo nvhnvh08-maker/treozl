@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Core module xử lý Zalo API cho tính năng Treo Text Zalo Đa Luồng Đa Tab
 Hỗ trợ chạy song song nhiều Tab độc lập không giới hạn!
@@ -33,9 +31,6 @@ try:
     import zlapi._util
     ZALO_AVAILABLE = True
 
-    # ==============================================================
-    # VÁ LỖI AN TOÀN CHO ZLAPI (TRÁNH CRASH 'NONETYPE' KHI COOKIE HẾT HẠN)
-    # ==============================================================
     def _safe_state_login(self, phone, password, imei, session_cookies=None, user_agent=None):
         if user_agent:
             self._headers["User-Agent"] = user_agent
@@ -92,14 +87,13 @@ try:
 except ImportError:
     ZALO_AVAILABLE = False
 
-# Danh sách mã màu chuẩn trong tool gốc dangkhiem_1.py
 TOOL_COLOR_LIST = [
-    "#DB342E",  # Đỏ rực
-    "#15A85F",  # Xanh lá
-    "#F27806",  # Cam tươi
-    "#F7B503",  # Vàng nghệ
-    "#FFFFFF",  # Trắng tinh
-    "#000000"   # Đen huyền
+    "#DB342E",
+    "#15A85F",
+    "#F27806",
+    "#F7B503",
+    "#FFFFFF",
+    "#000000"
 ]
 
 def normalize_ttl_value(ttl):
@@ -134,7 +128,6 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
         if not cookie_str:
             return {}
 
-        # Dạng JSON object hoặc JSON array
         if (cookie_str.startswith("{") and cookie_str.endswith("}")) or (cookie_str.startswith("[") and cookie_str.endswith("]")):
             try:
                 parsed = json.loads(cookie_str)
@@ -143,7 +136,7 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
                 pass
 
         if not res:
-            # Dạng chuỗi cookie: k=v; k2=v2
+
             for part in cookie_str.split(";"):
                 part = part.strip()
                 if "=" in part:
@@ -153,13 +146,9 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
                     if k:
                         res[k] = v
 
-            # Nếu người dùng chỉ dán trực tiếp token session thuần (chuỗi dài bắt đầu bằng tzao hoặc token dài)
             if not res and len(cookie_str) > 20 and "=" not in cookie_str:
                 res["zpw_sek"] = cookie_str
 
-    # TỰ ĐỘNG THUẬT TOÁN CHUẨN HÓA TOKEN ZALO (zpw_sek):
-    # Rất nhiều trường hợp người dùng copy từ localStorage bị lưu dưới dạng hash key: {"146b6e...": "tzao..."}
-    # hoặc copy chỉ 1 cookie nhưng tên key bị sai. Hệ thống tự động nhận diện và gán key chuẩn 'zpw_sek'.
     if "zpw_sek" not in res:
         for k, v in list(res.items()):
             val_str = str(v).strip()
@@ -167,11 +156,9 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
                 res["zpw_sek"] = val_str
                 break
 
-    # Nếu key là zpw_sek nhưng dán cả ngoặc kép
     if "zpw_sek" in res:
         res["zpw_sek"] = str(res["zpw_sek"]).strip('"\'')
 
-    # Tự động đồng bộ cookie z_uuid theo imei nếu thiếu
     if imei and str(imei).strip() and "z_uuid" not in res:
         res["z_uuid"] = str(imei).strip()
 
@@ -235,7 +222,6 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
         groups.append({"id": gid_str, "name": gname})
 
     return groups
-
 
 class SingleTabRunner:
     """
@@ -364,7 +350,6 @@ class SingleTabRunner:
                 multi_style = MultiMsgStyle(styles)
                 ttl_to_send = normalize_ttl_value(ttl)
 
-                # Gửi toàn bộ ngôn cùng lúc trong 1 tin nhắn
                 msg_payload = Message(text=formatted_text, style=multi_style)
                 bot.send(msg_payload, thread_id=group_id, thread_type=ThreadType.GROUP, ttl=ttl_to_send)
 
@@ -379,7 +364,6 @@ class SingleTabRunner:
                 self.stats["total_failed"] += 1
                 self.add_log(f"[{acc_label}] Gửi thất bại lượt #{loop_count} (Nhóm: {group_id}): {e}", "error")
 
-            # Delay giữa các lần gửi (ngắt quãng để dừng ngay khi người dùng bấm Stop)
             sleep_chunks = max(int(delay * 10), 1)
             for _ in range(sleep_chunks):
                 if self.stop_event.is_set() or not self.is_running:
@@ -429,7 +413,6 @@ class SingleTabRunner:
                 self.add_log(f"[Acc #{idx+1}] Bỏ qua vì thiếu IMEI hoặc Cookie hợp lệ", "warning")
                 continue
 
-            # Ưu tiên nhóm cấu hình riêng cho tài khoản này, nếu không có mới dùng nhóm chung
             acc_gid = str(acc.get("group_id") or "").strip() or group_id
             acc_gname = str(acc.get("group_name") or "").strip() or (group_name if acc_gid == group_id else f"Nhóm {acc_gid}")
 
@@ -451,7 +434,6 @@ class SingleTabRunner:
             raise ValueError("Không có tài khoản nào đủ điều kiện khởi chạy (kiểm tra lại IMEI, Cookie hoặc nhóm chọn)")
 
         return True
-
 
 class MultiTabBotManager:
     """
@@ -529,5 +511,4 @@ class MultiTabBotManager:
                 self.tabs[tab_id].stop()
                 del self.tabs[tab_id]
 
-# Singleton instance quản lý đa tab
 bot_manager = MultiTabBotManager()
