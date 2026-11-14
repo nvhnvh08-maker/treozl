@@ -545,16 +545,16 @@ function renderTabFormAccs(presetAccs) {
                 </button>
                 ` : ''}
             </div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div>
-                    <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">IMEI:</label>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="form-row" style="margin-bottom: 0;">
+                    <label>IMEI Acc #${i + 1}:</label>
                     <input type="text" id="tab_acc_imei_${i}" value="${escapeHtml(imeiVal)}" placeholder="IMEI Acc #${i + 1}..." required>
                 </div>
-                <div>
-                    <label style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 3px;">Cookie (JSON, chuỗi cookie hoặc token zpw_sek):</label>
-                    <textarea id="tab_acc_cookie_${i}" style="min-height: 48px; font-size: 0.76rem;" placeholder='Dán Cookie hoặc token zpw_sek (VD: {"zpw_sek": "tzao..."} hoặc chuỗi cookie)...' required>${escapeHtml(cookieVal)}</textarea>
-                    <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">
-                        💡 <em>Lưu ý: Cookie phải còn hạn đăng nhập trên web chat.zalo.me</em>
+                <div class="form-row" style="margin-bottom: 0;">
+                    <label>Cookie Acc #${i + 1} (JSON hoặc chuỗi token zpw_sek):</label>
+                    <textarea id="tab_acc_cookie_${i}" style="min-height: 52px; font-size: 0.8rem;" placeholder='Dán Cookie hoặc token zpw_sek...' required>${escapeHtml(cookieVal)}</textarea>
+                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">
+                        💡 <em>Cookie phải còn phiên hoạt động trên chat.zalo.me</em>
                     </div>
                 </div>
                                 <div class="acc-group-box">
