@@ -1119,3 +1119,23 @@ function dongModalXemMaQR(event) {
         modal.style.display = "none";
     }
 }
+
+
+function capNhatLocalBackupTab(tabId, name, config) {
+    try {
+        const backupKey = "zalo_backup_tabs_" + (tenNguoiDung || "user");
+        let list = [];
+        const raw = localStorage.getItem(backupKey);
+        if (raw) {
+            try { list = JSON.parse(raw) || []; } catch(e) {}
+        }
+        const existingIdx = list.findIndex(t => t.id === tabId);
+        if (existingIdx >= 0) {
+            list[existingIdx].name = name;
+            list[existingIdx].config = config;
+        } else {
+            list.push({ id: tabId, name: name, config: config });
+        }
+        localStorage.setItem(backupKey, JSON.stringify(list));
+    } catch(e) {}
+}

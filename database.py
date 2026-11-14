@@ -1,5 +1,3 @@
-
-
 import sqlite3
 import hashlib
 import uuid
@@ -18,10 +16,9 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    cursor.execute()
-
-    cursor.execute()
+    cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);")
+    cursor.execute("CREATE TABLE IF NOT EXISTS tabs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, name TEXT NOT NULL, config_json TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users (id));")
+    cursor.execute("CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id INTEGER NOT NULL, username TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);")
     conn.commit()
     conn.close()
 
@@ -65,6 +62,55 @@ def authenticate_user(username: str, password: str) -> tuple[bool, str, Optional
         if row:
             return True, "Đăng nhập thành công", row["id"]
         return False, "Sai tên tài khoản hoặc mật khẩu", None
+    finally:
+        conn.close()
+
+def restore_or_ensure_user(username: str, user_id: Optional[int] = None) -> int:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        row = cursor.fetchone()
+        if row:
+            return row["id"]
+        pwd_hash = hash_password("treo_zalo_2026_default_pass")
+        if user_id:
+            cursor.execute("INSERT OR IGNORE INTO users (id, username, password_hash) VALUES (?, ?, ?)", (user_id, username, pwd_hash))
+            conn.commit()
+            return user_id
+        cursor.execute("INSERT INTO users (username, password_hash) VALUES (?, ?)", (username, pwd_hash))
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()
+
+def save_session_db(token: str, user_id: int, username: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT OR REPLACE INTO sessions (token, user_id, username) VALUES (?, ?, ?)", (token, user_id, username))
+        conn.commit()
+    finally:
+        conn.close()
+
+def get_session_db(token: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT token, user_id, username FROM sessions WHERE token = ?", (token,))
+        row = cursor.fetchone()
+        if row:
+            return {"token": row["token"], "user_id": row["user_id"], "username": row["username"]}
+        return None
+    finally:
+        conn.close()
+
+def delete_session_db(token: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        conn.commit()
     finally:
         conn.close()
 
@@ -119,6 +165,27 @@ def get_user_tabs(user_id: int) -> List[Dict[str, Any]]:
                 "created_at": r["created_at"]
             })
         return result
+    finally:
+        conn.close()
+
+def sync_user_tabs(user_id: int, tabs: List[Dict[str, Any]]):
+    if not tabs:
+        return
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        for tab in tabs:
+            tid = str(tab.get("id", ""))
+            tname = str(tab.get("name", "Tab Treo"))
+            cfg = tab.get("config", {})
+            if not tid:
+                tid = str(uuid.uuid4())[:8]
+            cfg_json = json.dumps(cfg, ensure_ascii=False) if isinstance(cfg, dict) else str(cfg)
+            cursor.execute(
+                "INSERT OR REPLACE INTO tabs (id, user_id, name, config_json, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+                (tid, user_id, tname, cfg_json)
+            )
+        conn.commit()
     finally:
         conn.close()
 

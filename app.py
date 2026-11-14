@@ -11,6 +11,10 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
+import hmac
+import base64
+import hashlib
+
 from database import (
     register_user,
     authenticate_user,
@@ -18,7 +22,12 @@ from database import (
     get_user_tabs,
     get_tab_by_id,
     update_tab_config,
-    delete_tab
+    delete_tab,
+    save_session_db,
+    get_session_db,
+    delete_session_db,
+    restore_or_ensure_user,
+    sync_user_tabs
 )
 
 from zalo_core import (
@@ -42,15 +51,53 @@ app.add_middleware(
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ACTIVE_SESSIONS: Dict[str, Dict[str, Any]] = {}
+SESSION_SECRET = os.environ.get("SESSION_SECRET", "treo_zalo_247_secret_key_ngbao_2026_super_persistent")
+
+def tao_token_xac_thuc(user_id: int, username: str) -> str:
+    ts = int(time.time())
+    payload = f"{user_id}:{username}:{ts}"
+    sig = hmac.new(SESSION_SECRET.encode(), payload.encode(), hashlib.sha256).hexdigest()
+    token_str = f"{payload}:{sig}"
+    return base64.urlsafe_b64encode(token_str.encode()).decode()
+
+def xac_thuc_token(token_b64: str) -> Optional[Dict[str, Any]]:
+    try:
+        raw = base64.urlsafe_b64decode(token_b64.encode()).decode()
+        parts = raw.split(":")
+        if len(parts) >= 4:
+            uid = int(parts[0])
+            uname = parts[1]
+            ts = int(parts[2])
+            sig = parts[3]
+            expected_sig = hmac.new(SESSION_SECRET.encode(), f"{uid}:{uname}:{ts}".encode(), hashlib.sha256).hexdigest()
+            if hmac.compare_digest(sig, expected_sig):
+                return {"user_id": uid, "username": uname, "id": uid}
+    except Exception:
+        pass
+    return None
 
 def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
     if not authorization:
         raise HTTPException(status_code=401, detail="Chưa đăng nhập hoặc thiếu token")
     token = authorization.replace("Bearer ", "").strip()
-    session = ACTIVE_SESSIONS.get(token)
-    if not session:
-        raise HTTPException(status_code=401, detail="Phiên đăng nhập đã hết hạn hoặc không hợp lệ")
-    return session
+    if token in ACTIVE_SESSIONS:
+        return ACTIVE_SESSIONS[token]
+
+    db_sess = get_session_db(token)
+    if db_sess:
+        sess_obj = {"user_id": db_sess["user_id"], "username": db_sess["username"], "id": db_sess["user_id"]}
+        ACTIVE_SESSIONS[token] = sess_obj
+        return sess_obj
+
+    verified = xac_thuc_token(token)
+    if verified:
+        uid = restore_or_ensure_user(verified["username"], verified["user_id"])
+        sess_obj = {"user_id": uid, "username": verified["username"], "id": uid}
+        ACTIVE_SESSIONS[token] = sess_obj
+        save_session_db(token, uid, verified["username"])
+        return sess_obj
+
+    raise HTTPException(status_code=401, detail="Phiên đăng nhập đã hết hạn hoặc không hợp lệ")
 
 @app.post("/api/register")
 async def api_register(payload: Dict[str, Any]):
@@ -61,8 +108,9 @@ async def api_register(payload: Dict[str, Any]):
     if not success:
         return JSONResponse(status_code=400, content={"success": False, "message": msg})
 
-    token = secrets.token_hex(24)
-    ACTIVE_SESSIONS[token] = {"user_id": user_id, "username": username}
+    token = tao_token_xac_thuc(user_id, username)
+    ACTIVE_SESSIONS[token] = {"user_id": user_id, "username": username, "id": user_id}
+    save_session_db(token, user_id, username)
 
     create_tab(user_id, "Tab Treo #1")
 
@@ -82,8 +130,9 @@ async def api_login(payload: Dict[str, Any]):
     if not success:
         return JSONResponse(status_code=400, content={"success": False, "message": msg})
 
-    token = secrets.token_hex(24)
-    ACTIVE_SESSIONS[token] = {"user_id": user_id, "username": username}
+    token = tao_token_xac_thuc(user_id, username)
+    ACTIVE_SESSIONS[token] = {"user_id": user_id, "username": username, "id": user_id}
+    save_session_db(token, user_id, username)
 
     return {
         "success": True,
@@ -98,11 +147,21 @@ async def api_logout(authorization: Optional[str] = Header(None)):
         token = authorization.replace("Bearer ", "").strip()
         if token in ACTIVE_SESSIONS:
             del ACTIVE_SESSIONS[token]
+        delete_session_db(token)
     return {"success": True, "message": "Đã đăng xuất"}
 
 @app.get("/api/me")
 async def api_me(user: Dict[str, Any] = Depends(get_current_user)):
     return {"success": True, "user": user}
+
+
+@app.post("/api/tabs/sync")
+async def api_tabs_sync(payload: Dict[str, Any], user: Dict[str, Any] = Depends(get_current_user)):
+    client_tabs = payload.get("tabs", [])
+    if client_tabs and isinstance(client_tabs, list):
+        sync_user_tabs(user["user_id"], client_tabs)
+    tabs = get_user_tabs(user["user_id"])
+    return {"success": True, "tabs": tabs}
 
 @app.get("/api/tabs")
 async def api_get_tabs(user: Dict[str, Any] = Depends(get_current_user)):
