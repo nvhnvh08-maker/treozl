@@ -9,42 +9,130 @@ const TOOL_COLORS = [
     { id: "#FFFFFF", ten: "Trắng tinh", hex: "#FFFFFF" },
     { id: "#000000", ten: "Đen huyền", hex: "#000000" }
 ];
+
+const ICONS = {
+    "shield-check": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+    "user": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    "lock": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+    "eye": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
+    "eye-off": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`,
+    "arrow-right": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+    "zap": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+    "menu": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`,
+    "plus": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>`,
+    "plus-circle": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>`,
+    "check": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    "check-circle-2": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
+    "qr-code": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>`,
+    "edit-3": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+    "rotate-cw": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`,
+    "refresh-cw": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
+    "play": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,
+    "square": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>`,
+    "layers": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+    "layout-grid": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`,
+    "users": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    "user-check": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>`,
+    "sliders": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>`,
+    "file-text": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>`,
+    "info": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+    "alert-triangle": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`,
+    "x": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`,
+    "arrow-left": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+    "arrow-up-right": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" x2="17" y1="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>`,
+    "log-out": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>`,
+    "headset": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>`,
+    "copy": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+    "copy-check": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 15 2 2 4-4"/><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+    "send": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+    "message-circle": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`,
+    "gamepad-2": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="6"/></svg>`
+};
+
+function capNhatIcons() {
+    try {
+        if (typeof lucide !== "undefined" && lucide && typeof lucide.createIcons === "function") {
+            lucide.createIcons();
+        }
+    } catch(e) {}
+    document.querySelectorAll("[data-lucide]").forEach(el => {
+        const name = el.getAttribute("data-lucide");
+        if (name && ICONS[name] && !el.querySelector("svg")) {
+            const w = el.style.width || "18px";
+            const h = el.style.height || "18px";
+            el.innerHTML = ICONS[name];
+            const svg = el.querySelector("svg");
+            if (svg) {
+                svg.style.width = w;
+                svg.style.height = h;
+                svg.style.display = "inline-block";
+                svg.style.verticalAlign = "middle";
+            }
+        }
+    });
+}
+
 let maToken = localStorage.getItem("zalo_web_token") || null;
 let tenNguoiDung = localStorage.getItem("zalo_web_user") || "";
 let cheDoAuth = "login";
 let chuKyPolling = null;
 let currentEditingTabId = null;
 let currentTabConfig = null;
+let cheDoNhapAcc = "manual";
+let qrSessions = {};
+let qrPollingTimer = null;
+let currentQRIndex = 0;
+
 window.onload = function() {
-    lucide.createIcons();
+    capNhatIcons();
     khoiTao3DParticles();
     if (maToken) {
-        hienThiAppChinh();
+        kiemTraPhienTuDong();
     } else {
         hienThiAuth();
     }
 };
+
+async function kiemTraPhienTuDong() {
+    try {
+        const res = await fetch("/api/me", {
+            headers: { "Authorization": "Bearer " + maToken }
+        });
+        const data = await res.json();
+        if (data.success && data.user) {
+            tenNguoiDung = data.user.username || tenNguoiDung;
+            localStorage.setItem("zalo_web_user", tenNguoiDung);
+            hienThiAppChinh();
+            return;
+        }
+    } catch(e) {}
+    hienThiAppChinh();
+}
+
 function khoiTao3DParticles() {
     const canvas = document.getElementById("canvas3dBg");
     if (!canvas || typeof THREE === "undefined") return;
+    if (window.innerWidth < 768) {
+        canvas.style.display = "none";
+        return;
+    }
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 110;
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false, powerPreference: "low-power" });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
-    const pCount = 160;
+    renderer.setPixelRatio(1);
+    const pCount = 75;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(pCount * 3);
     const cols = new Float32Array(pCount * 3);
     const c1 = new THREE.Color(0x00F0FF);
     const c2 = new THREE.Color(0x0084FF);
-    const c3 = new THREE.Color(0xA855F7);
     for (let i = 0; i < pCount; i++) {
-        pos[i * 3] = (Math.random() - 0.5) * 360;
-        pos[i * 3 + 1] = (Math.random() - 0.5) * 320;
-        pos[i * 3 + 2] = (Math.random() - 0.5) * 260;
-        const picked = i % 3 === 0 ? c1 : (i % 3 === 1 ? c2 : c3);
+        pos[i * 3] = (Math.random() - 0.5) * 320;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 280;
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 220;
+        const picked = i % 2 === 0 ? c1 : c2;
         cols[i * 3] = picked.r;
         cols[i * 3 + 1] = picked.g;
         cols[i * 3 + 2] = picked.b;
@@ -55,21 +143,10 @@ function khoiTao3DParticles() {
         size: 2.2,
         vertexColors: true,
         transparent: true,
-        opacity: 0.65,
-        blending: THREE.AdditiveBlending
+        opacity: 0.55
     });
     const pts = new THREE.Points(geo, mat);
     scene.add(pts);
-    const wireGeo = new THREE.IcosahedronGeometry(36, 1);
-    const wireMat = new THREE.MeshBasicMaterial({
-        color: 0x00F0FF,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.12
-    });
-    const wireSphere = new THREE.Mesh(wireGeo, wireMat);
-    wireSphere.position.set(45, -10, -50);
-    scene.add(wireSphere);
     let isHidden = false;
     document.addEventListener("visibilitychange", () => {
         isHidden = document.hidden;
@@ -77,10 +154,8 @@ function khoiTao3DParticles() {
     function render() {
         requestAnimationFrame(render);
         if (isHidden) return;
-        pts.rotation.y += 0.0006;
-        pts.rotation.x += 0.0003;
-        wireSphere.rotation.x += 0.002;
-        wireSphere.rotation.y += 0.003;
+        pts.rotation.y += 0.0004;
+        pts.rotation.x += 0.0002;
         renderer.render(scene, camera);
     }
     render();
@@ -90,6 +165,7 @@ function khoiTao3DParticles() {
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 }
+
 function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
     const modal = document.getElementById("glassModalAlert");
     if (!modal) {
@@ -110,19 +186,17 @@ function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
     }
     modal.classList.add("show");
     modal.style.setProperty("display", "flex", "important");
-    lucide.createIcons();
+    capNhatIcons();
 }
-function dongGlassModal(e) {
-    if (e && e.target && e.target.closest && e.target.closest(".glass-modal-card") && e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
-        return;
-    }
+
+function dongGlassModal() {
     const modal = document.getElementById("glassModalAlert");
     if (modal) {
         modal.classList.remove("show");
         modal.style.setProperty("display", "none", "important");
-        modal.style.display = "none";
     }
 }
+
 function anHienMatKhau() {
     const input = document.getElementById("authPassword");
     const icon = document.getElementById("authEyeIcon");
@@ -134,8 +208,9 @@ function anHienMatKhau() {
         input.type = "password";
         icon.setAttribute("data-lucide", "eye");
     }
-    lucide.createIcons();
+    capNhatIcons();
 }
+
 function chuyenCheDoAuth(mode) {
     cheDoAuth = mode;
     const tabLogin = document.getElementById("tabBtnLogin");
@@ -144,252 +219,283 @@ function chuyenCheDoAuth(mode) {
     const btnText = document.getElementById("btnAuthText");
     const notice = document.getElementById("authNotice");
     if (mode === "login") {
-        if (tabLogin) tabLogin.className = "auth-capsule-btn active";
-        if (tabReg) tabReg.className = "auth-capsule-btn";
+        if (tabLogin) tabLogin.classList.add("active");
+        if (tabReg) tabReg.classList.remove("active");
         if (title) title.textContent = "Đăng Nhập Quản Trị";
         if (btnText) btnText.textContent = "ĐĂNG NHẬP";
         if (notice) notice.innerHTML = 'Chưa có tài khoản? <a href="javascript:void(0)" onclick="chuyenCheDoAuth(\'register\')">Đăng ký mới ngay</a>';
     } else {
-        if (tabReg) tabReg.className = "auth-capsule-btn active";
-        if (tabLogin) tabLogin.className = "auth-capsule-btn";
+        if (tabReg) tabReg.classList.add("active");
+        if (tabLogin) tabLogin.classList.remove("active");
         if (title) title.textContent = "Tạo Tài Khoản Mới";
         if (btnText) btnText.textContent = "ĐĂNG KÝ NGAY";
-        if (notice) notice.innerHTML = 'Đã có tài khoản? <a href="javascript:void(0)" onclick="chuyenCheDoAuth(\'login\')">Đăng nhập tại đây</a>';
+        if (notice) notice.innerHTML = 'Đã có tài khoản? <a href="javascript:void(0)" onclick="chuyenCheDoAuth(\'login\')">Đăng nhập ngay</a>';
     }
-    lucide.createIcons();
+    capNhatIcons();
 }
+
 function hienThiAuth() {
-    const authBackdrop = document.getElementById("authBackdrop");
-    if (authBackdrop) {
-        authBackdrop.classList.remove("hidden");
-        authBackdrop.style.setProperty("display", "flex", "important");
+    const backdrop = document.getElementById("authBackdrop");
+    const main = document.getElementById("mainDashboard");
+    if (backdrop) {
+        backdrop.classList.remove("hidden");
+        backdrop.style.setProperty("display", "flex", "important");
     }
-    const mainDash = document.getElementById("mainDashboard");
-    if (mainDash) mainDash.style.display = "none";
-    if (chuKyPolling) clearInterval(chuKyPolling);
+    if (main) main.style.display = "none";
+    chuyenCheDoAuth("login");
+    capNhatIcons();
 }
+
 function hienThiAppChinh() {
-    const authBackdrop = document.getElementById("authBackdrop");
-    if (authBackdrop) {
-        authBackdrop.classList.add("hidden");
-        authBackdrop.style.setProperty("display", "none", "important");
+    const backdrop = document.getElementById("authBackdrop");
+    const main = document.getElementById("mainDashboard");
+    if (backdrop) {
+        backdrop.classList.add("hidden");
+        backdrop.style.setProperty("display", "none", "important");
     }
-    const mainDash = document.getElementById("mainDashboard");
-    if (mainDash) mainDash.style.display = "block";
-    const welcomeUser = document.getElementById("welcomeUsername");
-    if (welcomeUser) welcomeUser.textContent = tenNguoiDung || "Sếp";
-    lucide.createIcons();
+    if (main) main.style.display = "block";
+    const userSpan = document.getElementById("welcomeUsername");
+    if (userSpan && tenNguoiDung) {
+        userSpan.textContent = tenNguoiDung;
+    }
     chuyenTrang('quan-ly-tab');
-    batDauPolling();
+    taiDanhSachTabs();
+    capNhatIcons();
 }
+
 async function xuLyXacThuc(e) {
     e.preventDefault();
-    const user = document.getElementById("authUsername").value.trim();
-    const pass = document.getElementById("authPassword").value.trim();
-    const btn = document.getElementById("btnAuthSubmit");
-    btn.disabled = true;
-    btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 18px; height: 18px;"></i> <span>Đang xử lý...</span>`;
-    lucide.createIcons();
-    const endpoint = cheDoAuth === "login" ? "/api/login" : "/api/register";
+    const u = document.getElementById("authUsername").value.trim();
+    const p = document.getElementById("authPassword").value.trim();
+    if (!u || !p) {
+        hienThiThongBaoGlass("Thiếu Thông Tin", "Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!", "error");
+        return;
+    }
+    const endpoint = cheDoAuth === "login" ? "/api/auth/login" : "/api/auth/register";
     try {
         const res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: user, password: pass })
+            body: JSON.stringify({ username: u, password: p })
         });
         const data = await res.json();
-        if (data.success && data.token) {
+        if (data.success) {
             maToken = data.token;
             tenNguoiDung = data.username;
             localStorage.setItem("zalo_web_token", maToken);
             localStorage.setItem("zalo_web_user", tenNguoiDung);
             hienThiAppChinh();
+            hienThiThongBaoGlass("Thành Công", data.message || "Đăng nhập thành công!", "success");
         } else {
-            hienThiThongBaoGlass(
-                cheDoAuth === "login" ? "Đăng Nhập Thất Bại" : "Đăng Ký Thất Bại",
-                data.message || "Tài khoản hoặc mật khẩu không hợp lệ",
-                "error"
-            );
+            hienThiThongBaoGlass("Xác Thực Thất Bại", data.message || "Tài khoản hoặc mật khẩu không chính xác!", "error");
         }
-    } catch (err) {
+    } catch(err) {
         hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể kết nối máy chủ: " + err, "error");
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<span id="btnAuthText">${cheDoAuth === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ NGAY'}</span><i data-lucide="arrow-right" class="auth-btn-arrow"></i>`;
-        lucide.createIcons();
-        chuyenCheDoAuth(cheDoAuth);
     }
 }
+
 async function xuLyDangXuat() {
-    if (maToken) {
-        try {
-            await fetch("/api/logout", {
+    try {
+        if (maToken) {
+            await fetch("/api/auth/logout", {
                 method: "POST",
                 headers: { "Authorization": "Bearer " + maToken }
             });
-        } catch(e) {}
-    }
-    maToken = null;
-    tenNguoiDung = "";
+        }
+    } catch(e) {}
     localStorage.removeItem("zalo_web_token");
     localStorage.removeItem("zalo_web_user");
+    maToken = null;
+    tenNguoiDung = "";
     dongMenu3Gach();
     hienThiAuth();
 }
+
 function moMenu3Gach() {
-    document.getElementById("drawerMenu").classList.add("open");
-    document.getElementById("drawerOverlay").classList.add("show");
+    const menu = document.getElementById("drawerMenu");
+    const overlay = document.getElementById("drawerOverlay");
+    if (menu) menu.classList.add("open");
+    if (overlay) overlay.classList.add("open");
 }
+
 function dongMenu3Gach() {
-    document.getElementById("drawerMenu").classList.remove("open");
-    document.getElementById("drawerOverlay").classList.remove("show");
+    const menu = document.getElementById("drawerMenu");
+    const overlay = document.getElementById("drawerOverlay");
+    if (menu) menu.classList.remove("open");
+    if (overlay) overlay.classList.remove("open");
 }
+
 function chuyenTrang(trang) {
     dongMenu3Gach();
-    document.getElementById("viewQuanLyTab").style.display = "none";
-    document.getElementById("viewTaoTab").style.display = "none";
-    document.getElementById("viewLienHe").style.display = "none";
-    document.getElementById("viewChiTietTab").style.display = "none";
+    const vQuanLy = document.getElementById("viewQuanLyTab");
+    const vTaoTab = document.getElementById("viewTaoTab");
+    const vLienHe = document.getElementById("viewLienHe");
+    const vChiTiet = document.getElementById("viewChiTietTab");
+    if (vQuanLy) vQuanLy.style.display = "none";
+    if (vTaoTab) vTaoTab.style.display = "none";
+    if (vLienHe) vLienHe.style.display = "none";
+    if (vChiTiet) vChiTiet.style.display = "none";
     document.querySelectorAll(".drawer-nav-item").forEach(el => el.classList.remove("active"));
     if (trang === "quan-ly-tab") {
-        document.getElementById("viewQuanLyTab").style.display = "block";
-        document.getElementById("menuItemQuanLyTab").classList.add("active");
+        if (vQuanLy) vQuanLy.style.display = "block";
+        document.getElementById("menuItemQuanLyTab")?.classList.add("active");
         taiDanhSachTabs();
     } else if (trang === "tao-tab") {
-        document.getElementById("viewTaoTab").style.display = "block";
-        document.getElementById("menuItemTaoTab").classList.add("active");
-        document.getElementById("inputTenTabMoi").value = "";
-        document.getElementById("inputTenTabMoi").focus();
+        if (vTaoTab) vTaoTab.style.display = "block";
+        document.getElementById("menuItemTaoTab")?.classList.add("active");
+        const inName = document.getElementById("inputTenTabMoi");
+        if (inName) { inName.value = ""; inName.focus(); }
     } else if (trang === "lien-he") {
-        document.getElementById("viewLienHe").style.display = "block";
-        document.getElementById("menuItemLienHe").classList.add("active");
+        if (vLienHe) vLienHe.style.display = "block";
+        document.getElementById("menuItemLienHe")?.classList.add("active");
     } else if (trang === "chi-tiet-tab") {
-        document.getElementById("viewChiTietTab").style.display = "block";
+        if (vChiTiet) vChiTiet.style.display = "block";
     }
-    lucide.createIcons();
+    capNhatIcons();
 }
+
 function saoChepDiscord(text) {
-    navigator.clipboard.writeText(text);
-    hienThiThongBaoGlass("Đã Sao Chép", `Đã sao chép Discord: "${text}" vào bộ nhớ tạm!`, "success");
+    navigator.clipboard.writeText(text).then(() => {
+        hienThiThongBaoGlass("Đã Sao Chép", "Đã sao chép Discord ID: " + text, "success");
+    }).catch(() => {
+        hienThiThongBaoGlass("Discord ID", text, "info");
+    });
 }
-let daLuuTabsJson = "";
+
+function luuBackupTabsCucBo(tabs) {
+    if (!tabs || !Array.isArray(tabs)) return;
+    try {
+        localStorage.setItem("zalo_permanent_tabs_backup", JSON.stringify(tabs));
+    } catch(e) {}
+}
+
+function layBackupTabsCucBo() {
+    try {
+        const raw = localStorage.getItem("zalo_permanent_tabs_backup");
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [];
+}
+
 async function taiDanhSachTabs() {
     if (!maToken) return;
     try {
         const res = await fetch("/api/tabs", {
             headers: { "Authorization": "Bearer " + maToken }
         });
-        if (res.status === 401) {
-            xuLyDangXuat();
-            return;
-        }
         const data = await res.json();
-        if (data.success && data.tabs) {
-            const chuoiMoi = JSON.stringify(data.tabs);
-            if (chuoiMoi !== daLuuTabsJson) {
-                daLuuTabsJson = chuoiMoi;
-                renderDanhSachTabsNgang(data.tabs);
+        if (data.success) {
+            let tabs = data.tabs || [];
+            if (tabs.length === 0) {
+                const localTabs = layBackupTabsCucBo();
+                if (localTabs.length > 0) {
+                    await fetch("/api/tabs/sync", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + maToken
+                        },
+                        body: JSON.stringify({ tabs: localTabs })
+                    });
+                    const resSync = await fetch("/api/tabs", {
+                        headers: { "Authorization": "Bearer " + maToken }
+                    });
+                    const dataSync = await resSync.json();
+                    if (dataSync.success && dataSync.tabs) {
+                        tabs = dataSync.tabs;
+                    }
+                }
             }
+            luuBackupTabsCucBo(tabs);
+            renderDanhSachTabsNgang(tabs);
         }
-    } catch(e) {}
+    } catch(e) {
+        const localTabs = layBackupTabsCucBo();
+        if (localTabs.length > 0) {
+            renderDanhSachTabsNgang(localTabs);
+        }
+    }
 }
+
 function renderDanhSachTabsNgang(tabs) {
     const container = document.getElementById("vungDanhSachTabsNgang");
     if (!container) return;
-    if (tabs.length === 0) {
+    if (!tabs || tabs.length === 0) {
         container.innerHTML = `
-            <div class="card-3d" style="text-align: center; padding: 50px 24px;">
-                <div class="logo-icon-3d" style="margin: 0 auto 16px; width: 56px; height: 56px;">
-                    <i data-lucide="layers" style="width: 28px; height: 28px;"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff;">Chưa Có Tab Treo Text Nào</h3>
-                <p style="color: var(--text-muted); margin-top: 6px; margin-bottom: 24px; font-size: 0.9rem;">
-                    Hệ thống sẵn sàng chạy song song nhiều tab không giới hạn. Sếp bấm nút bên dưới để tạo tab mới nhé!
-                </p>
-                <button class="btn-glow btn-primary" onclick="chuyenTrang('tao-tab')" style="padding: 12px 24px; font-size: 0.95rem;">
-                    <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
-                    Tạo Tab Mới Ngay
-                </button>
+        <div class="card-3d" style="text-align: center; padding: 48px 20px;">
+            <div class="auth-icon-badge" style="margin: 0 auto 16px; background: rgba(255,255,255,0.06); box-shadow: none;">
+                <i data-lucide="layers" style="width: 26px; height: 26px; color: var(--text-muted);"></i>
             </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;">Chưa có tab treo nào</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Tạo tab mới ngay để thiết lập treo tin tự động đa tài khoản 24/7!</p>
+            <button class="btn-glow btn-primary" onclick="chuyenTrang('tao-tab')">
+                <i data-lucide="plus" style="width: 16px; height: 16px;"></i> Tạo Tab Đầu Tiên
+            </button>
+        </div>
         `;
-        lucide.createIcons();
+        capNhatIcons();
         return;
     }
+
     let html = "";
-    tabs.forEach(t => {
-        const classVien = t.is_running ? "running" : "stopped";
-        const badgeTrangThai = t.is_running
-            ? `<span class="tab-meta-pill" style="color: #34d399; border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.14);">
-                 <i data-lucide="zap" style="width: 13px; height: 13px;"></i>
-                 ĐANG CHẠY (${t.runtime_formatted || '00:00:00'})
-               </span>`
-            : `<span class="tab-meta-pill" style="color: #f87171; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.1);">
-                 <i data-lucide="stop-circle" style="width: 13px; height: 13px;"></i>
-                 ĐÃ DỪNG
-               </span>`;
-        const iconTrangThai = t.is_running
-            ? `<div style="position: relative;">
-                 <i data-lucide="activity" style="width: 24px; height: 24px;"></i>
-                 <span class="pulse-radar-dot"></span>
-               </div>`
-            : `<i data-lucide="pause-circle" style="width: 24px; height: 24px;"></i>`;
-        const btnBatDungNhanh = t.is_running
-            ? `<button class="btn-glow btn-danger" onclick="dungNhanhTab('${t.id}')" title="Dừng tab này ngay">
-                 <i data-lucide="square" style="width: 14px; height: 14px;"></i>
-                 Dừng
-               </button>`
-            : `<button class="btn-glow btn-success" onclick="moChiTietTab('${t.id}')" title="Chạy tab này ngay">
-                 <i data-lucide="play" style="width: 14px; height: 14px;"></i>
-                 Chạy
-               </button>`;
+    tabs.forEach(tab => {
+        const isRunning = tab.is_running;
+        const statusClass = isRunning ? "running" : "stopped";
+        const statusText = isRunning ? "ĐANG CHẠY" : "ĐÃ DỪNG";
+        const iconName = isRunning ? "play" : "square";
+        const runtime = tab.runtime_formatted || "00:00:00";
+        const sent = tab.total_sent || 0;
+        const failed = tab.total_failed || 0;
+        const accCount = tab.acc_count || (tab.config?.accounts?.length || 1);
+        const groupName = tab.target_group_name || tab.config?.group_name || tab.config?.group_id || "Chưa chọn";
+
         html += `
-        <div class="tab-horizontal-card ${classVien}">
+        <div class="tab-horizontal-card ${statusClass}">
             <div class="tab-info-left">
                 <div class="tab-status-icon">
-                    ${iconTrangThai}
+                    <i data-lucide="${iconName}" style="width: 20px; height: 20px;"></i>
                 </div>
-                <div>
-                    <div class="tab-name-title">
-                        <span>${escapeHtml(t.name)}</span>
-                    </div>
-                    <div class="tab-meta-desc">
-                        ${badgeTrangThai}
-                        <span class="tab-meta-pill">
-                            <i data-lucide="users" style="width: 13px; height: 13px;"></i>
-                            ${t.acc_count || 1} Acc
+                <div class="tab-details">
+                    <div class="tab-name-title">${escapeHtml(tab.name)}</div>
+                    <div class="tab-meta-pills">
+                        <span class="tab-meta-pill" style="color: ${isRunning ? 'var(--neon-emerald)' : 'var(--neon-red)'}; border-color: ${isRunning ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'};">
+                            ● ${statusText}
                         </span>
-                        <span class="tab-meta-pill">
-                            <i data-lucide="send" style="width: 13px; height: 13px; color: #38bdf8;"></i>
-                            Đã gửi: <strong style="color: #fff; margin-left: 2px;">${t.total_sent || 0}</strong>
-                        </span>
-                        <span class="tab-meta-pill">
-                            <i data-lucide="message-square" style="width: 13px; height: 13px; color: #a78bfa;"></i>
-                            Nhóm: <strong style="color: #fff; margin-left: 2px;">${escapeHtml(t.target_group_name || 'Chưa chọn')}</strong>
-                        </span>
+                        <span class="tab-meta-pill">⏱ ${runtime}</span>
+                        <span class="tab-meta-pill">👥 ${accCount} Acc</span>
+                        <span class="tab-meta-pill">🎯 ${escapeHtml(groupName)}</span>
+                        <span class="tab-meta-pill">🚀 Đã gửi: ${sent} | ❌ ${failed}</span>
                     </div>
                 </div>
             </div>
             <div class="tab-actions-right">
-                ${btnBatDungNhanh}
-                <button class="btn-glow btn-primary" onclick="moChiTietTab('${t.id}')">
-                    <i data-lucide="sliders" style="width: 15px; height: 15px;"></i>
-                    Cấu hình Tab
+                <button class="btn-glow btn-primary" onclick="moChiTietTab('${tab.id}')">
+                    <i data-lucide="sliders" style="width: 15px; height: 15px;"></i> Cấu hình
                 </button>
-                <button class="btn-glow btn-outline" onclick="xoaTab('${t.id}')" style="color: #f87171;" title="Xóa tab này">
-                    <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                ${isRunning ? `
+                <button class="btn-glow btn-danger" onclick="dungNhanhTab('${tab.id}')">
+                    <i data-lucide="square" style="width: 15px; height: 15px;"></i> Dừng
                 </button>
+                ` : `
+                <button class="btn-glow btn-outline" style="color: #f87171; border-color: rgba(239, 68, 68, 0.35);" onclick="xoaTab('${tab.id}')">
+                    <i data-lucide="x" style="width: 15px; height: 15px;"></i> Xóa
+                </button>
+                `}
             </div>
         </div>
         `;
     });
+
     container.innerHTML = html;
-    lucide.createIcons();
+    capNhatIcons();
 }
+
 async function xuLyTaoTabMoi(e) {
     e.preventDefault();
-    const tenTab = document.getElementById("inputTenTabMoi").value.trim();
-    if (!tenTab) {
-        hienThiThongBaoGlass("Lỗi", "Vui lòng nhập tên tab mới!", "error");
+    const input = document.getElementById("inputTenTabMoi");
+    const name = input ? input.value.trim() : "";
+    if (!name) {
+        hienThiThongBaoGlass("Thiếu Tên Tab", "Vui lòng nhập tên cho tab mới!", "error");
         return;
     }
     try {
@@ -399,19 +505,21 @@ async function xuLyTaoTabMoi(e) {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + maToken
             },
-            body: JSON.stringify({ name: tenTab })
+            body: JSON.stringify({ name: name })
         });
         const data = await res.json();
         if (data.success) {
-            hienThiThongBaoGlass("Tạo Tab Thành Công", `Đã tạo tab "${tenTab}" thành công!`, "success");
+            hienThiThongBaoGlass("Tạo Thành Công", `Tab [${name}] đã được tạo thành công!`, "success");
             chuyenTrang('quan-ly-tab');
+            taiDanhSachTabs();
         } else {
-            hienThiThongBaoGlass("Lỗi Tạo Tab", data.message || "Lỗi tạo tab", "error");
+            hienThiThongBaoGlass("Lỗi Tạo Tab", data.message || "Không thể tạo tab mới", "error");
         }
-    } catch (err) {
-        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể tạo tab: " + err, "error");
+    } catch(err) {
+        hienThiThongBaoGlass("Lỗi Tạo Tab", "Không thể kết nối máy chủ: " + err, "error");
     }
 }
+
 async function dungNhanhTab(tabId) {
     try {
         await fetch(`/api/tabs/${tabId}/stop`, {
@@ -421,6 +529,7 @@ async function dungNhanhTab(tabId) {
         taiDanhSachTabs();
     } catch(e) {}
 }
+
 async function xoaTab(tabId) {
     if (!confirm("Sếp có chắc chắn muốn xóa tab này không?")) return;
     try {
@@ -436,6 +545,7 @@ async function xoaTab(tabId) {
         }
     } catch(e) {}
 }
+
 async function moChiTietTab(tabId) {
     currentEditingTabId = tabId;
     try {
@@ -454,11 +564,13 @@ async function moChiTietTab(tabId) {
         hienThiThongBaoGlass("Lỗi Mở Tab", "Không thể tải chi tiết tab: " + e, "error");
     }
 }
+
 function napDuLieuVaoTabForm(tab, status) {
     const cfg = tab.config || {};
     const accs = cfg.accounts && cfg.accounts.length > 0 ? cfg.accounts : [{ imei: "", cookie: "" }];
     document.getElementById("inputTabSoLuongAcc").value = accs.length;
     renderTabFormAccs(accs);
+    renderTabFormAccsQR(accs);
     const selectNhom = document.getElementById("selectTabNhomZalo");
     if (cfg.group_id) {
         selectNhom.innerHTML = `<option value="${cfg.group_id}">${cfg.group_name || ('Nhóm ' + cfg.group_id)}</option>`;
@@ -474,6 +586,35 @@ function napDuLieuVaoTabForm(tab, status) {
     chonMauTab(mode, hex);
     capNhatStatusTabUI(status);
 }
+
+function thayDoiSoLuongAcc() {
+    renderTabFormAccs();
+    renderTabFormAccsQR();
+}
+
+function chuyenCheDoNhapAcc(mode) {
+    cheDoNhapAcc = mode;
+    const btnManual = document.getElementById("btnModeManual");
+    const btnQR = document.getElementById("btnModeQR");
+    const wrapManual = document.getElementById("vungTabDanhSachAccsManual");
+    const wrapQR = document.getElementById("vungTabDanhSachAccsQR");
+    if (btnManual && btnQR && wrapManual && wrapQR) {
+        if (mode === "manual") {
+            btnManual.classList.add("active");
+            btnQR.classList.remove("active");
+            wrapManual.style.display = "block";
+            wrapQR.style.display = "none";
+        } else {
+            btnQR.classList.add("active");
+            btnManual.classList.remove("active");
+            wrapManual.style.display = "none";
+            wrapQR.style.display = "block";
+            renderTabFormAccsQR();
+        }
+    }
+    capNhatIcons();
+}
+
 function renderTabFormAccs(presetAccs) {
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const container = document.getElementById("vungTabDanhSachAccs");
@@ -505,22 +646,18 @@ function renderTabFormAccs(presetAccs) {
                 <div class="form-row" style="margin-bottom: 0;">
                     <label>Cookie Acc #${i + 1} (JSON hoặc chuỗi token zpw_sek):</label>
                     <textarea id="tab_acc_cookie_${i}" style="min-height: 52px; font-size: 0.8rem;" placeholder='Dán Cookie hoặc token zpw_sek...' required>${escapeHtml(cookieVal)}</textarea>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">
-                        💡 <em>Cookie phải còn phiên hoạt động trên chat.zalo.me</em>
-                    </div>
                 </div>
-                                <div class="acc-group-box">
+                <div class="acc-group-box">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 0.76rem; font-weight: 600; color: var(--neon-cyan);">🎯 Nhóm của Acc #${i + 1}:</span>
-                        <button type="button" class="btn-glow btn-outline" id="btnLayNhomAcc_${i}" style="padding: 3px 8px; font-size: 0.72rem;" onclick="tabLayDanhSachNhomTheoAcc(${i})">
-                            <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i>
-                            Lấy nhóm của Acc #${i + 1}
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--neon-cyan);">Nhóm riêng Acc #${i + 1}:</span>
+                        <button type="button" class="btn-glow btn-outline" style="padding: 2px 6px; font-size: 0.7rem;" onclick="tabLayDanhSachNhomTheoAcc(${i})">
+                            <i data-lucide="rotate-cw" style="width: 11px; height: 11px;"></i> Lấy nhóm Acc này
                         </button>
                     </div>
-                    <select id="tab_acc_select_group_${i}" onchange="doiNhomAcc(${i})" style="margin-bottom: 6px; font-size: 0.8rem;">
-                        <option value="">${groupIdVal ? (escapeHtml(groupNameVal) || ('Nhóm ' + escapeHtml(groupIdVal))) : '-- Bấm nút "Lấy nhóm" hoặc nhập ID bên dưới --'}</option>
+                    <select id="tab_acc_select_group_${i}" onchange="doiNhomAcc(${i}, this.value)" style="margin-bottom: 6px; font-size: 0.82rem; padding: 8px 12px;">
+                        ${groupIdVal ? `<option value="${groupIdVal}">${groupNameVal || ('Nhóm ' + groupIdVal)}</option>` : '<option value="">-- Mặc định dùng nhóm chung ở Bước 2 --</option>'}
                     </select>
-                    <input type="text" id="tab_acc_group_id_${i}" value="${escapeHtml(groupIdVal)}" placeholder="ID nhóm Zalo của Acc #${i + 1}..." style="font-size: 0.8rem;" oninput="nhapTayNhomAcc(${i})">
+                    <input type="text" id="tab_acc_group_id_${i}" value="${escapeHtml(groupIdVal)}" placeholder="Hoặc tự gõ ID nhóm riêng cho Acc #${i + 1}..." oninput="nhapTayNhomAcc(${i}, this.value)" style="font-size: 0.82rem; padding: 8px 12px;">
                     <input type="hidden" id="tab_acc_group_name_${i}" value="${escapeHtml(groupNameVal)}">
                 </div>
             </div>
@@ -528,434 +665,13 @@ function renderTabFormAccs(presetAccs) {
         `;
     }
     container.innerHTML = html;
-    lucide.createIcons();
-}
-async function tabLayDanhSachNhomTheoAcc(accIndex) {
-    const imeiEl = document.getElementById(`tab_acc_imei_${accIndex}`);
-    const cookieEl = document.getElementById(`tab_acc_cookie_${accIndex}`);
-    const btn = document.getElementById(`btnLayNhomAcc_${accIndex}`);
-    const btnChung = (accIndex === 0) ? document.getElementById("btnTabLayNhom") : null;
-    if (!imeiEl || !imeiEl.value.trim()) {
-        hienThiThongBaoGlass("Thiếu Thông Tin", `Vui lòng nhập IMEI của Acc #${accIndex + 1}!`, "error");
-        return;
-    }
-    if (!cookieEl || !cookieEl.value.trim()) {
-        hienThiThongBaoGlass("Thiếu Thông Tin", `Vui lòng nhập Cookie của Acc #${accIndex + 1}!`, "error");
-        return;
-    }
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 12px; height: 12px;"></i> Đang tải...`;
-    }
-    if (btnChung) {
-        btnChung.disabled = true;
-        btnChung.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 15px; height: 15px;"></i> Đang tải nhóm...`;
-    }
-    lucide.createIcons();
-    try {
-        const res = await fetch("/api/get-groups", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + maToken
-            },
-            body: JSON.stringify({
-                imei: imeiEl.value.trim(),
-                cookie: cookieEl.value.trim()
-            })
-        });
-        const data = await res.json();
-        if (data.success && data.groups) {
-            const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
-            if (data.groups.length === 0) {
-                if (selectEl) selectEl.innerHTML = `<option value="">Acc #${accIndex + 1} không tham gia nhóm nào</option>`;
-                hienThiThongBaoGlass("Thông Báo", `Acc #${accIndex + 1} hiện không tham gia nhóm Zalo nào!`, "info");
-            } else {
-                let optHtml = `<option value="">-- Chọn 1 nhóm (${data.groups.length} nhóm tìm thấy) --</option>`;
-                data.groups.forEach(g => {
-                    optHtml += `<option value="${escapeHtml(g.id)}" data-name="${escapeHtml(g.name)}">${escapeHtml(g.name)} (ID: ${escapeHtml(g.id)})</option>`;
-                });
-                if (selectEl) selectEl.innerHTML = optHtml;
-                if (accIndex === 0) {
-                    const selectChung = document.getElementById("selectTabNhomZalo");
-                    if (selectChung) selectChung.innerHTML = optHtml;
-                }
-                hienThiThongBaoGlass("Thành Công", `Đã tải thành công ${data.groups.length} nhóm Zalo của Acc #${accIndex + 1}!`, "success");
-            }
-        } else {
-            hienThiThongBaoGlass("Lỗi Tải Nhóm Zalo", data.message || `Không thể tải danh sách nhóm của Acc #${accIndex + 1}`, "error");
-        }
-    } catch(e) {
-        hienThiThongBaoGlass("Lỗi Kết Nối", "Lỗi kết nối tới Zalo hoặc máy chủ: " + e, "error");
-    } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = `<i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Lấy nhóm của Acc #${accIndex + 1}`;
-        }
-        if (btnChung) {
-            btnChung.disabled = false;
-            btnChung.innerHTML = `<i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i> Lấy danh sách nhóm từ Acc #1`;
-        }
-        lucide.createIcons();
-    }
-}
-function doiNhomAcc(accIndex) {
-    const selectEl = document.getElementById(`tab_acc_select_group_${accIndex}`);
-    const inputId = document.getElementById(`tab_acc_group_id_${accIndex}`);
-    const inputName = document.getElementById(`tab_acc_group_name_${accIndex}`);
-    if (!selectEl || !inputId) return;
-    const val = selectEl.value;
-    if (val) {
-        inputId.value = val;
-        const opt = selectEl.options[selectEl.selectedIndex];
-        const gName = opt?.getAttribute("data-name") || opt?.text || ("Nhóm " + val);
-        if (inputName) inputName.value = gName;
-        if (accIndex === 0) {
-            const manualChung = document.getElementById("inputTabManualGroupId");
-            if (manualChung) manualChung.value = val;
-            const selectChung = document.getElementById("selectTabNhomZalo");
-            if (selectChung) selectChung.value = val;
-        }
-    }
-}
-function nhapTayNhomAcc(accIndex) {
-    const inputId = document.getElementById(`tab_acc_group_id_${accIndex}`);
-    const inputName = document.getElementById(`tab_acc_group_name_${accIndex}`);
-    if (inputId && inputName) {
-        inputName.value = "Nhóm " + inputId.value.trim();
-    }
-}
-function dongBoNhomChoTatCaAcc() {
-    const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
-    const gid0 = document.getElementById("tab_acc_group_id_0")?.value.trim() || document.getElementById("inputTabManualGroupId")?.value.trim() || document.getElementById("selectTabNhomZalo")?.value.trim();
-    const gname0 = document.getElementById("tab_acc_group_name_0")?.value.trim() || ("Nhóm " + gid0);
-    if (!gid0) {
-        hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập ID nhóm Zalo cho Acc #1 trước khi đồng bộ!", "error");
-        return;
-    }
-    for (let i = 1; i < count; i++) {
-        const inputId = document.getElementById(`tab_acc_group_id_${i}`);
-        const inputName = document.getElementById(`tab_acc_group_name_${i}`);
-        const selectEl = document.getElementById(`tab_acc_select_group_${i}`);
-        if (inputId) inputId.value = gid0;
-        if (inputName) inputName.value = gname0;
-        if (selectEl) {
-            selectEl.innerHTML = `<option value="${escapeHtml(gid0)}" selected>${escapeHtml(gname0)} (ID: ${escapeHtml(gid0)})</option>`;
-        }
-    }
-    hienThiThongBaoGlass("Đồng Bộ Thành Công", `Đã đồng bộ nhóm [${gname0}] cho tất cả ${count} tài khoản!`, "success");
-}
-function doiNhomChung(val) {
-    const manualChung = document.getElementById("inputTabManualGroupId");
-    if (manualChung) manualChung.value = val;
-    const gid0 = document.getElementById("tab_acc_group_id_0");
-    if (gid0 && !gid0.value.trim()) {
-        gid0.value = val;
-        const selectChung = document.getElementById("selectTabNhomZalo");
-        const gName = selectChung?.options[selectChung.selectedIndex]?.text || ("Nhóm " + val);
-        const name0 = document.getElementById("tab_acc_group_name_0");
-        if (name0) name0.value = gName;
-    }
-}
-function nhapTayNhomChung(val) {
-    const gid0 = document.getElementById("tab_acc_group_id_0");
-    if (gid0 && !gid0.value.trim()) {
-        gid0.value = val;
-    }
-}
-function tabDocFileNgon(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-        document.getElementById("textareaTabNoiDungNgon").value = evt.target.result;
-        hienThiThongBaoGlass("Tải File Ngôn Thành Công", `Đã tải file: ${file.name}\nTổng cộng ${evt.target.result.split('\n').length} dòng ngôn sẵn sàng gửi!`, "success");
-    };
-    reader.readAsText(file, "UTF-8");
-}
-function renderBangMauTab() {
-    const grid = document.getElementById("vungTabBangMau");
-    let html = "";
-    TOOL_COLORS.forEach((c, idx) => {
-        let dot = c.hex === "rainbow"
-            ? "background: linear-gradient(135deg, red, orange, yellow, green, blue, purple);"
-            : (c.hex === "dice" ? "background: linear-gradient(135deg, #0084ff, #a855f7);" : `background-color: ${c.hex};`);
-        html += `
-        <div class="palette-item" id="tabPal_${idx}" onclick="tabChonMauClick('${c.id}', '${c.ten}', ${idx})">
-            <div class="palette-circle" style="${dot}"></div>
-            <span class="palette-label">${c.ten}</span>
-        </div>
-        `;
-    });
-    grid.innerHTML = html;
-}
-function tabChonMauClick(colorId, colorName, idx) {
-    document.querySelectorAll(".palette-item").forEach(el => el.classList.remove("active"));
-    const item = document.getElementById(`tabPal_${idx}`);
-    if (item) item.classList.add("active");
-    if (colorId === "random_line") {
-        document.getElementById("tabColorMode").value = "random_line";
-        document.getElementById("tabColorHex").value = "#DB342E";
-        document.getElementById("lblTabMauDangChon").textContent = "Mỗi dòng 1 màu ngẫu nhiên (Rainbow)";
-    } else if (colorId === "random_msg") {
-        document.getElementById("tabColorMode").value = "random_msg";
-        document.getElementById("tabColorHex").value = "#DB342E";
-        document.getElementById("lblTabMauDangChon").textContent = "Cả tin 1 màu ngẫu nhiên mỗi lần gửi";
-    } else {
-        document.getElementById("tabColorMode").value = "fixed";
-        document.getElementById("tabColorHex").value = colorId;
-        document.getElementById("lblTabMauDangChon").textContent = `Cố định: ${colorName} (${colorId})`;
-        document.getElementById("tabColorPicker").value = colorId;
-    }
-}
-function tabChonMauPicker(hex) {
-    document.querySelectorAll(".palette-item").forEach(el => el.classList.remove("active"));
-    document.getElementById("tabColorMode").value = "fixed";
-    document.getElementById("tabColorHex").value = hex;
-    document.getElementById("lblTabMauDangChon").textContent = `Màu tùy chỉnh: ${hex}`;
-}
-function chonMauTab(mode, hex) {
-    if (mode === "random_line") {
-        tabChonMauClick("random_line", "Ngẫu nhiên dòng", 0);
-    } else if (mode === "random_msg") {
-        tabChonMauClick("random_msg", "Ngẫu nhiên tin", 1);
-    } else {
-        const foundIdx = TOOL_COLORS.findIndex(c => c.id === hex);
-        if (foundIdx >= 0) {
-            tabChonMauClick(hex, TOOL_COLORS[foundIdx].ten, foundIdx);
-        } else {
-            tabChonMauPicker(hex);
-        }
-    }
-}
-async function tabBatDauTreo() {
-    if (!currentEditingTabId) return;
-    const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
-    const accounts = [];
-    let defaultGroupId = (document.getElementById("inputTabManualGroupId")?.value || "").trim() || (document.getElementById("selectTabNhomZalo")?.value || "").trim();
-    let defaultGroupName = "";
-    const selectChung = document.getElementById("selectTabNhomZalo");
-    if (selectChung && selectChung.selectedIndex >= 0 && selectChung.options[selectChung.selectedIndex]) {
-        defaultGroupName = selectChung.options[selectChung.selectedIndex].getAttribute("data-name") || selectChung.options[selectChung.selectedIndex].text;
-    }
-    if (!defaultGroupName && defaultGroupId) {
-        defaultGroupName = "Nhóm " + defaultGroupId;
-    }
-    for (let i = 0; i < count; i++) {
-        const imei = (document.getElementById(`tab_acc_imei_${i}`)?.value || "").trim();
-        const cookie = (document.getElementById(`tab_acc_cookie_${i}`)?.value || "").trim();
-        let accGid = (document.getElementById(`tab_acc_group_id_${i}`)?.value || "").trim();
-        let accGname = (document.getElementById(`tab_acc_group_name_${i}`)?.value || "").trim();
-        if (!accGid && defaultGroupId) {
-            accGid = defaultGroupId;
-            accGname = defaultGroupName;
-        }
-        if (imei && cookie) {
-            accounts.push({
-                imei,
-                cookie,
-                group_id: accGid,
-                group_name: accGname || (accGid ? ("Nhóm " + accGid) : "")
-            });
-        }
-    }
-    if (accounts.length === 0) {
-        hienThiThongBaoGlass("Thiếu Tài Khoản", "Vui lòng nhập đầy đủ IMEI và Cookie của ít nhất 1 tài khoản!", "error");
-        return;
-    }
-    const coNhom = accounts.some(a => Boolean(a.group_id)) || Boolean(defaultGroupId);
-    if (!coNhom) {
-        hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập nhóm Zalo cho các tài khoản!", "error");
-        return;
-    }
-    const messageText = document.getElementById("textareaTabNoiDungNgon").value.trim();
-    if (!messageText) {
-        hienThiThongBaoGlass("Thiếu File Ngôn", "Vui lòng nhập nội dung ngôn hoặc bấm 'Chọn File Ngôn (.txt)'!", "error");
-        return;
-    }
-    const delay = parseInt(document.getElementById("inputTabDelay").value) || 5;
-    const fontSize = parseInt(document.getElementById("inputTabFontSize").value) || 500;
-    const colorMode = document.getElementById("tabColorMode").value;
-    const chosenColor = document.getElementById("tabColorHex").value;
-    const btnStart = document.getElementById("btnTabStart");
-    btnStart.disabled = true;
-    try {
-        const res = await fetch(`/api/tabs/${currentEditingTabId}/start`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + maToken
-            },
-            body: JSON.stringify({
-                accounts,
-                group_id: defaultGroupId || accounts[0].group_id,
-                group_name: defaultGroupName || accounts[0].group_name,
-                message_text: messageText,
-                delay,
-                color_mode: colorMode,
-                chosen_color: chosenColor,
-                font_size: fontSize
-            })
-        });
-        const data = await res.json();
-        if (data.success) {
-            hienThiThongBaoGlass("Thành Công", "🚀 BẮT ĐẦU TREO TAB THÀNH CÔNG!\nTiến trình đang chạy ngầm trong tab này.", "success");
-        } else {
-            hienThiThongBaoGlass("Lỗi Khởi Động Tab", data.message || "Không thể khởi động tab treo", "error");
-        }
-    } catch(e) {
-        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể kết nối máy chủ: " + e, "error");
-    } finally {
-        btnStart.disabled = false;
-    }
-}
-async function tabDungTreo() {
-    if (!currentEditingTabId) return;
-    try {
-        await fetch(`/api/tabs/${currentEditingTabId}/stop`, {
-            method: "POST",
-            headers: { "Authorization": "Bearer " + maToken }
-        });
-        hienThiThongBaoGlass("Đã Dừng Tab", "⏹ Đã gửi lệnh dừng tiến trình treo text của tab này thành công.", "info");
-    } catch(e) {}
-}
-function capNhatStatusTabUI(st) {
-    if (!st) return;
-    const badge = document.getElementById("badgeTabDangChay");
-    const btnStart = document.getElementById("btnTabStart");
-    const btnStop = document.getElementById("btnTabStop");
-    if (st.is_running) {
-        badge.textContent = `ĐANG TREO (${st.runtime_formatted || '00:00:00'})`;
-        badge.style.background = "rgba(16, 185, 129, 0.2)";
-        badge.style.color = "#34d399";
-        badge.style.border = "1px solid rgba(16, 185, 129, 0.5)";
-        btnStart.disabled = true;
-        btnStart.style.opacity = "0.5";
-        btnStop.disabled = false;
-        btnStop.style.opacity = "1";
-    } else {
-        badge.textContent = "ĐÃ DỪNG";
-        badge.style.background = "rgba(239, 68, 68, 0.2)";
-        badge.style.color = "#f87171";
-        badge.style.border = "1px solid rgba(239, 68, 68, 0.4)";
-        btnStart.disabled = false;
-        btnStart.style.opacity = "1";
-        btnStop.disabled = true;
-        btnStop.style.opacity = "0.5";
-    }
-    document.getElementById("lblTabTimerDisplay").textContent = st.runtime_formatted || "00:00:00";
-    document.getElementById("lblTabSentDisplay").textContent = st.total_sent || 0;
-    document.getElementById("lblTabFailedDisplay").textContent = st.total_failed || 0;
-    document.getElementById("lblTabAccCountDisplay").textContent = st.acc_count || 0;
-    if (st.logs && st.logs.length > 0) {
-        const term = document.getElementById("tabTerminalLogs");
-        let logHtml = "";
-        st.logs.forEach(l => {
-            logHtml += `
-            <div class="log-row">
-                <span class="log-time">[${l.time}]</span>
-                <span class="log-${l.level}">${escapeHtml(l.message)}</span>
-            </div>
-            `;
-        });
-        term.innerHTML = logHtml;
-        term.scrollTop = term.scrollHeight;
-    }
-}
-function batDauPolling() {
-    if (chuKyPolling) clearInterval(chuKyPolling);
-    chuKyPolling = setInterval(tickRealtime, 2500);
-    tickRealtime();
-}
-async function tickRealtime() {
-    if (!maToken) return;
-    if (document.getElementById("viewQuanLyTab").style.display !== "none") {
-        taiDanhSachTabs();
-    }
-    if (document.getElementById("viewChiTietTab").style.display !== "none" && currentEditingTabId) {
-        try {
-            const res = await fetch(`/api/tabs/${currentEditingTabId}`, {
-                headers: { "Authorization": "Bearer " + maToken }
-            });
-            const data = await res.json();
-            if (data.success && data.status) {
-                capNhatStatusTabUI(data.status);
-            }
-        } catch(e) {}
-    }
-}
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    capNhatIcons();
 }
 
-
-let cheDoNhapAcc = "manual";
-let qrSessions = {};
-let qrPollingTimer = null;
-let currentQRIndex = 0;
-
-function thayDoiSoLuongAcc() {
-    renderTabFormAccs();
-}
-
-function chuyenCheDoNhapAcc(mode) {
-    cheDoNhapAcc = mode;
-    const btnManual = document.getElementById("btnModeManual");
-    const btnQR = document.getElementById("btnModeQR");
-    const wrapManual = document.getElementById("vungTabDanhSachAccsManual");
-    const wrapQR = document.getElementById("vungTabDanhSachAccsQR");
-    if (btnManual && btnQR && wrapManual && wrapQR) {
-        if (mode === "manual") {
-            btnManual.classList.add("active");
-            btnQR.classList.remove("active");
-            wrapManual.style.display = "block";
-            wrapQR.style.display = "none";
-        } else {
-            btnQR.classList.add("active");
-            btnManual.classList.remove("active");
-            wrapManual.style.display = "none";
-            wrapQR.style.display = "block";
-            renderTabFormAccsQR();
-        }
-    }
-    lucide.createIcons();
-}
-
-function renderTabFormAccsQR() {
+function renderTabFormAccsQR(presetAccs) {
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const container = document.getElementById("vungTabDanhSachAccsQRList");
     if (!container) return;
-    let html = "";
-    for (let i = 0; i < count; i++) {
-        const cookieInput = document.getElementById("tab_acc_cookie_" + i);
-        const cookieVal = cookieInput ? cookieInput.value.trim() : "";
-        const sess = qrSessions[i];
-        const isLogged = (sess && sess.status === "confirmed") || (cookieVal.length > 10);
-        const name = (sess && sess.credentials && sess.credentials.name) ? sess.credentials.name : (isLogged ? "Đã có Cookie" : "Chưa đăng nhập");
-        const badgeClass = isLogged ? "badge-logged" : "badge-unlogged";
-        const badgeText = isLogged ? ("✅ Đã đăng nhập: " + escapeHtml(name)) : "⚪ Chưa đăng nhập";
-
-        html += '<div class="qr-acc-card">' +
-            '<div class="qr-acc-header-info">' +
-                '<div class="qr-acc-title">' +
-                    '<i data-lucide="user" style="width: 16px; height: 16px; color: var(--neon-cyan);"></i>' +
-                    '<span>Acc ' + (i + 1) + ' :</span>' +
-                '</div>' +
-                '<div class="qr-acc-badge ' + badgeClass + '" id="qrBadge_' + i + '">' +
-                    badgeText +
-                '</div>' +
-            '</div>' +
-            '<div style="display: flex; gap: 8px; align-items: center;">' +
-                '<button type="button" class="btn-glow ' + (isLogged ? "btn-outline" : "btn-primary") + ' btn-xem-ma" onclick="moModalXemMaQR(' + i + ')">' +
-                    '<i data-lucide="qr-code" style="width: 15px; height: 15px;"></i>' +
-                    'Xem mã' +
-                '</button>' +
-            '</div>' +
-        '</div>';
-    }
-    container.innerHTML = html;
     if (presetAccs && Array.isArray(presetAccs)) {
         presetAccs.forEach((a, idx) => {
             if (a && a.cookie) {
@@ -970,8 +686,39 @@ function renderTabFormAccsQR() {
             }
         });
     }
-    renderTabFormAccsQR();
-    lucide.createIcons();
+
+    let html = "";
+    for (let i = 0; i < count; i++) {
+        const cookieInput = document.getElementById("tab_acc_cookie_" + i);
+        const cookieVal = cookieInput ? cookieInput.value.trim() : "";
+        const sess = qrSessions[i];
+        const isLogged = (sess && sess.status === "confirmed") || (cookieVal.length > 10);
+        const name = (sess && sess.credentials && sess.credentials.name) ? sess.credentials.name : (isLogged ? "Đã có Cookie" : "Chưa đăng nhập");
+        const badgeClass = isLogged ? "badge-logged" : "badge-unlogged";
+        const badgeText = isLogged ? ("✅ Đã đăng nhập: " + escapeHtml(name)) : "⚪ Chưa quét mã QR";
+
+        html += `
+        <div class="qr-acc-card">
+            <div class="qr-acc-header-info">
+                <div class="qr-acc-title">
+                    <i data-lucide="user" style="width: 16px; height: 16px; color: var(--neon-cyan);"></i>
+                    <span>Acc ${i + 1} :</span>
+                </div>
+                <div class="qr-acc-badge ${badgeClass}" id="qrBadge_${i}">
+                    ${badgeText}
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" class="btn-glow ${isLogged ? 'btn-outline' : 'btn-primary'} btn-xem-ma" onclick="moModalXemMaQR(${i})">
+                    <i data-lucide="qr-code" style="width: 15px; height: 15px;"></i>
+                    ${isLogged ? 'Đổi mã' : 'Xem mã'}
+                </button>
+            </div>
+        </div>
+        `;
+    }
+    container.innerHTML = html;
+    capNhatIcons();
 }
 
 async function moModalXemMaQR(accIndex) {
@@ -979,13 +726,13 @@ async function moModalXemMaQR(accIndex) {
     const modal = document.getElementById("modalQRContainer");
     if (!modal) return;
     modal.classList.add("show");
-    modal.style.display = "flex";
+    modal.style.setProperty("display", "flex", "important");
     document.getElementById("modalQRTitle").innerHTML = '<i data-lucide="qr-code" style="color: var(--neon-cyan);"></i> Mã QR Đăng Nhập - Acc #' + (accIndex + 1);
-    document.getElementById("qrLoadingSpinner").style.display = "flex";
-    document.getElementById("qrImageWrapper").style.display = "none";
+    document.getElementById("qrLoadingSpinner").style.setProperty("display", "flex", "important");
+    document.getElementById("qrImageWrapper").style.setProperty("display", "none", "important");
     document.getElementById("lblTrangThaiQR").innerText = "⏳ Đang kết nối máy chủ Zalo tạo mã QR...";
     document.getElementById("lblTrangThaiQR").style.color = "var(--neon-cyan)";
-    lucide.createIcons();
+    capNhatIcons();
 
     if (qrPollingTimer) {
         clearInterval(qrPollingTimer);
@@ -993,13 +740,9 @@ async function moModalXemMaQR(accIndex) {
     }
 
     try {
-        const token = maToken || localStorage.getItem("token") || "";
         const res = await fetch("/api/qr/generate", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ acc_index: accIndex })
         });
         const data = await res.json();
@@ -1015,14 +758,14 @@ async function moModalXemMaQR(accIndex) {
             status: "waiting-scan"
         };
 
-        document.getElementById("imgMaQRZalo").src = sessionInfo.image;
-        document.getElementById("qrLoadingSpinner").style.display = "none";
-        document.getElementById("qrImageWrapper").style.display = "block";
+        const imgEl = document.getElementById("imgMaQRZalo");
+        if (imgEl) imgEl.src = sessionInfo.image;
+        document.getElementById("qrLoadingSpinner").style.setProperty("display", "none", "important");
+        document.getElementById("qrImageWrapper").style.setProperty("display", "block", "important");
         document.getElementById("lblTrangThaiQR").innerText = "📱 Mở Zalo trên điện thoại quét mã này";
-
         batDauPollQR(sessionInfo.session_id, accIndex);
     } catch (err) {
-        document.getElementById("qrLoadingSpinner").style.display = "none";
+        document.getElementById("qrLoadingSpinner").style.setProperty("display", "none", "important");
         document.getElementById("lblTrangThaiQR").innerText = "❌ Lỗi: " + err.message;
         document.getElementById("lblTrangThaiQR").style.color = "#f87171";
     }
@@ -1033,9 +776,7 @@ function batDauPollQR(sessionId, accIndex) {
         clearInterval(qrPollingTimer);
         qrPollingTimer = null;
     }
-    const token = maToken || localStorage.getItem("token") || "";
     let elapsed = 0;
-
     qrPollingTimer = setInterval(async () => {
         elapsed += 1.5;
         const remaining = Math.max(0, Math.floor(120 - elapsed));
@@ -1052,63 +793,51 @@ function batDauPollQR(sessionId, accIndex) {
         }
 
         try {
-            const res = await fetch("/api/qr/status/" + sessionId, {
-                headers: { "Authorization": "Bearer " + token }
-            });
-            const resJson = await res.json();
-            if (!res.ok || resJson.status !== "ok") return;
+            const res = await fetch("/api/qr/status/" + sessionId);
+            const data = await res.json();
+            if (data.status === "ok" && data.data) {
+                const s = data.data;
+                if (s.status === "scanned") {
+                    document.getElementById("lblTrangThaiQR").innerText = "⏳ Đã quét! Vui lòng bấm 'Đăng nhập' trên điện thoại...";
+                    document.getElementById("lblTrangThaiQR").style.color = "#38bdf8";
+                } else if (s.status === "confirmed") {
+                    clearInterval(qrPollingTimer);
+                    qrPollingTimer = null;
+                    const creds = s.credentials || {};
+                    qrSessions[accIndex] = {
+                        status: "confirmed",
+                        credentials: creds
+                    };
+                    const imeiInput = document.getElementById("tab_acc_imei_" + accIndex);
+                    const cookieInput = document.getElementById("tab_acc_cookie_" + accIndex);
+                    if (imeiInput && creds.imei) imeiInput.value = creds.imei;
+                    if (cookieInput && creds.cookie) cookieInput.value = creds.cookie;
 
-            const st = resJson.data.status;
-            if (st === "scanned") {
-                document.getElementById("lblTrangThaiQR").innerText = "🎉 Đã quét mã! Vui lòng chọn 'Đăng nhập' trên điện thoại...";
-                document.getElementById("lblTrangThaiQR").style.color = "#38bdf8";
-            } else if (st === "confirmed") {
-                clearInterval(qrPollingTimer);
-                qrPollingTimer = null;
-                const creds = resJson.data.credentials || {};
-                const userName = creds.name || "Zalo User";
+                    const userName = creds.name || "Zalo User";
+                    document.getElementById("lblTrangThaiQR").innerText = "🎉 Đăng nhập thành công: " + userName + "!";
+                    document.getElementById("lblTrangThaiQR").style.color = "#34d399";
 
-                qrSessions[accIndex] = {
-                    session_id: sessionId,
-                    status: "confirmed",
-                    credentials: creds,
-                    user_info: resJson.data.user_info || {}
-                };
-
-                const imeiInput = document.getElementById("tab_acc_imei_" + accIndex);
-                const cookieInput = document.getElementById("tab_acc_cookie_" + accIndex);
-                if (imeiInput && creds.imei) imeiInput.value = creds.imei;
-                if (cookieInput && creds.cookie) cookieInput.value = creds.cookie;
-
-                document.getElementById("lblTrangThaiQR").innerText = "✅ Đăng nhập thành công: " + userName + "!";
-                document.getElementById("lblTrangThaiQR").style.color = "#34d399";
-
-                renderTabFormAccsQR();
-                hienThiThongBaoGlass("Thành công", "Acc #" + (accIndex + 1) + " (" + userName + ") đã quét mã và đăng nhập thành công!", "success");
-
-                setTimeout(() => {
-                    dongModalXemMaQR();
-                }, 1600);
-            } else if (st === "expired") {
-                clearInterval(qrPollingTimer);
-                qrPollingTimer = null;
-                document.getElementById("lblTrangThaiQR").innerText = "⚠️ Mã QR đã hết hạn!";
-                document.getElementById("lblTrangThaiQR").style.color = "#fbbf24";
+                    renderTabFormAccsQR();
+                    setTimeout(() => {
+                        dongModalXemMaQR();
+                        hienThiThongBaoGlass("Đăng Nhập Thành Công", "Acc #" + (accIndex + 1) + " (" + userName + ") đã kết nối!", "success");
+                    }, 1400);
+                } else if (s.status === "expired") {
+                    clearInterval(qrPollingTimer);
+                    qrPollingTimer = null;
+                    document.getElementById("lblTrangThaiQR").innerText = "⚠️ Mã QR đã hết hạn hoặc bị hủy!";
+                    document.getElementById("lblTrangThaiQR").style.color = "#fbbf24";
+                }
             }
         } catch (e) {}
     }, 1500);
 }
 
 function lamMoiMaQRHienTai() {
-    if (currentQRIndex !== null) {
-        moModalXemMaQR(currentQRIndex);
-    }
+    moModalXemMaQR(currentQRIndex);
 }
 
-function dongModalXemMaQR(event) {
-    if (event && event.target && event.target !== event.currentTarget) {
-        return;
-    }
+function dongModalXemMaQR() {
     if (qrPollingTimer) {
         clearInterval(qrPollingTimer);
         qrPollingTimer = null;
@@ -1116,26 +845,355 @@ function dongModalXemMaQR(event) {
     const modal = document.getElementById("modalQRContainer");
     if (modal) {
         modal.classList.remove("show");
-        modal.style.display = "none";
+        modal.style.setProperty("display", "none", "important");
     }
 }
 
-
-function capNhatLocalBackupTab(tabId, name, config) {
+async function tabLayDanhSachNhomTheoAcc(idx) {
+    const imei = document.getElementById(`tab_acc_imei_${idx}`)?.value.trim();
+    const cookie = document.getElementById(`tab_acc_cookie_${idx}`)?.value.trim();
+    if (!imei || !cookie) {
+        hienThiThongBaoGlass("Thiếu Thông Tin Acc", `Vui lòng nhập IMEI và Cookie cho Tài khoản #${idx + 1} trước!`, "error");
+        return;
+    }
+    hienThiThongBaoGlass("Đang Lấy Nhóm", `Đang kết nối API Zalo để quét danh sách nhóm của Acc #${idx + 1}...`, "info");
     try {
-        const backupKey = "zalo_backup_tabs_" + (tenNguoiDung || "user");
-        let list = [];
-        const raw = localStorage.getItem(backupKey);
-        if (raw) {
-            try { list = JSON.parse(raw) || []; } catch(e) {}
-        }
-        const existingIdx = list.findIndex(t => t.id === tabId);
-        if (existingIdx >= 0) {
-            list[existingIdx].name = name;
-            list[existingIdx].config = config;
+        const res = await fetch("/api/get-groups", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + maToken
+            },
+            body: JSON.stringify({ imei: imei, cookie: cookie })
+        });
+        const data = await res.json();
+        if (data.success && data.groups && data.groups.length > 0) {
+            let opts = `<option value="">-- Chọn nhóm từ Acc #${idx + 1} (${data.groups.length} nhóm) --</option>`;
+            data.groups.forEach(g => {
+                opts += `<option value="${g.id}">${escapeHtml(g.name)} (${g.id})</option>`;
+            });
+            const selAcc = document.getElementById(`tab_acc_select_group_${idx}`);
+            if (selAcc) selAcc.innerHTML = opts;
+            if (idx === 0) {
+                const selChung = document.getElementById("selectTabNhomZalo");
+                if (selChung) selChung.innerHTML = opts;
+            }
+            hienThiThongBaoGlass("Lấy Nhóm Thành Công", `Tìm thấy ${data.groups.length} nhóm Zalo từ Acc #${idx + 1}!`, "success");
         } else {
-            list.push({ id: tabId, name: name, config: config });
+            hienThiThongBaoGlass("Không Tìm Thấy Nhóm", data.message || "Không tìm thấy nhóm nào hoặc Cookie hết hạn", "error");
         }
-        localStorage.setItem(backupKey, JSON.stringify(list));
+    } catch(err) {
+        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể lấy danh sách nhóm: " + err, "error");
+    }
+}
+
+function doiNhomAcc(idx, val) {
+    const gidInp = document.getElementById(`tab_acc_group_id_${idx}`);
+    if (gidInp) gidInp.value = val;
+    const sel = document.getElementById(`tab_acc_select_group_${idx}`);
+    const gName = sel?.options[sel.selectedIndex]?.text || ("Nhóm " + val);
+    const nameInp = document.getElementById(`tab_acc_group_name_${idx}`);
+    if (nameInp) nameInp.value = gName;
+}
+
+function nhapTayNhomAcc(idx, val) {
+    const nameInp = document.getElementById(`tab_acc_group_name_${idx}`);
+    if (nameInp) nameInp.value = val ? ("Nhóm " + val) : "";
+}
+
+function dongBoNhomChoTatCaAcc() {
+    const gid0 = document.getElementById("tab_acc_group_id_0")?.value.trim() || document.getElementById("inputTabManualGroupId")?.value.trim();
+    const gname0 = document.getElementById("tab_acc_group_name_0")?.value.trim() || "Nhóm " + gid0;
+    if (!gid0) {
+        hienThiThongBaoGlass("Chưa Chọn Nhóm", "Vui lòng chọn hoặc nhập ID nhóm ở Acc #1 hoặc Bước 2 trước!", "error");
+        return;
+    }
+    const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
+    for (let i = 0; i < count; i++) {
+        const inp = document.getElementById(`tab_acc_group_id_${i}`);
+        if (inp) inp.value = gid0;
+        const nameInp = document.getElementById(`tab_acc_group_name_${i}`);
+        if (nameInp) nameInp.value = gname0;
+    }
+    document.getElementById("inputTabManualGroupId").value = gid0;
+    hienThiThongBaoGlass("Đồng Bộ Thành Công", `Đã đồng bộ nhóm [${gname0}] cho tất cả ${count} tài khoản!`, "success");
+}
+
+function doiNhomChung(val) {
+    const manualChung = document.getElementById("inputTabManualGroupId");
+    if (manualChung) manualChung.value = val;
+    const gid0 = document.getElementById("tab_acc_group_id_0");
+    if (gid0 && !gid0.value.trim()) {
+        gid0.value = val;
+        const selectChung = document.getElementById("selectTabNhomZalo");
+        const gName = selectChung?.options[selectChung.selectedIndex]?.text || ("Nhóm " + val);
+        const name0 = document.getElementById("tab_acc_group_name_0");
+        if (name0) name0.value = gName;
+    }
+}
+
+function nhapTayNhomChung(val) {
+    const gid0 = document.getElementById("tab_acc_group_id_0");
+    if (gid0 && !gid0.value.trim()) {
+        gid0.value = val;
+    }
+}
+
+function tabDocFileNgon(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        document.getElementById("textareaTabNoiDungNgon").value = evt.target.result;
+        hienThiThongBaoGlass("Tải File Ngôn Thành Công", `Đã tải file: ${file.name}\nTổng cộng ${evt.target.result.split('\n').length} dòng ngôn sẵn sàng gửi!`, "success");
+    };
+    reader.readAsText(file, "UTF-8");
+}
+
+function renderBangMauTab() {
+    const grid = document.getElementById("vungTabBangMau");
+    if (!grid) return;
+    let html = "";
+    TOOL_COLORS.forEach((c, idx) => {
+        let dot = c.hex === "rainbow"
+            ? "background: linear-gradient(135deg, red, orange, yellow, green, blue, purple);"
+            : (c.hex === "dice" ? "background: linear-gradient(135deg, #0084ff, #a855f7);" : `background-color: ${c.hex};`);
+        html += `
+        <div class="palette-item" id="tabPal_${idx}" onclick="tabChonMauClick('${c.id}', '${c.ten}', ${idx})">
+            <div class="palette-circle" style="${dot}"></div>
+            <span class="palette-label">${c.ten}</span>
+        </div>
+        `;
+    });
+    grid.innerHTML = html;
+}
+
+function tabChonMauClick(colorId, colorName, idx) {
+    document.querySelectorAll(".palette-item").forEach(el => el.classList.remove("active"));
+    const item = document.getElementById(`tabPal_${idx}`);
+    if (item) item.classList.add("active");
+    if (colorId === "random_line") {
+        document.getElementById("tabColorMode").value = "random_line";
+        document.getElementById("tabColorHex").value = "#DB342E";
+        document.getElementById("lblTabMauDangChon").textContent = "Mỗi dòng 1 màu ngẫu nhiên (Rainbow)";
+    } else if (colorId === "random_msg") {
+        document.getElementById("tabColorMode").value = "random_msg";
+        document.getElementById("tabColorHex").value = "#DB342E";
+        document.getElementById("lblTabMauDangChon").textContent = "Cả tin 1 màu ngẫu nhiên mỗi lần gửi";
+    } else {
+        document.getElementById("tabColorMode").value = "fixed";
+        document.getElementById("tabColorHex").value = colorId;
+        document.getElementById("tabColorPicker").value = colorId;
+        document.getElementById("lblTabMauDangChon").textContent = colorName + " (" + colorId + ")";
+    }
+}
+
+function tabChonMauPicker(hex) {
+    document.querySelectorAll(".palette-item").forEach(el => el.classList.remove("active"));
+    document.getElementById("tabColorMode").value = "fixed";
+    document.getElementById("tabColorHex").value = hex;
+    document.getElementById("lblTabMauDangChon").textContent = "Tùy chỉnh (" + hex + ")";
+}
+
+function chonMauTab(mode, hex) {
+    if (mode === "random_line") {
+        tabChonMauClick("random_line", "Ngẫu nhiên dòng", 0);
+    } else if (mode === "random_msg") {
+        tabChonMauClick("random_msg", "Ngẫu nhiên tin", 1);
+    } else {
+        let foundIdx = TOOL_COLORS.findIndex(c => c.hex.toLowerCase() === hex.toLowerCase());
+        if (foundIdx >= 0) {
+            tabChonMauClick(TOOL_COLORS[foundIdx].id, TOOL_COLORS[foundIdx].ten, foundIdx);
+        } else {
+            tabChonMauPicker(hex);
+        }
+    }
+}
+
+async function tabBatDauTreo() {
+    if (!currentEditingTabId) return;
+    const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
+    const accounts = [];
+    for (let i = 0; i < count; i++) {
+        const imei = document.getElementById(`tab_acc_imei_${i}`)?.value.trim() || "";
+        const cookie = document.getElementById(`tab_acc_cookie_${i}`)?.value.trim() || "";
+        const gid = document.getElementById(`tab_acc_group_id_${i}`)?.value.trim() || "";
+        const gname = document.getElementById(`tab_acc_group_name_${i}`)?.value.trim() || "";
+        if (!imei || !cookie) {
+            hienThiThongBaoGlass("Thiếu Thông Tin Acc", `Tài khoản #${i + 1} chưa có IMEI hoặc Cookie!`, "error");
+            return;
+        }
+        accounts.push({
+            imei: imei,
+            cookie: cookie,
+            group_id: gid,
+            group_name: gname
+        });
+    }
+
+    const groupIdChung = document.getElementById("inputTabManualGroupId")?.value.trim() || document.getElementById("selectTabNhomZalo")?.value.trim();
+    const selectChung = document.getElementById("selectTabNhomZalo");
+    const groupNameChung = selectChung?.options[selectChung.selectedIndex]?.text || ("Nhóm " + groupIdChung);
+    const messageText = document.getElementById("textareaTabNoiDungNgon")?.value.trim();
+    const delay = parseInt(document.getElementById("inputTabDelay")?.value) || 5;
+    const fontSize = parseInt(document.getElementById("inputTabFontSize")?.value) || 500;
+    const colorMode = document.getElementById("tabColorMode")?.value || "random_line";
+    const chosenColor = document.getElementById("tabColorHex")?.value || "#DB342E";
+
+    if (!messageText) {
+        hienThiThongBaoGlass("Thiếu File Ngôn", "Vui lòng nhập hoặc tải file ngôn vào ô 'Nội dung File Ngôn'!", "error");
+        return;
+    }
+
+    const payload = {
+        accounts: accounts,
+        group_id: groupIdChung,
+        group_name: groupNameChung,
+        message_text: messageText,
+        delay: delay,
+        font_size: fontSize,
+        color_mode: colorMode,
+        chosen_color: chosenColor,
+        ttl: 0
+    };
+
+    try {
+        const res = await fetch(`/api/tabs/${currentEditingTabId}/start`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + maToken
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            hienThiThongBaoGlass("Bắt Đầu Thành Công", data.message || "Tab đã bắt đầu chạy!", "success");
+            capNhatStatusTabUI({ is_running: true });
+            batDauPolling();
+        } else {
+            hienThiThongBaoGlass("Lỗi Chạy Tab", data.message || "Không thể bắt đầu treo tab này", "error");
+        }
+    } catch(err) {
+        hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể gửi lệnh chạy: " + err, "error");
+    }
+}
+
+async function tabDungTreo() {
+    if (!currentEditingTabId) return;
+    try {
+        const res = await fetch(`/api/tabs/${currentEditingTabId}/stop`, {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + maToken }
+        });
+        const data = await res.json();
+        if (data.success) {
+            hienThiThongBaoGlass("Đã Dừng", "Đã dừng tiến trình treo của tab này!", "info");
+            capNhatStatusTabUI({ is_running: false });
+        }
+    } catch(err) {}
+}
+
+function capNhatStatusTabUI(status) {
+    const isRunning = status && status.is_running;
+    const btnStart = document.getElementById("btnTabStart");
+    const btnStop = document.getElementById("btnTabStop");
+    const badge = document.getElementById("badgeTabDangChay");
+    if (isRunning) {
+        if (badge) {
+            badge.textContent = "ĐANG CHẠY";
+            badge.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+            badge.style.color = "#fff";
+        }
+        if (btnStart) {
+            btnStart.disabled = true;
+            btnStart.style.opacity = "0.5";
+            btnStart.style.cursor = "not-allowed";
+        }
+        if (btnStop) {
+            btnStop.disabled = false;
+            btnStop.style.opacity = "1";
+            btnStop.style.cursor = "pointer";
+        }
+    } else {
+        if (badge) {
+            badge.textContent = "ĐÃ DỪNG";
+            badge.style.background = "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)";
+            badge.style.color = "#fff";
+        }
+        if (btnStart) {
+            btnStart.disabled = false;
+            btnStart.style.opacity = "1";
+            btnStart.style.cursor = "pointer";
+        }
+        if (btnStop) {
+            btnStop.disabled = true;
+            btnStop.style.opacity = "0.5";
+            btnStop.style.cursor = "not-allowed";
+        }
+    }
+    if (status) {
+        document.getElementById("lblTabTimerDisplay").textContent = status.runtime_formatted || "00:00:00";
+        document.getElementById("lblTabSentDisplay").textContent = status.total_sent || 0;
+        document.getElementById("lblTabFailedDisplay").textContent = status.total_failed || 0;
+        document.getElementById("lblTabAccCountDisplay").textContent = status.acc_count || 0;
+        if (status.logs && Array.isArray(status.logs)) {
+            const logsStr = JSON.stringify(status.logs);
+            if (logsStr !== daLuuLogsJson) {
+                daLuuLogsJson = logsStr;
+                const box = document.getElementById("tabTerminalLogs");
+                if (box) {
+                    let logHtml = "";
+                    status.logs.forEach(l => {
+                        let col = "#e2e8f0";
+                        if (l.type === "success") col = "#34d399";
+                        else if (l.type === "error") col = "#f87171";
+                        else if (l.type === "warning") col = "#fbbf24";
+                        logHtml += `<div class="log-row"><span class="log-time">[${l.time}]</span> <span style="color: ${col};">${escapeHtml(l.text)}</span></div>`;
+                    });
+                    box.innerHTML = logHtml;
+                    box.scrollTop = box.scrollHeight;
+                }
+            }
+        }
+    }
+}
+
+function batDauPolling() {
+    if (chuKyPolling) clearInterval(chuKyPolling);
+    chuKyPolling = setInterval(tickRealtime, 1500);
+}
+
+async function tickRealtime() {
+    const vChiTiet = document.getElementById("viewChiTietTab");
+    if (!vChiTiet || vChiTiet.style.display === "none" || !currentEditingTabId || !maToken) {
+        if (chuKyPolling) {
+            clearInterval(chuKyPolling);
+            chuKyPolling = null;
+        }
+        return;
+    }
+    try {
+        const res = await fetch(`/api/tabs/${currentEditingTabId}`, {
+            headers: { "Authorization": "Bearer " + maToken }
+        });
+        const data = await res.json();
+        if (data.success && data.status) {
+            capNhatStatusTabUI(data.status);
+            if (!data.status.is_running && chuKyPolling) {
+                clearInterval(chuKyPolling);
+                chuKyPolling = null;
+            }
+        }
     } catch(e) {}
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

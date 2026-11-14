@@ -3,1228 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>treo ngôn zalo 24/7 by ngbao</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=20261115_v3"><style>
-*, *::before, *::after {
-    box-sizing: border-box !important;
-    margin: 0;
-    padding: 0;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-:root {
-    --bg-space: #02040a;
-    --glass-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(10, 20, 45, 0.55) 100%);
-    --glass-card: linear-gradient(145deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.015) 50%, rgba(8, 16, 36, 0.5) 100%);
-    --glass-border: rgba(255, 255, 255, 0.16);
-    --glass-border-light: rgba(255, 255, 255, 0.28);
-    --glass-blur: blur(14px) saturate(150%) brightness(1.05);
-    --glass-blur-sm: blur(10px) saturate(130%) brightness(1.05);
-    --neon-blue: #0084FF;
-    --neon-cyan: #00F0FF;
-    --neon-purple: #A855F7;
-    --neon-pink: #EC4899;
-    --neon-emerald: #10B981;
-    --neon-red: #EF4444;
-    --neon-amber: #F59E0B;
-    --text-primary: #FFFFFF;
-    --text-secondary: rgba(255, 255, 255, 0.85);
-    --text-muted: rgba(255, 255, 255, 0.55);
-    --text-dim: rgba(255, 255, 255, 0.35);
-    --radius-pill: 9999px;
-    --radius-3d: 32px;
-    --radius-card: 26px;
-    --radius-inner: 18px;
-    --radius-sm: 12px;
-    --shadow-glass: 0 30px 80px -15px rgba(0, 0, 0, 0.85), 0 0 40px -10px rgba(0, 132, 255, 0.2), inset 0 1.8px 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.5);
-    --shadow-card: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1.5px 1px rgba(255, 255, 255, 0.42), inset 0 -1px 1px rgba(0, 0, 0, 0.45);
-    --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 0 2px rgba(255, 255, 255, 0.08);
-    --transition-spring: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-html, body {
-    width: 100%;
-    min-height: 100%;
-    background-color: var(--bg-space);
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    color: var(--text-primary);
-    overflow-x: hidden;
-    position: relative;
-    font-size: 14.5px;
-    line-height: 1.5;
-}
-
-#canvas3dBg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.92;
-}
-
-.pinui-ambient-orb {
-    position: fixed;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.45;
-    will-change: transform;
-    transform: translateZ(0);
-}
-
-.pinui-orb-1 {
-    width: 420px;
-    height: 420px;
-    top: -80px;
-    left: -80px;
-    background: radial-gradient(circle, rgba(0, 132, 255, 0.45) 0%, rgba(0, 240, 255, 0.15) 50%, transparent 70%);
-}
-
-.pinui-orb-2 {
-    width: 450px;
-    height: 450px;
-    bottom: -100px;
-    right: -80px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 70%);
-}
-
-.pinui-orb-3 {
-    display: none;
-}
-
-@keyframes orbPulseMotion {
-    0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-    33% { transform: translate(60px, -40px) scale(1.15) rotate(45deg); }
-    66% { transform: translate(-40px, 60px) scale(0.9) rotate(90deg); }
-    100% { transform: translate(40px, 30px) scale(1.08) rotate(135deg); }
-}
-
-.auth-backdrop {
-    position: fixed !important;
-    inset: 0 !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    display: flex;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 20px !important;
-    background: radial-gradient(circle at 50% 25%, rgba(14, 28, 64, 0.8) 0%, rgba(2, 4, 10, 0.95) 75%) !important;
-    overflow-y: auto !important;
-    box-sizing: border-box !important;
-}
-
-.auth-backdrop.hidden {
-    display: none !important;
-}
-
-.auth-card-pinui {
-    width: 100% !important;
-    max-width: 410px !important;
-    margin: auto !important;
-    background: rgba(10, 16, 34, 0.78) !important;
-    backdrop-filter: blur(14px) saturate(150%) !important; transform: translateZ(0);
-    -webkit-backdrop-filter: blur(14px) saturate(150%) !important; transform: translateZ(0);
-    border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
-    border-radius: var(--radius-3d) !important;
-    box-shadow: var(--shadow-glass) !important;
-    padding: 36px 28px 30px !important;
-    position: relative !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-}
-
-.auth-card-pinui::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 120px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 60%, transparent 100%);
-    pointer-events: none;
-}
-
-.auth-header {
-    text-align: center !important;
-    margin-bottom: 24px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.auth-icon-badge {
-    width: 68px !important;
-    height: 68px !important;
-    margin: 0 auto 14px !important;
-    border-radius: 50% !important;
-    background: radial-gradient(circle at 30% 30%, #00f0ff, #0072ff 60%, #8a2be2 100%) !important;
-    box-shadow: 0 12px 30px rgba(0, 114, 255, 0.55), inset 0 2.5px 3px rgba(255, 255, 255, 0.75), inset 0 -3px 4px rgba(0, 0, 0, 0.4) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #ffffff !important;
-    flex-shrink: 0 !important;
-}
-
-.auth-icon-badge svg,
-.auth-icon-badge i {
-    width: 30px !important;
-    height: 30px !important;
-    color: #ffffff !important;
-}
-
-.auth-title {
-    font-size: 1.5rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.02em !important;
-    text-align: center !important;
-    color: #ffffff !important;
-    margin-bottom: 5px !important;
-}
-
-.auth-subtitle {
-    font-size: 0.84rem !important;
-    font-weight: 500 !important;
-    color: var(--text-muted) !important;
-    text-align: center !important;
-    letter-spacing: 0.01em !important;
-}
-
-.auth-capsule-tabs {
-    display: flex !important;
-    width: 100% !important;
-    background: rgba(3, 7, 18, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: var(--radius-pill) !important;
-    padding: 5px !important;
-    margin-bottom: 22px !important;
-    box-shadow: var(--shadow-inner) !important;
-    box-sizing: border-box !important;
-}
-
-.auth-capsule-btn {
-    flex: 1 !important;
-    border: none !important;
-    background: transparent !important;
-    color: var(--text-muted) !important;
-    font-family: inherit !important;
-    font-size: 0.92rem !important;
-    font-weight: 700 !important;
-    padding: 11px 16px !important;
-    border-radius: var(--radius-pill) !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    transition: var(--transition-bounce) !important;
-}
-
-.auth-capsule-btn.active {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #00C6FF 0%, #0072FF 60%, #0052cc 100%) !important;
-    box-shadow: 0 4px 18px rgba(0, 114, 255, 0.55), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
-}
-
-.auth-form {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px !important;
-    width: 100% !important;
-}
-
-.auth-input-group {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-    width: 100% !important;
-}
-
-.auth-input-label {
-    display: block !important;
-    font-size: 0.82rem !important;
-    font-weight: 700 !important;
-    color: var(--text-secondary) !important;
-    text-align: left !important;
-}
-
-.auth-input-wrapper {
-    position: relative !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    width: 100% !important;
-    height: 50px !important;
-    background: rgba(4, 8, 20, 0.75) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.14) !important;
-    border-radius: var(--radius-inner) !important;
-    padding: 0 14px !important;
-    box-shadow: var(--shadow-inner) !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-    transition: var(--transition-spring) !important;
-}
-
-.auth-input-wrapper:focus-within {
-    border-color: var(--neon-cyan) !important;
-    box-shadow: 0 0 24px rgba(0, 240, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-    background: rgba(8, 16, 36, 0.9) !important;
-}
-
-.auth-input-icon {
-    width: 20px !important;
-    height: 20px !important;
-    color: var(--text-muted) !important;
-    margin-right: 10px !important;
-    flex-shrink: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.auth-input-wrapper:focus-within .auth-input-icon {
-    color: var(--neon-cyan) !important;
-}
-
-.auth-input-wrapper input,
-.auth-input-wrapper input[type="text"],
-.auth-input-wrapper input[type="password"] {
-    flex: 1 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: transparent !important;
-    border: none !important;
-    outline: none !important;
-    color: #ffffff !important;
-    font-family: inherit !important;
-    font-size: 0.95rem !important;
-    font-weight: 500 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    -webkit-appearance: none !important;
-}
-
-.auth-eye-btn {
-    background: transparent !important;
-    border: none !important;
-    color: var(--text-muted) !important;
-    cursor: pointer !important;
-    padding: 8px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-}
-
-.auth-eye-btn:hover {
-    color: #ffffff !important;
-}
-
-.auth-submit-btn {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    width: 100% !important;
-    height: 52px !important;
-    margin-top: 8px !important;
-    padding: 0 24px !important;
-    border-radius: var(--radius-inner) !important;
-    border: none !important;
-    background: linear-gradient(135deg, #00C6FF 0%, #0072FF 50%, #8A2BE2 100%) !important;
-    box-shadow: 0 14px 35px -5px rgba(0, 114, 255, 0.65), inset 0 2px 2px rgba(255, 255, 255, 0.65), inset 0 -2px 3px rgba(0, 0, 0, 0.3) !important;
-    color: #ffffff !important;
-    font-family: inherit !important;
-    font-size: 1rem !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.04em !important;
-    cursor: pointer !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-    transition: var(--transition-spring) !important;
-}
-
-.auth-submit-btn:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 18px 45px -5px rgba(0, 114, 255, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.75) !important;
-}
-
-.auth-submit-btn:active {
-    transform: translateY(2px) scale(0.98) !important;
-}
-
-.auth-btn-arrow {
-    width: 18px !important;
-    height: 18px !important;
-    transition: transform 0.3s ease !important;
-}
-
-.auth-submit-btn:hover .auth-btn-arrow {
-    transform: translateX(4px) !important;
-}
-
-.auth-switch-note {
-    text-align: center !important;
-    font-size: 0.84rem !important;
-    color: var(--text-muted) !important;
-    margin-top: 10px !important;
-}
-
-.auth-switch-note a {
-    color: var(--neon-cyan) !important;
-    text-decoration: none !important;
-    font-weight: 700 !important;
-}
-
-.glass-modal-backdrop {
-    position: fixed !important;
-    inset: 0 !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 99999 !important;
-    background: rgba(2, 4, 10, 0.78) !important;
-    backdrop-filter: blur(28px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-    display: none;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 20px !important;
-    box-sizing: border-box !important;
-}
-
-.glass-modal-backdrop.show {
-    display: flex !important;
-}
-
-.glass-modal-card {
-    width: 100% !important;
-    max-width: 420px !important;
-    background: var(--glass-surface) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-3d) !important;
-    box-shadow: var(--shadow-glass) !important;
-    padding: 32px 24px 26px !important;
-    text-align: center !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-.glass-modal-icon {
-    width: 64px !important;
-    height: 64px !important;
-    margin: 0 auto 16px !important;
-    border-radius: 50% !important;
-    background: radial-gradient(circle at 30% 30%, #00f0ff, #0072ff 60%, #8a2be2 100%) !important;
-    box-shadow: 0 14px 30px rgba(0, 132, 255, 0.5) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #fff !important;
-}
-
-.glass-modal-icon.error {
-    background: radial-gradient(circle at 30% 30%, #ff6b6b, #ef4444 60%, #991b1b 100%) !important;
-    box-shadow: 0 14px 30px rgba(239, 68, 68, 0.5) !important;
-}
-
-.glass-modal-icon.success {
-    background: radial-gradient(circle at 30% 30%, #34d399, #10b981 60%, #065f46 100%) !important;
-    box-shadow: 0 14px 30px rgba(16, 185, 129, 0.5) !important;
-}
-
-.glass-modal-title {
-    font-size: 1.3rem !important;
-    font-weight: 800 !important;
-    margin-bottom: 10px !important;
-    color: #ffffff !important;
-}
-
-.glass-modal-message {
-    font-size: 0.92rem !important;
-    color: var(--text-secondary) !important;
-    line-height: 1.6 !important;
-    margin-bottom: 22px !important;
-}
-
-.drawer-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 800;
-    background: rgba(2, 4, 10, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease;
-}
-
-.drawer-overlay.open {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.drawer-menu {
-    position: fixed;
-    top: 0;
-    right: -360px;
-    width: 320px;
-    max-width: 85vw;
-    height: 100%;
-    z-index: 850;
-    background: var(--glass-surface);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-left: 1px solid var(--glass-border);
-    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
-    display: flex;
-    flex-direction: column;
-    padding: 30px 24px;
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.drawer-menu.open {
-    right: 0;
-}
-
-.drawer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.drawer-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 18px;
-    border-radius: var(--radius-inner);
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-spring);
-    margin-bottom: 8px;
-}
-
-.drawer-nav-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: #ffffff;
-    transform: translateX(4px);
-}
-
-.drawer-nav-item.active {
-    background: linear-gradient(135deg, rgba(0, 132, 255, 0.25) 0%, rgba(0, 240, 255, 0.15) 100%);
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    color: var(--neon-cyan);
-    box-shadow: 0 4px 20px rgba(0, 132, 255, 0.25);
-}
-
-.main-wrapper {
-    position: relative;
-    z-index: 10;
-    max-width: 1050px;
-    margin: 0 auto;
-    padding: 24px 20px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-}
-
-.card-3d {
-    background: var(--glass-card) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-card) !important;
-    box-shadow: var(--shadow-card) !important;
-    position: relative;
-    overflow: hidden;
-    transition: var(--transition-spring);
-}
-
-.card-3d::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 90px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, transparent 100%);
-    pointer-events: none;
-}
-
-header.card-3d {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 26px;
-    border-radius: var(--radius-pill) !important;
-}
-
-.logo-box {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-decoration: none;
-    color: inherit;
-}
-
-.logo-icon-3d {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    background: radial-gradient(circle at 30% 30%, #00f0ff, #0072ff 60%, #8a2be2 100%);
-    box-shadow: 0 8px 24px rgba(0, 114, 255, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
-}
-
-.logo-text h1 {
-    font-size: 1.18rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: #ffffff;
-}
-
-.logo-text p {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--neon-cyan);
-    letter-spacing: 0.06em;
-}
-
-.btn-hamburger {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    cursor: pointer;
-    transition: var(--transition-spring);
-}
-
-.btn-hamburger:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.06);
-    border-color: var(--neon-cyan);
-}
-
-.welcome-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 30px;
-    background: linear-gradient(135deg, rgba(0, 132, 255, 0.12) 0%, rgba(168, 85, 247, 0.08) 50%, rgba(8, 16, 36, 0.6) 100%) !important;
-}
-
-.welcome-text h2 {
-    font-size: 1.35rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
-}
-
-.welcome-text p {
-    font-size: 0.88rem;
-    color: var(--text-muted);
-}
-
-.tab-horizontal-card {
-    background: var(--glass-card) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    border-radius: var(--radius-card) !important;
-    padding: 20px 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 20px !important;
-    margin-bottom: 16px !important;
-    position: relative !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-    transition: var(--transition-spring) !important;
-}
-
-.tab-horizontal-card.running {
-    border: 2px solid var(--neon-emerald) !important;
-    box-shadow: 0 0 30px rgba(16, 185, 129, 0.45), 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 0 18px rgba(16, 185, 129, 0.22) !important;
-}
-
-.tab-horizontal-card.stopped {
-    border: 2px solid var(--neon-red) !important;
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4), 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 0 18px rgba(239, 68, 68, 0.18) !important;
-}
-
-.tab-info-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    min-width: 0;
-}
-
-.tab-status-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: var(--transition-spring);
-}
-
-.tab-horizontal-card.running .tab-status-icon {
-    background: radial-gradient(circle at 30% 30%, #34d399, #10b981 60%, #065f46 100%);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
-    color: #fff;
-    animation: pulseRunning 2.2s infinite;
-}
-
-.tab-horizontal-card.stopped .tab-status-icon {
-    background: radial-gradient(circle at 30% 30%, #f87171, #ef4444 60%, #7f1d1d 100%);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-    color: #fff;
-}
-
-@keyframes pulseRunning {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-    70% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-.tab-details {
-    min-width: 0;
-    flex: 1;
-}
-
-.tab-name-title {
-    font-size: 1.15rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    color: #ffffff;
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tab-meta-pills {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.tab-meta-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-secondary);
-}
-
-.tab-actions-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-.btn-glow {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: var(--radius-pill);
-    font-family: inherit;
-    font-size: 0.86rem;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    transition: var(--transition-spring);
-    text-decoration: none;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.btn-glow:active {
-    transform: scale(0.96);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #00C6FF 0%, #0072FF 60%, #0052cc 100%) !important;
-    box-shadow: 0 8px 24px rgba(0, 114, 255, 0.5), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
-    color: #ffffff !important;
-}
-
-.btn-primary:hover {
-    box-shadow: 0 12px 30px rgba(0, 114, 255, 0.7), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.75) !important;
-    transform: translateY(-2px);
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 60%, #059669 100%) !important;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
-    color: #ffffff !important;
-}
-
-.btn-success:hover {
-    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.7), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.75) !important;
-    transform: translateY(-2px);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 60%, #dc2626 100%) !important;
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
-    color: #ffffff !important;
-}
-
-.btn-danger:hover {
-    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.7);
-    transform: translateY(-2px);
-}
-
-.btn-outline {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.16) !important;
-    color: #ffffff !important;
-}
-
-.btn-outline:hover {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
-    transform: translateY(-2px);
-}
-
-.contact-card-box {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 18px;
-    margin-top: 18px;
-}
-
-.contact-btn {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 22px;
-    border-radius: var(--radius-inner);
-    background: var(--glass-card);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-card);
-    color: #ffffff;
-    text-decoration: none;
-    transition: var(--transition-spring);
-}
-
-.contact-btn:hover {
-    transform: translateY(-4px);
-    border-color: var(--neon-cyan);
-    box-shadow: 0 18px 45px rgba(0, 132, 255, 0.35);
-}
-
-.contact-btn.tele .contact-icon {
-    background: radial-gradient(circle at 30% 30%, #29b6f6, #0288d1);
-    box-shadow: 0 8px 20px rgba(2, 136, 209, 0.5);
-}
-
-.contact-btn.zalo .contact-icon {
-    background: radial-gradient(circle at 30% 30%, #38bdf8, #0068ff);
-    box-shadow: 0 8px 20px rgba(0, 104, 255, 0.5);
-}
-
-.contact-btn.discord .contact-icon {
-    background: radial-gradient(circle at 30% 30%, #818cf8, #5865f2);
-    box-shadow: 0 8px 20px rgba(88, 101, 242, 0.5);
-}
-
-.contact-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
-}
-
-.grid-2col {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
-    gap: 20px !important;
-    margin-bottom: 22px !important;
-}
-
-.form-row {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 7px !important;
-    margin-bottom: 18px !important;
-    width: 100% !important;
-}
-
-.form-row label,
-.form-label-pinui {
-    display: block !important;
-    font-size: 0.82rem !important;
-    font-weight: 700 !important;
-    color: rgba(255, 255, 255, 0.85) !important;
-    letter-spacing: 0.01em !important;
-    margin-bottom: 2px !important;
-    text-align: left !important;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="password"],
-textarea,
-select,
-.form-control-pinui {
-    width: 100% !important;
-    background: rgba(6, 12, 26, 0.85) !important;
-    background-color: rgba(6, 12, 26, 0.85) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
-    border-radius: var(--radius-inner) !important;
-    padding: 12px 16px !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    caret-color: var(--neon-cyan) !important;
-    font-family: inherit !important;
-    font-size: 0.92rem !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-    outline: none !important;
-    box-sizing: border-box !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    transition: var(--transition-spring) !important;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none !important;
-    margin: 0 !important;
-}
-
-select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 14px center !important;
-    background-size: 16px !important;
-    padding-right: 40px !important;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="password"]:focus,
-textarea:focus,
-select:focus,
-.form-control-pinui:focus {
-    border-color: var(--neon-cyan) !important;
-    box-shadow: 0 0 22px rgba(0, 240, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-    background: rgba(8, 16, 36, 0.92) !important;
-    background-color: rgba(8, 16, 36, 0.92) !important;
-}
-
-textarea {
-    resize: vertical !important;
-    min-height: 90px !important;
-    line-height: 1.5 !important;
-}
-
-.palette-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-    gap: 10px !important;
-    margin: 10px 0 !important;
-    width: 100% !important;
-}
-
-.palette-item {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 10px 14px !important;
-    border-radius: 14px !important;
-    background: rgba(6, 12, 26, 0.75) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-    cursor: pointer !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    -webkit-tap-highlight-color: transparent !important;
-    box-sizing: border-box !important;
-}
-
-.palette-item:hover {
-    background: rgba(10, 20, 42, 0.85) !important;
-    border-color: rgba(0, 240, 255, 0.4) !important;
-    transform: translateY(-1px) !important;
-}
-
-.palette-item.active {
-    background: linear-gradient(135deg, rgba(0, 132, 255, 0.32) 0%, rgba(0, 240, 255, 0.2) 100%) !important;
-    border-color: var(--neon-cyan) !important;
-    box-shadow: 0 4px 18px rgba(0, 240, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
-    transform: scale(1.02) !important;
-}
-
-.palette-circle {
-    width: 22px !important;
-    height: 22px !important;
-    border-radius: 50% !important;
-    flex-shrink: 0 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-.palette-label {
-    font-size: 0.82rem !important;
-    font-weight: 700 !important;
-    color: #ffffff !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-.acc-config-card {
-    background: rgba(4, 9, 22, 0.65) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 20px !important;
-    padding: 20px !important;
-    margin-bottom: 16px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
-    transition: var(--transition-spring) !important;
-}
-
-.acc-config-card:hover {
-    border-color: rgba(0, 240, 255, 0.35) !important;
-    background: rgba(6, 14, 30, 0.8) !important;
-}
-
-.acc-group-box {
-    background: rgba(2, 6, 16, 0.6) !important;
-    border: 1px solid rgba(0, 240, 255, 0.25) !important;
-    border-radius: 16px !important;
-    padding: 14px 16px !important;
-    margin-top: 14px !important;
-}
-
-.terminal-screen {
-    background: rgba(3, 6, 16, 0.9) !important;
-    border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
-    border-radius: 18px !important;
-    padding: 16px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.8rem !important;
-    color: #e2e8f0 !important;
-    max-height: 260px !important;
-    overflow-y: auto !important;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0, 240, 255, 0.1) !important;
-}
-
-.log-row {
-    margin-bottom: 4px !important;
-    word-break: break-all !important;
-}
-
-.log-time {
-    color: var(--neon-cyan) !important;
-    margin-right: 8px !important;
-}
-
-.stat-box-pinui {
-    background: rgba(6, 14, 30, 0.7) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 18px !important;
-    padding: 16px 14px !important;
-    text-align: center !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
-    box-sizing: border-box !important;
-}
-
-.stat-title-pinui {
-    font-size: 0.74rem !important;
-    color: var(--text-muted) !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.03em !important;
-}
-
-.stat-number-pinui {
-    font-size: 1.55rem !important;
-    font-weight: 800 !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    margin-top: 4px !important;
-}
-
-@media (max-width: 768px) {
-    .main-wrapper {
-        padding: 16px 14px 50px !important;
-        gap: 16px !important;
-    }
-    header.card-3d {
-        padding: 12px 18px !important;
-    }
-    .logo-text h1 {
-        font-size: 1.02rem !important;
-    }
-    .welcome-banner {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 14px !important;
-        padding: 20px !important;
-    }
-    .tab-horizontal-card {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 14px !important;
-        padding: 18px !important;
-    }
-    .tab-actions-right {
-        justify-content: flex-end !important;
-        flex-wrap: wrap !important;
-    }
-    .auth-card-pinui {
-        padding: 30px 22px 26px !important;
-        border-radius: 28px !important;
-    }
-    .grid-2col {
-        grid-template-columns: 1fr !important;
-    }
-    .palette-grid {
-        grid-template-columns: 1fr 1fr !important;
-    }
-}
-
-.qr-acc-card {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    padding: 14px 18px !important;
-    border-radius: var(--radius-inner) !important;
-    background: rgba(10, 20, 42, 0.75) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-    transition: var(--transition-spring) !important;
-    box-sizing: border-box !important;
-}
-
-.qr-acc-card:hover {
-    border-color: rgba(0, 240, 255, 0.35) !important;
-    background: rgba(14, 28, 56, 0.85) !important;
-}
-
-.qr-acc-header-info {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 4px !important;
-}
-
-.qr-acc-title {
-    font-size: 0.95rem !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-}
-
-.qr-acc-badge {
-    font-size: 0.74rem !important;
-    font-weight: 600 !important;
-    padding: 3px 8px !important;
-    border-radius: 12px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 4px !important;
-    width: fit-content !important;
-}
-
-.badge-unlogged {
-    background: rgba(255, 255, 255, 0.08) !important;
-    color: var(--text-muted) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-.badge-waiting {
-    background: rgba(245, 158, 11, 0.15) !important;
-    color: #fbbf24 !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-}
-
-.badge-logged {
-    background: rgba(16, 185, 129, 0.18) !important;
-    color: #34d399 !important;
-    border: 1px solid rgba(16, 185, 129, 0.35) !important;
-}
-
-.btn-xem-ma {
-    padding: 10px 18px !important;
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    flex-shrink: 0 !important;
-}
-
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.spin, .loader-spinner {
-    animation: spin 0.85s linear infinite !important;
-}
-
-</style>
+    <link rel="stylesheet" href="style.css?v=20261115_v9">
 </head>
 <body>
     <div class="pinui-ambient-orb pinui-orb-1"></div>
     <div class="pinui-ambient-orb pinui-orb-2"></div>
-    <div class="pinui-ambient-orb pinui-orb-3"></div>
     <canvas id="canvas3dBg"></canvas>
-    <div id="glassModalAlert" class="glass-modal-backdrop" style="display: none;" onclick="dongGlassModal(event)">
+    
+    <div id="glassModalAlert" class="glass-modal-backdrop" style="display: none;" onclick="dongGlassModal()">
         <div class="glass-modal-card" onclick="event.stopPropagation()">
             <div class="glass-modal-icon" id="glassModalIcon">
                 <i data-lucide="info" style="width: 28px; height: 28px;"></i>
@@ -1232,14 +25,15 @@ textarea {
             <h3 id="glassModalTitle" class="glass-modal-title">Thông Báo Hệ Thống</h3>
             <div id="glassModalMessage" class="glass-modal-message"></div>
             <div class="glass-modal-actions">
-                <button type="button" class="btn-glow btn-primary" onclick="dongGlassModal(event)" style="min-width: 130px; padding: 11px 22px;">
+                <button type="button" class="btn-glow btn-primary" onclick="dongGlassModal()" style="min-width: 130px; padding: 11px 22px;">
                     <i data-lucide="check-circle-2" style="width: 17px; height: 17px;"></i>
                     ĐÃ HIỂU
                 </button>
             </div>
         </div>
     </div>
-        <div id="modalQRContainer" class="glass-modal-backdrop" style="display: none;" onclick="dongModalXemMaQR(event)">
+
+    <div id="modalQRContainer" class="glass-modal-backdrop" style="display: none;" onclick="dongModalXemMaQR()">
         <div class="glass-modal-card" onclick="event.stopPropagation()" style="text-align: center; max-width: 380px;">
             <div class="glass-modal-header" style="margin-bottom: 12px;">
                 <h3 id="modalQRTitle" style="font-size: 1.15rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 8px;">
@@ -1273,11 +67,12 @@ textarea {
             </div>
         </div>
     </div>
-<div id="authBackdrop" class="auth-backdrop">
+
+    <div id="authBackdrop" class="auth-backdrop">
         <div class="auth-card-pinui">
             <div class="auth-header">
                 <div class="auth-icon-badge">
-                    <i data-lucide="shield-check" style="width: 26px; height: 26px;"></i>
+                    <i data-lucide="shield-check" style="width: 28px; height: 28px;"></i>
                 </div>
                 <h2 id="authTitle" class="auth-title">Đăng Nhập Quản Trị</h2>
                 <p class="auth-subtitle">Treo zalo ngôn 24/7</p>
@@ -1304,7 +99,7 @@ textarea {
                         <i data-lucide="lock" class="auth-input-icon"></i>
                         <input type="password" id="authPassword" placeholder="Nhập mật khẩu..." required autocomplete="current-password">
                         <button type="button" class="auth-eye-btn" onclick="anHienMatKhau()" tabindex="-1">
-                            <i data-lucide="eye" id="authEyeIcon" style="width: 16px; height: 16px;"></i>
+                            <i data-lucide="eye" id="authEyeIcon" style="width: 18px; height: 18px;"></i>
                         </button>
                     </div>
                 </div>
@@ -1318,6 +113,7 @@ textarea {
             </form>
         </div>
     </div>
+
     <div class="drawer-overlay" id="drawerOverlay" onclick="dongMenu3Gach()"></div>
     <aside class="drawer-menu" id="drawerMenu">
         <div class="drawer-header">
@@ -1350,6 +146,7 @@ textarea {
             </div>
         </nav>
     </aside>
+
     <div class="main-wrapper" id="mainDashboard" style="display: none;">
         <header class="card-3d">
             <a href="#" class="logo-box" onclick="chuyenTrang('quan-ly-tab')">
@@ -1365,20 +162,22 @@ textarea {
                 <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
             </button>
         </header>
+
         <div class="card-3d welcome-banner" id="bannerWelcome">
             <div class="welcome-text">
                 <h2>Welcome, <span id="welcomeUsername" style="color: var(--neon-cyan);">Sếp</span>! 👋</h2>
-                <p>Hệ thống hỗ trợ chạy song song không giới hạn nhiều tab treo text cùng lúc.</p>
+                <p>Treo ngôn zalo 24/7 by ngbao - Hệ thống chạy song song không giới hạn nhiều tab treo text cùng lúc.</p>
             </div>
             <button class="btn-glow btn-primary" onclick="chuyenTrang('tao-tab')">
                 <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
                 Tạo Tab Mới
             </button>
         </div>
+
         <div id="viewQuanLyTab">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
                 <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                    <i data-lucide="layers" style="color: var(--zalo-blue);"></i>
+                    <i data-lucide="layers" style="color: var(--neon-cyan);"></i>
                     Danh Sách Quản Lý Tab
                 </h2>
                 <button class="btn-glow btn-outline" onclick="taiDanhSachTabs()">
@@ -1388,8 +187,9 @@ textarea {
             </div>
             <div id="vungDanhSachTabsNgang"></div>
         </div>
+
         <div id="viewTaoTab" style="display: none;">
-            <div class="card-3d" style="max-width: 520px; margin: 0 auto; padding: 36px 30px;">
+            <div class="card-3d" style="max-width: 520px; width: 100%; margin: 0 auto; padding: 36px 28px;">
                 <div style="text-align: center; margin-bottom: 26px;">
                     <div class="auth-icon-badge" style="margin: 0 auto 14px;">
                         <i data-lucide="plus" style="width: 28px; height: 28px; color: #fff;"></i>
@@ -1401,91 +201,94 @@ textarea {
                         Nhập tên gợi nhớ cho tab (VD: Tab nhóm bạn, Tab war nhóm 1...)
                     </p>
                 </div>
-                <form onsubmit="xuLyTaoTabMoi(event)">
+                <form onsubmit="xuLyTaoTabMoi(event)" style="display: flex; flex-direction: column; gap: 18px;">
                     <div class="form-row">
                         <label>Tên tab gợi nhớ:</label>
-                        <input type="text" id="inputTenTabMoi" placeholder="Nhập tên tab gợi nhớ..." required autofocus>
+                        <input type="text" id="inputTenTabMoi" placeholder="Nhập tên tab gợi nhớ..." required autofocus style="width: 100% !important;">
                     </div>
-                    <div style="display: flex; gap: 12px; margin-top: 26px;">
-                        <button type="submit" class="btn-glow btn-primary" style="flex: 2; height: 50px;">
+                    <div style="display: flex; gap: 12px; margin-top: 8px;">
+                        <button type="submit" class="btn-glow btn-primary" style="flex: 2; height: 48px;">
                             <i data-lucide="check" style="width: 18px; height: 18px;"></i>
                             TẠO TAB & VỀ QUẢN LÝ
                         </button>
-                        <button type="button" class="btn-glow btn-outline" onclick="chuyenTrang('quan-ly-tab')" style="flex: 1; height: 50px;">
+                        <button type="button" class="btn-glow btn-outline" onclick="chuyenTrang('quan-ly-tab')" style="flex: 1; height: 48px;">
                             Hủy
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+
         <div id="viewLienHe" style="display: none;">
-            <div class="card-3d" style="max-width: 620px; margin: 0 auto; padding: 36px 30px;">
-                <h2 style="font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 6px;">
+            <div class="card-3d" style="max-width: 600px; margin: 0 auto; padding: 34px 28px;">
+                <h2 style="font-size: 1.38rem; font-weight: 800; text-align: center; margin-bottom: 6px;">
                     📞 THÔNG TIN LIÊN HỆ
                 </h2>
-                <p style="font-size: 0.88rem; color: var(--text-muted); text-align: center; margin-bottom: 30px;">
+                <p style="font-size: 0.86rem; color: var(--text-muted); text-align: center; margin-bottom: 24px;">
                     Liên hệ trực tiếp hỗ trợ, cập nhật tính năng hoặc giải đáp thắc mắc:
                 </p>
-                <a href="https://t.me/ngbaodev" target="_blank" class="contact-btn tele">
+                <a href="https://t.me/ngbaodev" target="_blank" class="contact-btn">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <i data-lucide="send" style="width: 24px; height: 24px;"></i>
+                        <i data-lucide="send" style="width: 22px; height: 22px; color: #29b6f6;"></i>
                         <div>
-                            <div>Telegram</div>
-                            <div style="font-size: 0.78rem; font-weight: 500; opacity: 0.85;">https://t.me/ngbaodev</div>
+                            <div style="font-weight: 700;">Telegram</div>
+                            <div style="font-size: 0.78rem; opacity: 0.8;">https://t.me/ngbaodev</div>
                         </div>
                     </div>
-                    <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
+                    <i data-lucide="arrow-up-right" style="width: 18px; height: 18px;"></i>
                 </a>
-                <a href="https://zalo.me/84988467271" target="_blank" class="contact-btn zalo">
+                <a href="https://zalo.me/84988467271" target="_blank" class="contact-btn">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <i data-lucide="message-circle" style="width: 24px; height: 24px;"></i>
+                        <i data-lucide="message-circle" style="width: 22px; height: 22px; color: #0084ff;"></i>
                         <div>
-                            <div>Zalo Hỗ Trợ</div>
-                            <div style="font-size: 0.78rem; font-weight: 500; opacity: 0.85;">zalo.me/84988467271</div>
+                            <div style="font-weight: 700;">Zalo Hỗ Trợ</div>
+                            <div style="font-size: 0.78rem; opacity: 0.8;">zalo.me/84988467271</div>
                         </div>
                     </div>
-                    <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
+                    <i data-lucide="arrow-up-right" style="width: 18px; height: 18px;"></i>
                 </a>
-                <div class="contact-btn discord" style="cursor: pointer;" onclick="saoChepDiscord('_5p40')">
+                <div class="contact-btn" style="cursor: pointer;" onclick="saoChepDiscord('_5p40')">
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <i data-lucide="gamepad-2" style="width: 24px; height: 24px;"></i>
+                        <i data-lucide="gamepad-2" style="width: 22px; height: 22px; color: #5865f2;"></i>
                         <div>
-                            <div>Discord</div>
-                            <div style="font-size: 0.78rem; font-weight: 500; opacity: 0.85;">_5p40 (Bấm để copy)</div>
+                            <div style="font-weight: 700;">Discord</div>
+                            <div style="font-size: 0.78rem; opacity: 0.8;">_5p40 (Bấm để copy)</div>
                         </div>
                     </div>
-                    <i data-lucide="copy" style="width: 20px; height: 20px;"></i>
+                    <i data-lucide="copy" style="width: 18px; height: 18px;"></i>
                 </div>
             </div>
         </div>
+
         <div id="viewChiTietTab" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
                 <button class="btn-glow btn-outline" onclick="chuyenTrang('quan-ly-tab')">
                     <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
                     Quay lại Quản lý tab
                 </button>
-                <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.1rem; font-weight: 800; color: #fff;" id="lblDangXemTabName">Tab Treo</span>
                     <span id="badgeTabDangChay" class="btn-glow" style="padding: 4px 12px; font-size: 0.75rem; pointer-events: none;">ĐÃ DỪNG</span>
                 </div>
             </div>
+
             <div class="grid-2col">
-                <div class="card-3d" style="padding: 24px;">
+                <div class="card-3d" style="padding: 22px;">
                     <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                        <i data-lucide="users" style="color: var(--zalo-blue);"></i>
+                        <i data-lucide="users" style="color: var(--neon-cyan);"></i>
                         Bước 1: Cấu hình Tài khoản Zalo
                     </h3>
                     <div class="form-row">
                         <label>Số lượng tài khoản muốn treo:</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="number" id="inputTabSoLuongAcc" min="1" max="25" value="1" style="max-width: 120px;">
-                            <button type="button" class="btn-glow btn-primary" onclick="renderTabFormAccs()">
-                                Xác nhận
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="inputTabSoLuongAcc" min="1" max="25" value="1" style="max-width: 100px; text-align: center; font-size: 1.05rem; font-weight: 700;" onchange="thayDoiSoLuongAcc()">
+                            <button type="button" class="btn-glow btn-primary" onclick="thayDoiSoLuongAcc()" style="padding: 10px 18px;">
+                                <i data-lucide="check" style="width: 16px; height: 16px;"></i> Xác nhận
                             </button>
                         </div>
                     </div>
                     
-                    <div class="auth-capsule-tabs" style="margin: 14px 0 16px 0; max-width: 440px;">
+                    <div class="auth-capsule-tabs" style="margin: 16px 0 14px 0;">
                         <button type="button" class="auth-capsule-btn active" id="btnModeManual" onclick="chuyenCheDoNhapAcc('manual')">
                             <i data-lucide="edit-3" style="width: 15px; height: 15px;"></i>
                             Nhập IMEI & Cookie thủ công
@@ -1495,14 +298,16 @@ textarea {
                             Quét mã QR đăng nhập
                         </button>
                     </div>
+
                     <div id="vungTabDanhSachAccsManual">
-                        <div id="vungTabDanhSachAccs" style="margin-top: 14px;"></div>
-                    </div>
-                    <div id="vungTabDanhSachAccsQR" style="display: none; margin-top: 14px;">
-                        <div id="vungTabDanhSachAccsQRList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                        <div id="vungTabDanhSachAccs" style="margin-top: 12px;"></div>
                     </div>
 
-                    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--card-border); display: flex; flex-direction: column; gap: 8px;">
+                    <div id="vungTabDanhSachAccsQR" style="display: none; margin-top: 12px;">
+                        <div id="vungTabDanhSachAccsQRList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    </div>
+
+                    <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--glass-border); display: flex; flex-direction: column; gap: 8px;">
                         <button type="button" class="btn-glow btn-outline" style="width: 100%;" id="btnTabLayNhom" onclick="tabLayDanhSachNhomTheoAcc(0)">
                             <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
                             Lấy danh sách nhóm từ Acc #1
@@ -1513,7 +318,8 @@ textarea {
                         </button>
                     </div>
                 </div>
-                <div class="card-3d" style="padding: 24px;">
+
+                <div class="card-3d" style="padding: 22px;">
                     <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                         <i data-lucide="sliders" style="color: var(--neon-cyan);"></i>
                         Bước 2: Nhóm, File Ngôn & Màu Sắc
@@ -1523,7 +329,7 @@ textarea {
                         <select id="selectTabNhomZalo" onchange="doiNhomChung(this.value)">
                             <option value="">-- Bấm "Lấy danh sách nhóm" hoặc nhập ID --</option>
                         </select>
-                        <input type="text" id="inputTabManualGroupId" placeholder="Hoặc tự gõ ID nhóm Zalo chung vào đây..." style="margin-top: 6px;" oninput="nhapTayNhomChung(this.value)">
+                        <input type="text" id="inputTabManualGroupId" placeholder="Hoặc tự gõ ID nhóm Zalo chung vào đây..." style="margin-top: 8px;" oninput="nhapTayNhomChung(this.value)">
                     </div>
                     <div class="form-row">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -1552,51 +358,57 @@ textarea {
                         <input type="hidden" id="tabColorMode" value="random_line">
                         <input type="hidden" id="tabColorHex" value="#DB342E">
                         <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
-                            <span style="font-size: 0.78rem; color: var(--text-muted);">Tùy chỉnh:</span>
-                            <input type="color" id="tabColorPicker" value="#0084FF" style="width: 38px; height: 30px; padding: 2px; border-radius: 6px; cursor: pointer;" onchange="tabChonMauPicker(this.value)">
-                            <span id="lblTabMauDangChon" style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: var(--neon-cyan);">Mỗi dòng 1 màu ngẫu nhiên</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Tùy chỉnh:</span>
+                            <input type="color" id="tabColorPicker" value="#0084FF" style="width: 40px; height: 32px; padding: 2px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); background: transparent;" onchange="tabChonMauPicker(this.value)">
+                            <span id="lblTabMauDangChon" style="font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; color: var(--neon-cyan);">Mỗi dòng 1 màu ngẫu nhiên (Rainbow)</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card-3d" style="padding: 24px; margin-top: 22px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px;">
-                    <div class="stat-box-pinui"><div class="stat-title-pinui">THỜI GIAN CHẠY</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--neon-cyan); margin-top: 4px;" id="lblTabTimerDisplay">00:00:00</div>
+
+            <div class="card-3d" style="padding: 22px; margin-top: 18px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 18px;">
+                    <div class="stat-box-pinui">
+                        <div class="stat-title-pinui">THỜI GIAN CHẠY</div>
+                        <div class="stat-number-pinui" style="color: var(--neon-cyan);" id="lblTabTimerDisplay">00:00:00</div>
                     </div>
-                    <div class="stat-box-pinui"><div class="stat-title-pinui">ĐÃ GỬI THÀNH CÔNG</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #34d399; margin-top: 4px;" id="lblTabSentDisplay">0</div>
+                    <div class="stat-box-pinui">
+                        <div class="stat-title-pinui">ĐÃ GỬI THÀNH CÔNG</div>
+                        <div class="stat-number-pinui" style="color: #34d399;" id="lblTabSentDisplay">0</div>
                     </div>
-                    <div class="stat-box-pinui"><div class="stat-title-pinui">GỬI THẤT BẠI</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #f87171; margin-top: 4px;" id="lblTabFailedDisplay">0</div>
+                    <div class="stat-box-pinui">
+                        <div class="stat-title-pinui">GỬI THẤT BẠI</div>
+                        <div class="stat-number-pinui" style="color: #f87171;" id="lblTabFailedDisplay">0</div>
                     </div>
-                    <div class="stat-box-pinui"><div class="stat-title-pinui">ACC ĐANG CHẠY</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #c084fc; margin-top: 4px;" id="lblTabAccCountDisplay">0</div>
+                    <div class="stat-box-pinui">
+                        <div class="stat-title-pinui">ACC ĐANG CHẠY</div>
+                        <div class="stat-number-pinui" style="color: #c084fc;" id="lblTabAccCountDisplay">0</div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 14px; margin-bottom: 20px;">
-                    <button type="button" class="btn-glow btn-success" style="flex: 1; padding: 14px; font-size: 1.05rem;" id="btnTabStart" onclick="tabBatDauTreo()">
-                        <i data-lucide="play" style="width: 22px; height: 22px;"></i>
+                <div style="display: flex; gap: 12px; margin-bottom: 18px;">
+                    <button type="button" class="btn-glow btn-success" style="flex: 1; padding: 13px; font-size: 1rem;" id="btnTabStart" onclick="tabBatDauTreo()">
+                        <i data-lucide="play" style="width: 20px; height: 20px;"></i>
                         BẮT ĐẦU TREO TAB NÀY
                     </button>
-                    <button type="button" class="btn-glow btn-danger" style="flex: 1; padding: 14px; font-size: 1.05rem;" id="btnTabStop" onclick="tabDungTreo()" disabled style="opacity: 0.5;">
-                        <i data-lucide="square" style="width: 22px; height: 22px;"></i>
+                    <button type="button" class="btn-glow btn-danger" style="flex: 1; padding: 13px; font-size: 1rem;" id="btnTabStop" onclick="tabDungTreo()" disabled style="opacity: 0.5;">
+                        <i data-lucide="square" style="width: 20px; height: 20px;"></i>
                         DỪNG TAB NÀY
                     </button>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label style="margin-bottom: 0;">Nhật ký hoạt động (Console Logs) của Tab:</label>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">Cuộn tự động</span>
+                    <label style="margin-bottom: 0; font-size: 0.82rem; font-weight: 700;">Nhật ký hoạt động (Console Logs) của Tab:</label>
+                    <span style="font-size: 0.74rem; color: var(--text-muted);">Cuộn tự động</span>
                 </div>
                 <div class="terminal-screen" id="tabTerminalLogs">
                     <div class="log-row">
                         <span class="log-time">[00:00:00]</span>
-                        <span class="log-info">Sẵn sàng chạy tiến trình cho tab này...</span>
+                        <span>Sẵn sàng chạy tiến trình cho tab này...</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="script.js?v=20261115_v3"></script>
+    
+    <script src="script.js?v=20261115_v9"></script>
 </body>
 </html>

@@ -325,7 +325,7 @@ async def api_get_groups(payload: Dict[str, Any], user: Dict[str, Any] = Depends
 
 
 @app.post("/api/qr/generate")
-def tao_ma_qr(payload: Dict[str, Any], user: Dict[str, Any] = Depends(get_current_user)):
+def tao_ma_qr(payload: Dict[str, Any]):
     acc_index = int(payload.get("acc_index", 0))
     try:
         session_info = qr_manager.create_qr_session(acc_index=acc_index)
@@ -334,7 +334,7 @@ def tao_ma_qr(payload: Dict[str, Any], user: Dict[str, Any] = Depends(get_curren
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/api/qr/status/{session_id}")
-def lay_trang_thai_qr(session_id: str, user: Dict[str, Any] = Depends(get_current_user)):
+def lay_trang_thai_qr(session_id: str):
     status_info = qr_manager.get_status(session_id)
     return {"status": "ok", "data": status_info}
 

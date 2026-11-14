@@ -12,8 +12,6 @@
     --glass-card: linear-gradient(145deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.015) 50%, rgba(8, 16, 36, 0.5) 100%);
     --glass-border: rgba(255, 255, 255, 0.16);
     --glass-border-light: rgba(255, 255, 255, 0.28);
-    --glass-blur: blur(14px) saturate(150%) brightness(1.05);
-    --glass-blur-sm: blur(10px) saturate(130%) brightness(1.05);
     --neon-blue: #0084FF;
     --neon-cyan: #00F0FF;
     --neon-purple: #A855F7;
@@ -33,8 +31,8 @@
     --shadow-glass: 0 30px 80px -15px rgba(0, 0, 0, 0.85), 0 0 40px -10px rgba(0, 132, 255, 0.2), inset 0 1.8px 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.5);
     --shadow-card: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1.5px 1px rgba(255, 255, 255, 0.42), inset 0 -1px 1px rgba(0, 0, 0, 0.45);
     --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 0 2px rgba(255, 255, 255, 0.08);
-    --transition-spring: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-spring: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 html, body {
@@ -57,7 +55,7 @@ html, body {
     height: 100vh;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.92;
+    opacity: 0.9;
 }
 
 .pinui-ambient-orb {
@@ -65,36 +63,25 @@ html, body {
     border-radius: 50%;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.45;
+    opacity: 0.35;
     will-change: transform;
     transform: translateZ(0);
 }
 
 .pinui-orb-1 {
-    width: 420px;
-    height: 420px;
-    top: -80px;
-    left: -80px;
-    background: radial-gradient(circle, rgba(0, 132, 255, 0.45) 0%, rgba(0, 240, 255, 0.15) 50%, transparent 70%);
+    width: 360px;
+    height: 360px;
+    top: -60px;
+    left: -60px;
+    background: radial-gradient(circle, rgba(0, 132, 255, 0.4) 0%, rgba(0, 240, 255, 0.12) 50%, transparent 70%);
 }
 
 .pinui-orb-2 {
-    width: 450px;
-    height: 450px;
-    bottom: -100px;
-    right: -80px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 70%);
-}
-
-.pinui-orb-3 {
-    display: none;
-}
-
-@keyframes orbPulseMotion {
-    0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-    33% { transform: translate(60px, -40px) scale(1.15) rotate(45deg); }
-    66% { transform: translate(-40px, 60px) scale(0.9) rotate(90deg); }
-    100% { transform: translate(40px, 30px) scale(1.08) rotate(135deg); }
+    width: 380px;
+    height: 380px;
+    bottom: -80px;
+    right: -60px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(236, 72, 153, 0.12) 50%, transparent 70%);
 }
 
 .auth-backdrop {
@@ -109,7 +96,7 @@ html, body {
     align-items: center !important;
     justify-content: center !important;
     padding: 20px !important;
-    background: radial-gradient(circle at 50% 25%, rgba(14, 28, 64, 0.8) 0%, rgba(2, 4, 10, 0.95) 75%) !important;
+    background: radial-gradient(circle at 50% 25%, rgba(14, 28, 64, 0.85) 0%, rgba(2, 4, 10, 0.96) 75%) !important;
     overflow-y: auto !important;
     box-sizing: border-box !important;
 }
@@ -122,9 +109,9 @@ html, body {
     width: 100% !important;
     max-width: 410px !important;
     margin: auto !important;
-    background: rgba(10, 16, 34, 0.78) !important;
-    backdrop-filter: blur(14px) saturate(150%) !important; transform: translateZ(0);
-    -webkit-backdrop-filter: blur(14px) saturate(150%) !important; transform: translateZ(0);
+    background: rgba(10, 16, 34, 0.85) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
     border-radius: var(--radius-3d) !important;
     box-shadow: var(--shadow-glass) !important;
@@ -141,7 +128,7 @@ html, body {
     left: 0;
     right: 0;
     height: 120px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 60%, transparent 100%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 60%, transparent 100%);
     pointer-events: none;
 }
 
@@ -155,12 +142,12 @@ html, body {
 }
 
 .auth-icon-badge {
-    width: 68px !important;
-    height: 68px !important;
+    width: 66px !important;
+    height: 66px !important;
     margin: 0 auto 14px !important;
     border-radius: 50% !important;
     background: radial-gradient(circle at 30% 30%, #00f0ff, #0072ff 60%, #8a2be2 100%) !important;
-    box-shadow: 0 12px 30px rgba(0, 114, 255, 0.55), inset 0 2.5px 3px rgba(255, 255, 255, 0.75), inset 0 -3px 4px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 10px 28px rgba(0, 114, 255, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.75), inset 0 -3px 4px rgba(0, 0, 0, 0.4) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -168,15 +155,8 @@ html, body {
     flex-shrink: 0 !important;
 }
 
-.auth-icon-badge svg,
-.auth-icon-badge i {
-    width: 30px !important;
-    height: 30px !important;
-    color: #ffffff !important;
-}
-
 .auth-title {
-    font-size: 1.5rem !important;
+    font-size: 1.48rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em !important;
     text-align: center !important;
@@ -199,9 +179,10 @@ html, body {
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: var(--radius-pill) !important;
     padding: 5px !important;
-    margin-bottom: 22px !important;
+    margin-bottom: 20px !important;
     box-shadow: var(--shadow-inner) !important;
     box-sizing: border-box !important;
+    gap: 4px;
 }
 
 .auth-capsule-btn {
@@ -210,13 +191,18 @@ html, body {
     background: transparent !important;
     color: var(--text-muted) !important;
     font-family: inherit !important;
-    font-size: 0.92rem !important;
+    font-size: 0.88rem !important;
     font-weight: 700 !important;
-    padding: 11px 16px !important;
+    padding: 10px 14px !important;
     border-radius: var(--radius-pill) !important;
     cursor: pointer !important;
     text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
     transition: var(--transition-bounce) !important;
+    white-space: nowrap !important;
 }
 
 .auth-capsule-btn.active {
@@ -266,7 +252,7 @@ html, body {
 
 .auth-input-wrapper:focus-within {
     border-color: var(--neon-cyan) !important;
-    box-shadow: 0 0 24px rgba(0, 240, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
     background: rgba(8, 16, 36, 0.9) !important;
 }
 
@@ -328,16 +314,16 @@ html, body {
     justify-content: center !important;
     gap: 10px !important;
     width: 100% !important;
-    height: 52px !important;
+    height: 50px !important;
     margin-top: 8px !important;
     padding: 0 24px !important;
     border-radius: var(--radius-inner) !important;
     border: none !important;
     background: linear-gradient(135deg, #00C6FF 0%, #0072FF 50%, #8A2BE2 100%) !important;
-    box-shadow: 0 14px 35px -5px rgba(0, 114, 255, 0.65), inset 0 2px 2px rgba(255, 255, 255, 0.65), inset 0 -2px 3px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 12px 30px -5px rgba(0, 114, 255, 0.6), inset 0 2px 2px rgba(255, 255, 255, 0.65), inset 0 -2px 3px rgba(0, 0, 0, 0.3) !important;
     color: #ffffff !important;
     font-family: inherit !important;
-    font-size: 1rem !important;
+    font-size: 0.98rem !important;
     font-weight: 800 !important;
     letter-spacing: 0.04em !important;
     cursor: pointer !important;
@@ -348,11 +334,11 @@ html, body {
 
 .auth-submit-btn:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 18px 45px -5px rgba(0, 114, 255, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 16px 40px -5px rgba(0, 114, 255, 0.75) !important;
 }
 
 .auth-submit-btn:active {
-    transform: translateY(2px) scale(0.98) !important;
+    transform: translateY(1px) scale(0.98) !important;
 }
 
 .auth-btn-arrow {
@@ -386,9 +372,9 @@ html, body {
     width: 100vw !important;
     height: 100vh !important;
     z-index: 99999 !important;
-    background: rgba(2, 4, 10, 0.78) !important;
-    backdrop-filter: blur(28px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    background: rgba(2, 4, 10, 0.8) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
     display: none;
     align-items: center !important;
     justify-content: center !important;
@@ -403,25 +389,24 @@ html, body {
 .glass-modal-card {
     width: 100% !important;
     max-width: 420px !important;
-    background: var(--glass-surface) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    border: 1px solid var(--glass-border) !important;
+    background: rgba(10, 18, 40, 0.92) !important;
+    border: 1.5px solid var(--glass-border) !important;
     border-radius: var(--radius-3d) !important;
     box-shadow: var(--shadow-glass) !important;
-    padding: 32px 24px 26px !important;
+    padding: 30px 24px 26px !important;
     text-align: center !important;
     position: relative !important;
     overflow: hidden !important;
+    box-sizing: border-box !important;
 }
 
 .glass-modal-icon {
-    width: 64px !important;
-    height: 64px !important;
-    margin: 0 auto 16px !important;
+    width: 60px !important;
+    height: 60px !important;
+    margin: 0 auto 14px !important;
     border-radius: 50% !important;
     background: radial-gradient(circle at 30% 30%, #00f0ff, #0072ff 60%, #8a2be2 100%) !important;
-    box-shadow: 0 14px 30px rgba(0, 132, 255, 0.5) !important;
+    box-shadow: 0 12px 28px rgba(0, 132, 255, 0.5) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -430,26 +415,27 @@ html, body {
 
 .glass-modal-icon.error {
     background: radial-gradient(circle at 30% 30%, #ff6b6b, #ef4444 60%, #991b1b 100%) !important;
-    box-shadow: 0 14px 30px rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5) !important;
 }
 
 .glass-modal-icon.success {
     background: radial-gradient(circle at 30% 30%, #34d399, #10b981 60%, #065f46 100%) !important;
-    box-shadow: 0 14px 30px rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5) !important;
 }
 
 .glass-modal-title {
-    font-size: 1.3rem !important;
+    font-size: 1.25rem !important;
     font-weight: 800 !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
     color: #ffffff !important;
 }
 
 .glass-modal-message {
-    font-size: 0.92rem !important;
+    font-size: 0.9rem !important;
     color: var(--text-secondary) !important;
-    line-height: 1.6 !important;
-    margin-bottom: 22px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 20px !important;
+    word-break: break-word;
 }
 
 .drawer-overlay {
@@ -457,11 +443,11 @@ html, body {
     inset: 0;
     z-index: 800;
     background: rgba(2, 4, 10, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.35s ease;
+    transition: opacity 0.3s ease;
 }
 
 .drawer-overlay.open {
@@ -472,20 +458,20 @@ html, body {
 .drawer-menu {
     position: fixed;
     top: 0;
-    right: -360px;
-    width: 320px;
+    right: -340px;
+    width: 300px;
     max-width: 85vw;
     height: 100%;
     z-index: 850;
-    background: var(--glass-surface);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(8, 16, 36, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-left: 1px solid var(--glass-border);
     box-shadow: -20px 0 60px rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
-    padding: 30px 24px;
-    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 26px 20px;
+    transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .drawer-menu.open {
@@ -496,36 +482,36 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 18px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .drawer-nav-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 18px;
+    gap: 12px;
+    padding: 12px 16px;
     border-radius: var(--radius-inner);
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition-spring);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .drawer-nav-item:hover {
     background: rgba(255, 255, 255, 0.06);
     color: #ffffff;
-    transform: translateX(4px);
+    transform: translateX(3px);
 }
 
 .drawer-nav-item.active {
     background: linear-gradient(135deg, rgba(0, 132, 255, 0.25) 0%, rgba(0, 240, 255, 0.15) 100%);
     border: 1px solid rgba(0, 240, 255, 0.4);
     color: var(--neon-cyan);
-    box-shadow: 0 4px 20px rgba(0, 132, 255, 0.25);
+    box-shadow: 0 4px 18px rgba(0, 132, 255, 0.25);
 }
 
 .main-wrapper {
@@ -533,22 +519,23 @@ html, body {
     z-index: 10;
     max-width: 1050px;
     margin: 0 auto;
-    padding: 24px 20px 60px;
+    padding: 20px 18px 50px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 20px;
 }
 
 .card-3d {
-    background: var(--glass-card) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    border: 1px solid var(--glass-border) !important;
+    background: rgba(10, 18, 38, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1.5px solid var(--glass-border) !important;
     border-radius: var(--radius-card) !important;
     box-shadow: var(--shadow-card) !important;
     position: relative;
     overflow: hidden;
     transition: var(--transition-spring);
+    box-sizing: border-box;
 }
 
 .card-3d::before {
@@ -557,8 +544,8 @@ html, body {
     top: 0;
     left: 0;
     right: 0;
-    height: 90px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, transparent 100%);
+    height: 80px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
     pointer-events: none;
 }
 
@@ -566,24 +553,24 @@ header.card-3d {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 26px;
+    padding: 14px 22px;
     border-radius: var(--radius-pill) !important;
 }
 
 .logo-box {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     text-decoration: none;
     color: inherit;
 }
 
 .logo-icon-3d {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
     background: radial-gradient(circle at 30% 30%, #00f0ff, #0072ff 60%, #8a2be2 100%);
-    box-shadow: 0 8px 24px rgba(0, 114, 255, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -592,7 +579,7 @@ header.card-3d {
 }
 
 .logo-text h1 {
-    font-size: 1.18rem;
+    font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: #ffffff;
@@ -602,15 +589,15 @@ header.card-3d {
     font-size: 0.72rem;
     font-weight: 600;
     color: var(--neon-cyan);
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
 }
 
 .btn-hamburger {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -621,7 +608,7 @@ header.card-3d {
 
 .btn-hamburger:hover {
     background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.06);
+    transform: scale(1.05);
     border-color: var(--neon-cyan);
 }
 
@@ -629,33 +616,33 @@ header.card-3d {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px 30px;
+    padding: 22px 26px;
     background: linear-gradient(135deg, rgba(0, 132, 255, 0.12) 0%, rgba(168, 85, 247, 0.08) 50%, rgba(8, 16, 36, 0.6) 100%) !important;
 }
 
 .welcome-text h2 {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     margin-bottom: 4px;
 }
 
 .welcome-text p {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     color: var(--text-muted);
 }
 
 .tab-horizontal-card {
-    background: var(--glass-card) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
+    background: rgba(10, 18, 38, 0.78) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     border-radius: var(--radius-card) !important;
-    padding: 20px 24px !important;
+    padding: 18px 22px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 20px !important;
-    margin-bottom: 16px !important;
+    gap: 18px !important;
+    margin-bottom: 14px !important;
     position: relative !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
@@ -664,25 +651,25 @@ header.card-3d {
 
 .tab-horizontal-card.running {
     border: 2px solid var(--neon-emerald) !important;
-    box-shadow: 0 0 30px rgba(16, 185, 129, 0.45), 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 0 18px rgba(16, 185, 129, 0.22) !important;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4), 0 14px 40px rgba(0, 0, 0, 0.5) !important;
 }
 
 .tab-horizontal-card.stopped {
     border: 2px solid var(--neon-red) !important;
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4), 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 0 18px rgba(239, 68, 68, 0.18) !important;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), 0 14px 40px rgba(0, 0, 0, 0.5) !important;
 }
 
 .tab-info-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     flex: 1;
     min-width: 0;
 }
 
 .tab-status-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -693,21 +680,14 @@ header.card-3d {
 
 .tab-horizontal-card.running .tab-status-icon {
     background: radial-gradient(circle at 30% 30%, #34d399, #10b981 60%, #065f46 100%);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.55);
     color: #fff;
-    animation: pulseRunning 2.2s infinite;
 }
 
 .tab-horizontal-card.stopped .tab-status-icon {
     background: radial-gradient(circle at 30% 30%, #f87171, #ef4444 60%, #7f1d1d 100%);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.45);
     color: #fff;
-}
-
-@keyframes pulseRunning {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-    70% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .tab-details {
@@ -716,11 +696,11 @@ header.card-3d {
 }
 
 .tab-name-title {
-    font-size: 1.15rem;
+    font-size: 1.12rem;
     font-weight: 800;
     letter-spacing: -0.01em;
     color: #ffffff;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -730,16 +710,16 @@ header.card-3d {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 7px;
 }
 
 .tab-meta-pill {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 3px 9px;
     border-radius: var(--radius-pill);
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -749,7 +729,7 @@ header.card-3d {
 .tab-actions-right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-shrink: 0;
 }
 
@@ -758,11 +738,11 @@ header.card-3d {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 18px;
+    gap: 7px;
+    padding: 9px 16px;
     border-radius: var(--radius-pill);
     font-family: inherit;
-    font-size: 0.86rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
     border: none;
@@ -778,35 +758,25 @@ header.card-3d {
 
 .btn-primary {
     background: linear-gradient(135deg, #00C6FF 0%, #0072FF 60%, #0052cc 100%) !important;
-    box-shadow: 0 8px 24px rgba(0, 114, 255, 0.5), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.45), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
     color: #ffffff !important;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 12px 30px rgba(0, 114, 255, 0.7), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.75) !important;
-    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0, 114, 255, 0.65) !important;
+    transform: translateY(-1.5px);
 }
 
 .btn-success {
     background: linear-gradient(135deg, #34d399 0%, #10b981 60%, #059669 100%) !important;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
     color: #ffffff !important;
-}
-
-.btn-success:hover {
-    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.7), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.75) !important;
-    transform: translateY(-2px);
 }
 
 .btn-danger {
     background: linear-gradient(135deg, #f87171 0%, #ef4444 60%, #dc2626 100%) !important;
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65) !important;
     color: #ffffff !important;
-}
-
-.btn-danger:hover {
-    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.7);
-    transform: translateY(-2px);
 }
 
 .btn-outline {
@@ -818,102 +788,62 @@ header.card-3d {
 .btn-outline:hover {
     background: rgba(255, 255, 255, 0.12) !important;
     border-color: rgba(255, 255, 255, 0.35) !important;
-    transform: translateY(-2px);
-}
-
-.contact-card-box {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 18px;
-    margin-top: 18px;
+    transform: translateY(-1.5px);
 }
 
 .contact-btn {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px 22px;
+    justify-content: space-between;
+    padding: 16px 20px;
     border-radius: var(--radius-inner);
-    background: var(--glass-card);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: rgba(10, 18, 38, 0.75);
     border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-card);
     color: #ffffff;
     text-decoration: none;
+    margin-bottom: 12px;
     transition: var(--transition-spring);
 }
 
 .contact-btn:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     border-color: var(--neon-cyan);
-    box-shadow: 0 18px 45px rgba(0, 132, 255, 0.35);
-}
-
-.contact-btn.tele .contact-icon {
-    background: radial-gradient(circle at 30% 30%, #29b6f6, #0288d1);
-    box-shadow: 0 8px 20px rgba(2, 136, 209, 0.5);
-}
-
-.contact-btn.zalo .contact-icon {
-    background: radial-gradient(circle at 30% 30%, #38bdf8, #0068ff);
-    box-shadow: 0 8px 20px rgba(0, 104, 255, 0.5);
-}
-
-.contact-btn.discord .contact-icon {
-    background: radial-gradient(circle at 30% 30%, #818cf8, #5865f2);
-    box-shadow: 0 8px 20px rgba(88, 101, 242, 0.5);
-}
-
-.contact-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    flex-shrink: 0;
 }
 
 .grid-2col {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
-    gap: 20px !important;
-    margin-bottom: 22px !important;
+    gap: 18px !important;
+    margin-bottom: 20px !important;
 }
 
 .form-row {
     display: flex !important;
     flex-direction: column !important;
     gap: 7px !important;
-    margin-bottom: 18px !important;
+    margin-bottom: 16px !important;
     width: 100% !important;
 }
 
-.form-row label,
-.form-label-pinui {
+.form-row label {
     display: block !important;
     font-size: 0.82rem !important;
     font-weight: 700 !important;
     color: rgba(255, 255, 255, 0.85) !important;
     letter-spacing: 0.01em !important;
-    margin-bottom: 2px !important;
-    text-align: left !important;
 }
 
 input[type="text"],
 input[type="number"],
 input[type="password"],
 textarea,
-select,
-.form-control-pinui {
+select {
     width: 100% !important;
     background: rgba(6, 12, 26, 0.85) !important;
     background-color: rgba(6, 12, 26, 0.85) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
     border-radius: var(--radius-inner) !important;
-    padding: 12px 16px !important;
+    padding: 11px 15px !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     caret-color: var(--neon-cyan) !important;
@@ -939,32 +869,28 @@ select {
     background-repeat: no-repeat !important;
     background-position: right 14px center !important;
     background-size: 16px !important;
-    padding-right: 40px !important;
+    padding-right: 38px !important;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="password"]:focus,
+input:focus,
 textarea:focus,
-select:focus,
-.form-control-pinui:focus {
+select:focus {
     border-color: var(--neon-cyan) !important;
-    box-shadow: 0 0 22px rgba(0, 240, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
     background: rgba(8, 16, 36, 0.92) !important;
-    background-color: rgba(8, 16, 36, 0.92) !important;
 }
 
 textarea {
     resize: vertical !important;
-    min-height: 90px !important;
+    min-height: 85px !important;
     line-height: 1.5 !important;
 }
 
 .palette-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-    gap: 10px !important;
-    margin: 10px 0 !important;
+    gap: 9px !important;
+    margin: 8px 0 !important;
     width: 100% !important;
 }
 
@@ -972,27 +898,25 @@ textarea {
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
-    padding: 10px 14px !important;
+    padding: 10px 12px !important;
     border-radius: 14px !important;
-    background: rgba(6, 12, 26, 0.75) !important;
+    background: rgba(6, 12, 26, 0.8) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
     cursor: pointer !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     -webkit-tap-highlight-color: transparent !important;
     box-sizing: border-box !important;
 }
 
 .palette-item:hover {
-    background: rgba(10, 20, 42, 0.85) !important;
+    background: rgba(10, 20, 42, 0.9) !important;
     border-color: rgba(0, 240, 255, 0.4) !important;
-    transform: translateY(-1px) !important;
 }
 
 .palette-item.active {
     background: linear-gradient(135deg, rgba(0, 132, 255, 0.32) 0%, rgba(0, 240, 255, 0.2) 100%) !important;
     border-color: var(--neon-cyan) !important;
-    box-shadow: 0 4px 18px rgba(0, 240, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
-    transform: scale(1.02) !important;
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.45) !important;
 }
 
 .palette-circle {
@@ -1000,8 +924,8 @@ textarea {
     height: 22px !important;
     border-radius: 50% !important;
     flex-shrink: 0 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
 }
 
 .palette-label {
@@ -1014,39 +938,33 @@ textarea {
 }
 
 .acc-config-card {
-    background: rgba(4, 9, 22, 0.65) !important;
+    background: rgba(4, 9, 22, 0.7) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 20px !important;
-    padding: 20px !important;
-    margin-bottom: 16px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
-    transition: var(--transition-spring) !important;
-}
-
-.acc-config-card:hover {
-    border-color: rgba(0, 240, 255, 0.35) !important;
-    background: rgba(6, 14, 30, 0.8) !important;
+    border-radius: 18px !important;
+    padding: 16px !important;
+    margin-bottom: 14px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
 }
 
 .acc-group-box {
-    background: rgba(2, 6, 16, 0.6) !important;
-    border: 1px solid rgba(0, 240, 255, 0.25) !important;
-    border-radius: 16px !important;
-    padding: 14px 16px !important;
-    margin-top: 14px !important;
+    background: rgba(2, 6, 16, 0.65) !important;
+    border: 1px solid rgba(0, 240, 255, 0.22) !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    margin-top: 12px !important;
 }
 
 .terminal-screen {
-    background: rgba(3, 6, 16, 0.9) !important;
+    background: rgba(3, 6, 16, 0.95) !important;
     border: 1.5px solid rgba(0, 240, 255, 0.25) !important;
-    border-radius: 18px !important;
-    padding: 16px !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.8rem !important;
+    font-size: 0.78rem !important;
     color: #e2e8f0 !important;
-    max-height: 260px !important;
+    max-height: 240px !important;
     overflow-y: auto !important;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0, 240, 255, 0.1) !important;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8) !important;
 }
 
 .log-row {
@@ -1060,66 +978,27 @@ textarea {
 }
 
 .stat-box-pinui {
-    background: rgba(6, 14, 30, 0.7) !important;
+    background: rgba(6, 14, 30, 0.75) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 18px !important;
-    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    padding: 14px 12px !important;
     text-align: center !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
     box-sizing: border-box !important;
 }
 
 .stat-title-pinui {
-    font-size: 0.74rem !important;
+    font-size: 0.72rem !important;
     color: var(--text-muted) !important;
     font-weight: 700 !important;
     letter-spacing: 0.03em !important;
 }
 
 .stat-number-pinui {
-    font-size: 1.55rem !important;
+    font-size: 1.45rem !important;
     font-weight: 800 !important;
     font-family: 'JetBrains Mono', monospace !important;
-    margin-top: 4px !important;
-}
-
-@media (max-width: 768px) {
-    .main-wrapper {
-        padding: 16px 14px 50px !important;
-        gap: 16px !important;
-    }
-    header.card-3d {
-        padding: 12px 18px !important;
-    }
-    .logo-text h1 {
-        font-size: 1.02rem !important;
-    }
-    .welcome-banner {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 14px !important;
-        padding: 20px !important;
-    }
-    .tab-horizontal-card {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 14px !important;
-        padding: 18px !important;
-    }
-    .tab-actions-right {
-        justify-content: flex-end !important;
-        flex-wrap: wrap !important;
-    }
-    .auth-card-pinui {
-        padding: 30px 22px 26px !important;
-        border-radius: 28px !important;
-    }
-    .grid-2col {
-        grid-template-columns: 1fr !important;
-    }
-    .palette-grid {
-        grid-template-columns: 1fr 1fr !important;
-    }
+    margin-top: 3px !important;
 }
 
 .qr-acc-card {
@@ -1129,15 +1008,14 @@ textarea {
     gap: 12px !important;
     padding: 14px 18px !important;
     border-radius: var(--radius-inner) !important;
-    background: rgba(10, 20, 42, 0.75) !important;
+    background: rgba(10, 20, 42, 0.85) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-    transition: var(--transition-spring) !important;
     box-sizing: border-box !important;
+    transition: var(--transition-spring) !important;
 }
 
 .qr-acc-card:hover {
-    border-color: rgba(0, 240, 255, 0.35) !important;
-    background: rgba(14, 28, 56, 0.85) !important;
+    border-color: rgba(0, 240, 255, 0.4) !important;
 }
 
 .qr-acc-header-info {
@@ -1185,7 +1063,7 @@ textarea {
 }
 
 .btn-xem-ma {
-    padding: 10px 18px !important;
+    padding: 9px 18px !important;
     font-size: 0.85rem !important;
     font-weight: 700 !important;
     display: inline-flex !important;
@@ -1194,11 +1072,54 @@ textarea {
     flex-shrink: 0 !important;
 }
 
-
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.spin, .loader-spinner {
+
+.loader-spinner {
     animation: spin 0.85s linear infinite !important;
+}
+
+@media (max-width: 768px) {
+    .main-wrapper {
+        padding: 14px 12px 40px !important;
+        gap: 14px !important;
+    }
+    header.card-3d {
+        padding: 10px 16px !important;
+    }
+    .logo-text h1 {
+        font-size: 1rem !important;
+    }
+    .welcome-banner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding: 18px !important;
+    }
+    .tab-horizontal-card {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 16px !important;
+    }
+    .tab-actions-right {
+        justify-content: flex-end !important;
+        flex-wrap: wrap !important;
+    }
+    .auth-card-pinui {
+        padding: 28px 20px 24px !important;
+        border-radius: 24px !important;
+    }
+    .grid-2col {
+        grid-template-columns: 1fr !important;
+    }
+    .palette-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .auth-capsule-btn {
+        font-size: 0.78rem !important;
+        padding: 8px 10px !important;
+    }
 }
