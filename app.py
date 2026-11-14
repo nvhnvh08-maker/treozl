@@ -1,7 +1,4 @@
-"""
-HỆ THỐNG TREO NGÔN ZALO 24/7 BY NGBAO
-Phục vụ các file Web tách biệt: index.html, style.css, script.js
-"""
+
 
 import os
 import sys
@@ -26,6 +23,7 @@ from database import (
 
 from zalo_core import (
     bot_manager,
+    qr_manager,
     fetch_groups_from_acc,
     TOOL_COLOR_LIST,
     parse_cookies_input
@@ -265,6 +263,21 @@ async def api_get_groups(payload: Dict[str, Any], user: Dict[str, Any] = Depends
         }
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "message": f"Lỗi lấy nhóm: {str(e)}"})
+
+
+@app.post("/api/qr/generate")
+def tao_ma_qr(payload: Dict[str, Any], user: Dict[str, Any] = Depends(get_current_user)):
+    acc_index = int(payload.get("acc_index", 0))
+    try:
+        session_info = qr_manager.create_qr_session(acc_index=acc_index)
+        return {"status": "ok", "data": session_info}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/api/qr/status/{session_id}")
+def lay_trang_thai_qr(session_id: str, user: Dict[str, Any] = Depends(get_current_user)):
+    status_info = qr_manager.get_status(session_id)
+    return {"status": "ok", "data": status_info}
 
 @app.get("/")
 async def serve_index():

@@ -1,7 +1,6 @@
-"""
-Core module xử lý Zalo API cho tính năng Treo Text Zalo Đa Luồng Đa Tab
-Hỗ trợ chạy song song nhiều Tab độc lập không giới hạn!
-"""
+import uuid
+import secrets
+
 
 import os
 import sys
@@ -97,7 +96,7 @@ TOOL_COLOR_LIST = [
 ]
 
 def normalize_ttl_value(ttl):
-    """Chuẩn hóa giá trị TTL tự hủy theo millisecond"""
+    
     if ttl is None:
         return None
     try:
@@ -111,7 +110,7 @@ def normalize_ttl_value(ttl):
     return t
 
 def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str, str]:
-    """Phân tích linh hoạt mọi định dạng Cookie và tự động chuẩn hóa token Zalo"""
+    
     if not cookie_raw:
         return {}
 
@@ -165,7 +164,7 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
     return res
 
 def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
-    """Lấy danh sách nhóm từ ZaloAPI qua IMEI và Cookie"""
+    
     if not ZALO_AVAILABLE:
         raise RuntimeError("Thư viện zlapi chưa được cài đặt. Vui lòng cài: pip install zlapi")
 
@@ -224,9 +223,7 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
     return groups
 
 class SingleTabRunner:
-    """
-    Tiến trình chạy độc lập cho một Tab cụ thể
-    """
+    
     def __init__(self, tab_id: str, name: str):
         self.tab_id = tab_id
         self.name = name
@@ -436,9 +433,7 @@ class SingleTabRunner:
         return True
 
 class MultiTabBotManager:
-    """
-    Quản lý tập trung toàn bộ các Tab đang chạy
-    """
+    
     def __init__(self):
         self.tabs: Dict[str, SingleTabRunner] = {}
         self.lock = threading.Lock()
@@ -512,3 +507,148 @@ class MultiTabBotManager:
                 del self.tabs[tab_id]
 
 bot_manager = MultiTabBotManager()
+
+
+class ZaloQRManager:
+    def __init__(self):
+        self.sessions = {}
+        self.lock = threading.Lock()
+
+    def create_qr_session(self, acc_index=0):
+        with self.lock:
+            now_ts = time.time()
+            self.sessions = {k: v for k, v in self.sessions.items() if now_ts - v.get('created_at', 0) < 600}
+        session_id = secrets.token_hex(16)
+        http_session = requests.Session()
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://id.zalo.me/account/login?continue=https%3A%2F%2Fchat.zalo.me%2F',
+            'Origin': 'https://id.zalo.me',
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        http_session.headers.update(headers)
+        try:
+            http_session.get('https://id.zalo.me/account/login', timeout=10)
+        except Exception:
+            pass
+        res = http_session.post('https://id.zalo.me/account/authen/qr/generate', data={'cliGenQR': 0}, timeout=10)
+        res_data = res.json()
+        if res_data.get('error_code') != 0:
+            raise Exception(res_data.get('error_message', 'Không thể tạo mã QR từ Zalo'))
+        qr_data = res_data.get('data', {})
+        code = qr_data.get('code')
+        image = qr_data.get('image')
+        session_obj = {
+            'session_id': session_id,
+            'acc_index': acc_index,
+            'code': code,
+            'image': image,
+            'status': 'waiting-scan',
+            'user_info': {},
+            'credentials': {},
+            'created_at': time.time(),
+            'http_session': http_session
+        }
+        with self.lock:
+            self.sessions[session_id] = session_obj
+        worker = threading.Thread(target=self._poll_worker, args=(session_id,), daemon=True)
+        worker.start()
+        return {
+            'session_id': session_id,
+            'image': image,
+            'code': code,
+            'status': 'waiting-scan'
+        }
+
+    def _poll_worker(self, session_id):
+        with self.lock:
+            session_obj = self.sessions.get(session_id)
+        if not session_obj:
+            return
+        http_session = session_obj['http_session']
+        code = session_obj['code']
+        scan_start = time.time()
+        while time.time() - scan_start < 150:
+            try:
+                r_scan = http_session.post('https://id.zalo.me/account/authen/qr/waiting-scan', data={'code': code}, timeout=30)
+                scan_res = r_scan.json()
+                scan_err = scan_res.get('error_code')
+                if scan_err == 0:
+                    scan_data = scan_res.get('data') or {}
+                    session_obj['status'] = 'scanned'
+                    session_obj['user_info'] = {
+                        'name': scan_data.get('display_name') or scan_data.get('name') or 'Tài khoản Zalo',
+                        'avatar': scan_data.get('avatar') or ''
+                    }
+                    break
+                elif scan_err == 8:
+                    continue
+                else:
+                    session_obj['status'] = 'expired'
+                    return
+            except Exception:
+                continue
+        if session_obj.get('status') != 'scanned':
+            session_obj['status'] = 'expired'
+            return
+        conf_start = time.time()
+        while time.time() - conf_start < 120:
+            try:
+                r_conf = http_session.post('https://id.zalo.me/account/authen/qr/waiting-confirm', data={'code': code}, timeout=30)
+                conf_res = r_conf.json()
+                conf_err = conf_res.get('error_code')
+                if conf_err == 0:
+                    conf_data = conf_res.get('data') or {}
+                    redirect_url = conf_data.get('url')
+                    if redirect_url:
+                        try:
+                            http_session.get(redirect_url, allow_redirects=True, timeout=15)
+                        except Exception:
+                            pass
+                    cookie_dict = http_session.cookies.get_dict()
+                    cookie_json = json.dumps(cookie_dict)
+                    imei = uuid.uuid4().hex
+                    user_name = session_obj['user_info'].get('name') or 'Zalo User'
+                    user_avatar = session_obj['user_info'].get('avatar') or ''
+                    try:
+                        ts = int(time.time() * 1000)
+                        test_url = f'https://wpa.chat.zalo.me/api/login/getLoginInfo?imei={imei}&type=30&client_version=645&computer_name=Web&ts={ts}'
+                        t_res = http_session.get(test_url, timeout=10)
+                        t_data = t_res.json().get('data', {})
+                        if t_data and isinstance(t_data, dict):
+                            t_name = t_data.get('name') or t_data.get('display_name')
+                            if t_name:
+                                user_name = t_name
+                    except Exception:
+                        pass
+                    session_obj['credentials'] = {
+                        'imei': imei,
+                        'cookie': cookie_json,
+                        'name': user_name,
+                        'avatar': user_avatar
+                    }
+                    session_obj['status'] = 'confirmed'
+                    return
+                elif conf_err == 8:
+                    continue
+                else:
+                    session_obj['status'] = 'expired'
+                    return
+            except Exception:
+                continue
+        session_obj['status'] = 'expired'
+
+    def get_status(self, session_id):
+        with self.lock:
+            session_obj = self.sessions.get(session_id)
+            if not session_obj:
+                return {'status': 'not_found', 'user_info': {}, 'credentials': {}}
+            return {
+                'session_id': session_id,
+                'status': session_obj.get('status', 'unknown'),
+                'user_info': session_obj.get('user_info', {}),
+                'credentials': session_obj.get('credentials', {})
+            }
+
+qr_manager = ZaloQRManager()

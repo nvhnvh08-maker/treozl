@@ -889,3 +889,233 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+
+let cheDoNhapAcc = "manual";
+let qrSessions = {};
+let qrPollingTimer = null;
+let currentQRIndex = 0;
+
+function thayDoiSoLuongAcc() {
+    renderTabFormAccs();
+}
+
+function chuyenCheDoNhapAcc(mode) {
+    cheDoNhapAcc = mode;
+    const btnManual = document.getElementById("btnModeManual");
+    const btnQR = document.getElementById("btnModeQR");
+    const wrapManual = document.getElementById("vungTabDanhSachAccsManual");
+    const wrapQR = document.getElementById("vungTabDanhSachAccsQR");
+    if (btnManual && btnQR && wrapManual && wrapQR) {
+        if (mode === "manual") {
+            btnManual.classList.add("active");
+            btnQR.classList.remove("active");
+            wrapManual.style.display = "block";
+            wrapQR.style.display = "none";
+        } else {
+            btnQR.classList.add("active");
+            btnManual.classList.remove("active");
+            wrapManual.style.display = "none";
+            wrapQR.style.display = "block";
+            renderTabFormAccsQR();
+        }
+    }
+    lucide.createIcons();
+}
+
+function renderTabFormAccsQR() {
+    const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
+    const container = document.getElementById("vungTabDanhSachAccsQRList");
+    if (!container) return;
+    let html = "";
+    for (let i = 0; i < count; i++) {
+        const cookieInput = document.getElementById("tab_acc_cookie_" + i);
+        const cookieVal = cookieInput ? cookieInput.value.trim() : "";
+        const sess = qrSessions[i];
+        const isLogged = (sess && sess.status === "confirmed") || (cookieVal.length > 10);
+        const name = (sess && sess.credentials && sess.credentials.name) ? sess.credentials.name : (isLogged ? "Đã có Cookie" : "Chưa đăng nhập");
+        const badgeClass = isLogged ? "badge-logged" : "badge-unlogged";
+        const badgeText = isLogged ? ("✅ Đã đăng nhập: " + escapeHtml(name)) : "⚪ Chưa đăng nhập";
+
+        html += '<div class="qr-acc-card">' +
+            '<div class="qr-acc-header-info">' +
+                '<div class="qr-acc-title">' +
+                    '<i data-lucide="user" style="width: 16px; height: 16px; color: var(--neon-cyan);"></i>' +
+                    '<span>Acc ' + (i + 1) + ' :</span>' +
+                '</div>' +
+                '<div class="qr-acc-badge ' + badgeClass + '" id="qrBadge_' + i + '">' +
+                    badgeText +
+                '</div>' +
+            '</div>' +
+            '<div style="display: flex; gap: 8px; align-items: center;">' +
+                '<button type="button" class="btn-glow ' + (isLogged ? "btn-outline" : "btn-primary") + ' btn-xem-ma" onclick="moModalXemMaQR(' + i + ')">' +
+                    '<i data-lucide="qr-code" style="width: 15px; height: 15px;"></i>' +
+                    'Xem mã' +
+                '</button>' +
+            '</div>' +
+        '</div>';
+    }
+    container.innerHTML = html;
+    if (presetAccs && Array.isArray(presetAccs)) {
+        presetAccs.forEach((a, idx) => {
+            if (a && a.cookie) {
+                qrSessions[idx] = {
+                    status: "confirmed",
+                    credentials: {
+                        imei: a.imei || "",
+                        cookie: a.cookie || "",
+                        name: "Acc #" + (idx + 1)
+                    }
+                };
+            }
+        });
+    }
+    renderTabFormAccsQR();
+    lucide.createIcons();
+}
+
+async function moModalXemMaQR(accIndex) {
+    currentQRIndex = accIndex;
+    const modal = document.getElementById("modalQRContainer");
+    if (!modal) return;
+    modal.classList.add("show");
+    modal.style.display = "flex";
+    document.getElementById("modalQRTitle").innerHTML = '<i data-lucide="qr-code" style="color: var(--neon-cyan);"></i> Mã QR Đăng Nhập - Acc #' + (accIndex + 1);
+    document.getElementById("qrLoadingSpinner").style.display = "flex";
+    document.getElementById("qrImageWrapper").style.display = "none";
+    document.getElementById("lblTrangThaiQR").innerText = "⏳ Đang kết nối máy chủ Zalo tạo mã QR...";
+    document.getElementById("lblTrangThaiQR").style.color = "var(--neon-cyan)";
+    lucide.createIcons();
+
+    if (qrPollingTimer) {
+        clearInterval(qrPollingTimer);
+        qrPollingTimer = null;
+    }
+
+    try {
+        const token = maToken || localStorage.getItem("token") || "";
+        const res = await fetch("/api/qr/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ acc_index: accIndex })
+        });
+        const data = await res.json();
+        if (!res.ok || data.status !== "ok") {
+            throw new Error(data.detail || "Không thể tạo mã QR Zalo");
+        }
+
+        const sessionInfo = data.data;
+        qrSessions[accIndex] = {
+            session_id: sessionInfo.session_id,
+            image: sessionInfo.image,
+            code: sessionInfo.code,
+            status: "waiting-scan"
+        };
+
+        document.getElementById("imgMaQRZalo").src = sessionInfo.image;
+        document.getElementById("qrLoadingSpinner").style.display = "none";
+        document.getElementById("qrImageWrapper").style.display = "block";
+        document.getElementById("lblTrangThaiQR").innerText = "📱 Mở Zalo trên điện thoại quét mã này";
+
+        batDauPollQR(sessionInfo.session_id, accIndex);
+    } catch (err) {
+        document.getElementById("qrLoadingSpinner").style.display = "none";
+        document.getElementById("lblTrangThaiQR").innerText = "❌ Lỗi: " + err.message;
+        document.getElementById("lblTrangThaiQR").style.color = "#f87171";
+    }
+}
+
+function batDauPollQR(sessionId, accIndex) {
+    if (qrPollingTimer) {
+        clearInterval(qrPollingTimer);
+        qrPollingTimer = null;
+    }
+    const token = maToken || localStorage.getItem("token") || "";
+    let elapsed = 0;
+
+    qrPollingTimer = setInterval(async () => {
+        elapsed += 1.5;
+        const remaining = Math.max(0, Math.floor(120 - elapsed));
+        const demNguocEl = document.getElementById("lblDemNguocQR");
+        if (demNguocEl) {
+            demNguocEl.innerText = "Mã tự động làm mới sau " + remaining + "s";
+        }
+        if (remaining <= 0) {
+            clearInterval(qrPollingTimer);
+            qrPollingTimer = null;
+            document.getElementById("lblTrangThaiQR").innerText = "⚠️ Mã QR đã hết hạn!";
+            document.getElementById("lblTrangThaiQR").style.color = "#fbbf24";
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/qr/status/" + sessionId, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            const resJson = await res.json();
+            if (!res.ok || resJson.status !== "ok") return;
+
+            const st = resJson.data.status;
+            if (st === "scanned") {
+                document.getElementById("lblTrangThaiQR").innerText = "🎉 Đã quét mã! Vui lòng chọn 'Đăng nhập' trên điện thoại...";
+                document.getElementById("lblTrangThaiQR").style.color = "#38bdf8";
+            } else if (st === "confirmed") {
+                clearInterval(qrPollingTimer);
+                qrPollingTimer = null;
+                const creds = resJson.data.credentials || {};
+                const userName = creds.name || "Zalo User";
+
+                qrSessions[accIndex] = {
+                    session_id: sessionId,
+                    status: "confirmed",
+                    credentials: creds,
+                    user_info: resJson.data.user_info || {}
+                };
+
+                const imeiInput = document.getElementById("tab_acc_imei_" + accIndex);
+                const cookieInput = document.getElementById("tab_acc_cookie_" + accIndex);
+                if (imeiInput && creds.imei) imeiInput.value = creds.imei;
+                if (cookieInput && creds.cookie) cookieInput.value = creds.cookie;
+
+                document.getElementById("lblTrangThaiQR").innerText = "✅ Đăng nhập thành công: " + userName + "!";
+                document.getElementById("lblTrangThaiQR").style.color = "#34d399";
+
+                renderTabFormAccsQR();
+                hienThiThongBaoGlass("Thành công", "Acc #" + (accIndex + 1) + " (" + userName + ") đã quét mã và đăng nhập thành công!", "success");
+
+                setTimeout(() => {
+                    dongModalXemMaQR();
+                }, 1600);
+            } else if (st === "expired") {
+                clearInterval(qrPollingTimer);
+                qrPollingTimer = null;
+                document.getElementById("lblTrangThaiQR").innerText = "⚠️ Mã QR đã hết hạn!";
+                document.getElementById("lblTrangThaiQR").style.color = "#fbbf24";
+            }
+        } catch (e) {}
+    }, 1500);
+}
+
+function lamMoiMaQRHienTai() {
+    if (currentQRIndex !== null) {
+        moModalXemMaQR(currentQRIndex);
+    }
+}
+
+function dongModalXemMaQR(event) {
+    if (event && event.target && event.target !== event.currentTarget) {
+        return;
+    }
+    if (qrPollingTimer) {
+        clearInterval(qrPollingTimer);
+        qrPollingTimer = null;
+    }
+    const modal = document.getElementById("modalQRContainer");
+    if (modal) {
+        modal.classList.remove("show");
+        modal.style.display = "none";
+    }
+}

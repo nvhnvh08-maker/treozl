@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=20261114_pro"><style>
+    <link rel="stylesheet" href="style.css?v=20261115_qr"><style>
 *, *::before, *::after {
     box-sizing: border-box !important;
     margin: 0;
@@ -1135,6 +1135,79 @@ textarea {
         grid-template-columns: 1fr 1fr !important;
     }
 }
+
+.qr-acc-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 14px 18px !important;
+    border-radius: var(--radius-inner) !important;
+    background: rgba(10, 20, 42, 0.75) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+    transition: var(--transition-spring) !important;
+    box-sizing: border-box !important;
+}
+
+.qr-acc-card:hover {
+    border-color: rgba(0, 240, 255, 0.35) !important;
+    background: rgba(14, 28, 56, 0.85) !important;
+}
+
+.qr-acc-header-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+.qr-acc-title {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.qr-acc-badge {
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    padding: 3px 8px !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: fit-content !important;
+}
+
+.badge-unlogged {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.badge-waiting {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.badge-logged {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+.btn-xem-ma {
+    padding: 10px 18px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+}
+
 </style>
 </head>
 <body>
@@ -1241,8 +1314,8 @@ textarea {
                     <i data-lucide="zap" style="width: 24px; height: 24px;"></i>
                 </div>
                 <div class="logo-text">
-                    <h1>ZALO TREO TEXT PRO</h1>
-                    <p>MULTI-TAB EDITION • QUẢN LÝ ĐA TAB CHUYÊN NGHIỆP</p>
+                    <h1>Treo zalo ngôn 24/7</h1>
+                    <p>treo ngôn zalo 24/7 by ngbao</p>
                 </div>
             </a>
             <button class="btn-hamburger" onclick="moMenu3Gach()" title="Mở menu 3 gạch">
@@ -1368,7 +1441,24 @@ textarea {
                             </button>
                         </div>
                     </div>
-                    <div id="vungTabDanhSachAccs" style="margin-top: 14px;"></div>
+                    
+                    <div class="auth-capsule-tabs" style="margin: 14px 0 16px 0; max-width: 440px;">
+                        <button type="button" class="auth-capsule-btn active" id="btnModeManual" onclick="chuyenCheDoNhapAcc('manual')">
+                            <i data-lucide="edit-3" style="width: 15px; height: 15px;"></i>
+                            Nhập IMEI & Cookie thủ công
+                        </button>
+                        <button type="button" class="auth-capsule-btn" id="btnModeQR" onclick="chuyenCheDoNhapAcc('qr')">
+                            <i data-lucide="qr-code" style="width: 15px; height: 15px;"></i>
+                            Quét mã QR đăng nhập
+                        </button>
+                    </div>
+                    <div id="vungTabDanhSachAccsManual">
+                        <div id="vungTabDanhSachAccs" style="margin-top: 14px;"></div>
+                    </div>
+                    <div id="vungTabDanhSachAccsQR" style="display: none; margin-top: 14px;">
+                        <div id="vungTabDanhSachAccsQRList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                    </div>
+
                     <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--card-border); display: flex; flex-direction: column; gap: 8px;">
                         <button type="button" class="btn-glow btn-outline" style="width: 100%;" id="btnTabLayNhom" onclick="tabLayDanhSachNhomTheoAcc(0)">
                             <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
@@ -1464,6 +1554,6 @@ textarea {
             </div>
         </div>
     </div>
-    <script src="script.js?v=20261114_fixicons"></script>
+    <script src="script.js?v=20261115_qr"></script>
 </body>
 </html>

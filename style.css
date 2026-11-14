@@ -1121,3 +1121,75 @@ textarea {
         grid-template-columns: 1fr 1fr !important;
     }
 }
+
+.qr-acc-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 14px 18px !important;
+    border-radius: var(--radius-inner) !important;
+    background: rgba(10, 20, 42, 0.75) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+    transition: var(--transition-spring) !important;
+    box-sizing: border-box !important;
+}
+
+.qr-acc-card:hover {
+    border-color: rgba(0, 240, 255, 0.35) !important;
+    background: rgba(14, 28, 56, 0.85) !important;
+}
+
+.qr-acc-header-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+.qr-acc-title {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.qr-acc-badge {
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    padding: 3px 8px !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: fit-content !important;
+}
+
+.badge-unlogged {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.badge-waiting {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.badge-logged {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+.btn-xem-ma {
+    padding: 10px 18px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+}
