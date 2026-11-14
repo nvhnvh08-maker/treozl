@@ -26,8 +26,8 @@
     --glass-card: linear-gradient(145deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.015) 50%, rgba(8, 16, 36, 0.5) 100%);
     --glass-border: rgba(255, 255, 255, 0.16);
     --glass-border-light: rgba(255, 255, 255, 0.28);
-    --glass-blur: blur(48px) saturate(220%) brightness(1.12);
-    --glass-blur-sm: blur(28px) saturate(190%) brightness(1.08);
+    --glass-blur: blur(14px) saturate(150%) brightness(1.05);
+    --glass-blur-sm: blur(10px) saturate(130%) brightness(1.05);
     --neon-blue: #0084FF;
     --neon-cyan: #00F0FF;
     --neon-purple: #A855F7;
@@ -77,41 +77,31 @@ html, body {
 .pinui-ambient-orb {
     position: fixed;
     border-radius: 50%;
-    filter: blur(100px);
     pointer-events: none;
     z-index: 1;
-    opacity: 0.55;
-    mix-blend-mode: screen;
-    animation: orbPulseMotion 16s ease-in-out infinite alternate;
+    opacity: 0.45;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .pinui-orb-1 {
-    width: 550px;
-    height: 550px;
-    top: -120px;
-    left: -100px;
-    background: radial-gradient(circle, rgba(0, 132, 255, 0.6) 0%, rgba(0, 240, 255, 0.2) 65%, transparent 80%);
+    width: 420px;
+    height: 420px;
+    top: -80px;
+    left: -80px;
+    background: radial-gradient(circle, rgba(0, 132, 255, 0.45) 0%, rgba(0, 240, 255, 0.15) 50%, transparent 70%);
 }
 
 .pinui-orb-2 {
-    width: 600px;
-    height: 600px;
-    bottom: -150px;
-    right: -120px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.55) 0%, rgba(236, 72, 153, 0.25) 60%, transparent 80%);
-    animation-delay: -5s;
-    animation-duration: 20s;
+    width: 450px;
+    height: 450px;
+    bottom: -100px;
+    right: -80px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.15) 50%, transparent 70%);
 }
 
 .pinui-orb-3 {
-    width: 480px;
-    height: 480px;
-    top: 40%;
-    left: 55%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(0, 240, 255, 0.15) 55%, transparent 75%);
-    animation-delay: -9s;
-    animation-duration: 24s;
+    display: none;
 }
 
 @keyframes orbPulseMotion {
@@ -147,8 +137,8 @@ html, body {
     max-width: 410px !important;
     margin: auto !important;
     background: rgba(10, 16, 34, 0.78) !important;
-    backdrop-filter: blur(40px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
+    backdrop-filter: blur(14px) saturate(150%) !important; transform: translateZ(0);
+    -webkit-backdrop-filter: blur(14px) saturate(150%) !important; transform: translateZ(0);
     border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
     border-radius: var(--radius-3d) !important;
     box-shadow: var(--shadow-glass) !important;

@@ -1,3 +1,4 @@
+let daLuuLogsJson = '';
 const TOOL_COLORS = [
     { id: "random_line", ten: "Ngẫu nhiên dòng", hex: "rainbow" },
     { id: "random_msg", ten: "Ngẫu nhiên tin", hex: "dice" },
@@ -29,26 +30,21 @@ function khoiTao3DParticles() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 110;
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false, powerPreference: "low-power" });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    const pCount = 900;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+    const pCount = 160;
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(pCount * 3);
     const cols = new Float32Array(pCount * 3);
-    const initialY = new Float32Array(pCount);
     const c1 = new THREE.Color(0x00F0FF);
     const c2 = new THREE.Color(0x0084FF);
     const c3 = new THREE.Color(0xA855F7);
-    const c4 = new THREE.Color(0x10B981);
     for (let i = 0; i < pCount; i++) {
-        pos[i * 3] = (Math.random() - 0.5) * 400;
-        const py = (Math.random() - 0.5) * 360;
-        pos[i * 3 + 1] = py;
-        initialY[i] = py;
-        pos[i * 3 + 2] = (Math.random() - 0.5) * 300;
-        const r = Math.random();
-        const picked = r < 0.35 ? c1 : (r < 0.65 ? c2 : (r < 0.88 ? c3 : c4));
+        pos[i * 3] = (Math.random() - 0.5) * 360;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 320;
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 260;
+        const picked = i % 3 === 0 ? c1 : (i % 3 === 1 ? c2 : c3);
         cols[i * 3] = picked.r;
         cols[i * 3 + 1] = picked.g;
         cols[i * 3 + 2] = picked.b;
@@ -56,66 +52,35 @@ function khoiTao3DParticles() {
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
     const mat = new THREE.PointsMaterial({
-        size: 2.4,
+        size: 2.2,
         vertexColors: true,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.65,
         blending: THREE.AdditiveBlending
     });
     const pts = new THREE.Points(geo, mat);
     scene.add(pts);
-    const wireGeo = new THREE.IcosahedronGeometry(38, 1);
+    const wireGeo = new THREE.IcosahedronGeometry(36, 1);
     const wireMat = new THREE.MeshBasicMaterial({
         color: 0x00F0FF,
         wireframe: true,
         transparent: true,
-        opacity: 0.14
+        opacity: 0.12
     });
     const wireSphere = new THREE.Mesh(wireGeo, wireMat);
-    wireSphere.position.set(40, -10, -50);
+    wireSphere.position.set(45, -10, -50);
     scene.add(wireSphere);
-    const innerGeo = new THREE.OctahedronGeometry(20, 0);
-    const innerMat = new THREE.MeshBasicMaterial({
-        color: 0xA855F7,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.2
+    let isHidden = false;
+    document.addEventListener("visibilitychange", () => {
+        isHidden = document.hidden;
     });
-    const innerCrystal = new THREE.Mesh(innerGeo, innerMat);
-    innerCrystal.position.set(40, -10, -50);
-    scene.add(innerCrystal);
-    let mX = 0, mY = 0, targetX = 0, targetY = 0;
-    function capNhatToaDo(x, y) {
-        targetX = (x - window.innerWidth / 2) * 0.0006;
-        targetY = (y - window.innerHeight / 2) * 0.0006;
-    }
-    window.addEventListener("mousemove", (e) => capNhatToaDo(e.clientX, e.clientY));
-    window.addEventListener("touchmove", (e) => {
-        if (e.touches && e.touches.length > 0) {
-            capNhatToaDo(e.touches[0].clientX, e.touches[0].clientY);
-        }
-    }, { passive: true });
-    let clock = 0;
     function render() {
         requestAnimationFrame(render);
-        clock += 0.015;
-        mX += (targetX - mX) * 0.06;
-        mY += (targetY - mY) * 0.06;
-        pts.rotation.y += 0.0008;
-        pts.rotation.x += 0.0004;
-        wireSphere.rotation.x += 0.003;
-        wireSphere.rotation.y += 0.004;
-        innerCrystal.rotation.x -= 0.005;
-        innerCrystal.rotation.y += 0.006;
-        const posAttr = geo.attributes.position;
-        const arr = posAttr.array;
-        for (let i = 0; i < pCount; i += 3) {
-            arr[i * 3 + 1] = initialY[i] + Math.sin(clock + arr[i * 3] * 0.04) * 4;
-        }
-        posAttr.needsUpdate = true;
-        camera.position.x += (mX * 60 - camera.position.x) * 0.05;
-        camera.position.y += (-mY * 60 - camera.position.y) * 0.05;
-        camera.lookAt(scene.position);
+        if (isHidden) return;
+        pts.rotation.y += 0.0006;
+        pts.rotation.x += 0.0003;
+        wireSphere.rotation.x += 0.002;
+        wireSphere.rotation.y += 0.003;
         renderer.render(scene, camera);
     }
     render();
@@ -124,26 +89,8 @@ function khoiTao3DParticles() {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
-    khoiTao3DTilt();
 }
-function khoiTao3DTilt() {
-    if (window.innerWidth < 768) return;
-    const cards = document.querySelectorAll(".auth-card-pinui, .card-3d");
-    cards.forEach(card => {
-        card.addEventListener("mousemove", (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            const rotX = (-y / rect.height) * 8;
-            const rotY = (x / rect.width) * 8;
-            card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) scale3d(1.008, 1.008, 1.008)`;
-        });
-        card.addEventListener("mouseleave", () => {
-            card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
-        });
-    });
-}
-function hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
+function hienThiThongBaoGlassfunction hienThiThongBaoGlass(tieuDe, noiDung, loai = "info") {
     const modal = document.getElementById("glassModalAlert");
     if (!modal) {
         alert(noiDung);
@@ -325,6 +272,7 @@ function saoChepDiscord(text) {
     navigator.clipboard.writeText(text);
     hienThiThongBaoGlass("Đã Sao Chép", `Đã sao chép Discord: "${text}" vào bộ nhớ tạm!`, "success");
 }
+let daLuuTabsJson = "";
 async function taiDanhSachTabs() {
     if (!maToken) return;
     try {
@@ -337,7 +285,11 @@ async function taiDanhSachTabs() {
         }
         const data = await res.json();
         if (data.success && data.tabs) {
-            renderDanhSachTabsNgang(data.tabs);
+            const chuoiMoi = JSON.stringify(data.tabs);
+            if (chuoiMoi !== daLuuTabsJson) {
+                daLuuTabsJson = chuoiMoi;
+                renderDanhSachTabsNgang(data.tabs);
+            }
         }
     } catch(e) {}
 }
@@ -912,7 +864,7 @@ function capNhatStatusTabUI(st) {
 }
 function batDauPolling() {
     if (chuKyPolling) clearInterval(chuKyPolling);
-    chuKyPolling = setInterval(tickRealtime, 1000);
+    chuKyPolling = setInterval(tickRealtime, 2500);
     tickRealtime();
 }
 async function tickRealtime() {
