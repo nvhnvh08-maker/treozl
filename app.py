@@ -271,21 +271,21 @@ async def serve_index():
     index_path = os.path.join(CURRENT_DIR, "index.html")
     if not os.path.exists(index_path):
         raise HTTPException(status_code=404, detail="Không tìm thấy file index.html")
-    return FileResponse(index_path, media_type="text/html")
+    return FileResponse(index_path, media_type="text/html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/style.css")
 async def serve_css():
     css_path = os.path.join(CURRENT_DIR, "style.css")
     if not os.path.exists(css_path):
         raise HTTPException(status_code=404, detail="Không tìm thấy file style.css")
-    return FileResponse(css_path, media_type="text/css")
+    return FileResponse(css_path, media_type="text/css", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/script.js")
 async def serve_js():
     js_path = os.path.join(CURRENT_DIR, "script.js")
     if not os.path.exists(js_path):
         raise HTTPException(status_code=404, detail="Không tìm thấy file script.js")
-    return FileResponse(js_path, media_type="application/javascript")
+    return FileResponse(js_path, media_type="application/javascript", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
