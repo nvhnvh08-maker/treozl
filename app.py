@@ -1,5 +1,5 @@
 """
-HỆ THỐNG ZALO TREO TEXT PRO - BACKEND FASTAPI & DATABASE SQLITE
+HỆ THỐNG TREO NGÔN ZALO 24/7 BY NGBAO
 Phục vụ các file Web tách biệt: index.html, style.css, script.js
 """
 
@@ -31,7 +31,7 @@ from zalo_core import (
     parse_cookies_input
 )
 
-app = FastAPI(title="Zalo Treo Text Multi-Tab 3D Pro", version="4.5.0")
+app = FastAPI(title="treo ngôn zalo 24/7 by ngbao", version="4.5.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -290,7 +290,7 @@ async def serve_js():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"==================================================")
-    print(f"🚀 ZALO TREO TEXT MULTI-TAB 3D PRO ĐANG CHẠY")
+    print(f"🚀 TREO NGÔN ZALO 24/7 BY NGBAO ĐANG CHẠY")
     print(f"👉 Mời sếp truy cập: http://localhost:{port}")
     print(f"📄 Tệp Web: index.html | style.css | script.js")
     print(f"💾 Cơ sở dữ liệu: SQLite (zalo_database.db)")
