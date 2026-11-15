@@ -708,11 +708,16 @@ function renderTabFormAccsQR(presetAccs) {
                     ${badgeText}
                 </div>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <button type="button" class="btn-glow ${isLogged ? 'btn-outline' : 'btn-primary'} btn-xem-ma" onclick="moModalXemMaQR(${i})">
                     <i data-lucide="qr-code" style="width: 15px; height: 15px;"></i>
                     ${isLogged ? 'Đổi mã' : 'Xem mã'}
                 </button>
+                ${isLogged ? `
+                <button type="button" class="btn-glow btn-outline" style="padding: 6px 12px; font-size: 0.78rem; display: flex; align-items: center; gap: 4px;" onclick="tabLayDanhSachNhomTheoAcc(${i})">
+                    <i data-lucide="rotate-cw" style="width: 13px; height: 13px;"></i> Lấy nhóm
+                </button>
+                ` : ''}
             </div>
         </div>
         `;
@@ -821,6 +826,9 @@ function batDauPollQR(sessionId, accIndex) {
                     setTimeout(() => {
                         dongModalXemMaQR();
                         hienThiThongBaoGlass("Đăng Nhập Thành Công", "Acc #" + (accIndex + 1) + " (" + userName + ") đã kết nối!", "success");
+                        if (accIndex === 0) {
+                            setTimeout(() => tabLayDanhSachNhomTheoAcc(0), 400);
+                        }
                     }, 1400);
                 } else if (s.status === "expired") {
                     clearInterval(qrPollingTimer);
@@ -850,10 +858,14 @@ function dongModalXemMaQR() {
 }
 
 async function tabLayDanhSachNhomTheoAcc(idx) {
-    const imei = document.getElementById(`tab_acc_imei_${idx}`)?.value.trim();
-    const cookie = document.getElementById(`tab_acc_cookie_${idx}`)?.value.trim();
+    let imei = document.getElementById(`tab_acc_imei_${idx}`)?.value.trim() || "";
+    let cookie = document.getElementById(`tab_acc_cookie_${idx}`)?.value.trim() || "";
+    if ((!imei || !cookie) && qrSessions[idx] && qrSessions[idx].credentials) {
+        if (!imei && qrSessions[idx].credentials.imei) imei = qrSessions[idx].credentials.imei;
+        if (!cookie && qrSessions[idx].credentials.cookie) cookie = qrSessions[idx].credentials.cookie;
+    }
     if (!imei || !cookie) {
-        hienThiThongBaoGlass("Thiếu Thông Tin Acc", `Vui lòng nhập IMEI và Cookie cho Tài khoản #${idx + 1} trước!`, "error");
+        hienThiThongBaoGlass("Thiếu Thông Tin Acc", `Vui lòng quét mã QR hoặc nhập IMEI/Cookie cho Tài khoản #${idx + 1} trước!`, "error");
         return;
     }
     hienThiThongBaoGlass("Đang Lấy Nhóm", `Đang kết nối API Zalo để quét danh sách nhóm của Acc #${idx + 1}...`, "info");
@@ -1015,12 +1027,16 @@ async function tabBatDauTreo() {
     const count = parseInt(document.getElementById("inputTabSoLuongAcc").value) || 1;
     const accounts = [];
     for (let i = 0; i < count; i++) {
-        const imei = document.getElementById(`tab_acc_imei_${i}`)?.value.trim() || "";
-        const cookie = document.getElementById(`tab_acc_cookie_${i}`)?.value.trim() || "";
+        let imei = document.getElementById(`tab_acc_imei_${i}`)?.value.trim() || "";
+        let cookie = document.getElementById(`tab_acc_cookie_${i}`)?.value.trim() || "";
+        if ((!imei || !cookie) && qrSessions[i] && qrSessions[i].credentials) {
+            if (!imei && qrSessions[i].credentials.imei) imei = qrSessions[i].credentials.imei;
+            if (!cookie && qrSessions[i].credentials.cookie) cookie = qrSessions[i].credentials.cookie;
+        }
         const gid = document.getElementById(`tab_acc_group_id_${i}`)?.value.trim() || "";
         const gname = document.getElementById(`tab_acc_group_name_${i}`)?.value.trim() || "";
         if (!imei || !cookie) {
-            hienThiThongBaoGlass("Thiếu Thông Tin Acc", `Tài khoản #${i + 1} chưa có IMEI hoặc Cookie!`, "error");
+            hienThiThongBaoGlass("Thiếu Thông Tin Acc", `Tài khoản #${i + 1} chưa có IMEI hoặc Cookie (hãy quét mã QR hoặc nhập tay)!`, "error");
             return;
         }
         accounts.push({

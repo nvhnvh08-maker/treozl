@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20261115_v9">
+    <link rel="stylesheet" href="style.css?v=20261115_v10">
 </head>
 <body>
     <div class="pinui-ambient-orb pinui-orb-1"></div>
@@ -326,9 +326,14 @@
                     </h3>
                     <div class="form-row">
                         <label>Nhóm Zalo mặc định chung (hoặc chọn riêng từng Acc bên trái):</label>
-                        <select id="selectTabNhomZalo" onchange="doiNhomChung(this.value)">
-                            <option value="">-- Bấm "Lấy danh sách nhóm" hoặc nhập ID --</option>
-                        </select>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="selectTabNhomZalo" onchange="doiNhomChung(this.value)" style="flex: 1;">
+                                <option value="">-- Bấm "Lấy nhóm" hoặc nhập ID --</option>
+                            </select>
+                            <button type="button" class="btn-glow btn-outline" style="padding: 8px 14px; font-size: 0.8rem; white-space: nowrap; display: flex; align-items: center; gap: 6px;" onclick="tabLayDanhSachNhomTheoAcc(0)" title="Lấy danh sách nhóm từ Acc #1">
+                                <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i> Lấy nhóm
+                            </button>
+                        </div>
                         <input type="text" id="inputTabManualGroupId" placeholder="Hoặc tự gõ ID nhóm Zalo chung vào đây..." style="margin-top: 8px;" oninput="nhapTayNhomChung(this.value)">
                     </div>
                     <div class="form-row">
@@ -409,6 +414,6 @@
         </div>
     </div>
     
-    <script src="script.js?v=20261115_v9"></script>
+    <script src="script.js?v=20261115_v10"></script>
 </body>
 </html>

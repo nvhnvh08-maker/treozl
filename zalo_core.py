@@ -1,16 +1,7 @@
 import uuid
 import secrets
-
-
-import os
-import sys
-import time
-import json
-import random
-import threading
-from datetime import datetime
-from typing import List, Dict, Any, Optional
-
+import hashlib
+import re
 import os
 import sys
 import time
@@ -51,8 +42,8 @@ try:
                     err_code = data.get("error_code", "102")
                     err_msg = data.get("error_message", "Phiên đăng nhập không hợp lệ hoặc đã hết hạn")
                     raise zlapi._exception.ZaloLoginError(
-                        f"Phiên Zalo hết hạn hoặc IMEI/Cookie không khớp (Mã {err_code}: {err_msg}). "
-                        f"Sếp vui lòng vào chat.zalo.me lấy lại token zpw_sek và IMEI mới!"
+                        f"Phiên Zalo không hợp lệ hoặc đã hết hạn (Mã {err_code}: {err_msg}). "
+                        f"Sếp vui lòng quét lại mã QR hoặc kiểm tra lại IMEI và Cookie (zpw_sek)!"
                     )
 
                 zpw = login_data.get("zpw_ws")
@@ -96,7 +87,6 @@ TOOL_COLOR_LIST = [
 ]
 
 def normalize_ttl_value(ttl):
-    
     if ttl is None:
         return None
     try:
@@ -110,7 +100,6 @@ def normalize_ttl_value(ttl):
     return t
 
 def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str, str]:
-    
     if not cookie_raw:
         return {}
 
@@ -120,8 +109,11 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
     elif isinstance(cookie_raw, list):
         res = {}
         for item in cookie_raw:
-            if isinstance(item, dict) and "name" in item and "value" in item:
-                res[str(item["name"]).strip()] = str(item["value"]).strip()
+            if isinstance(item, dict):
+                k = item.get("name") or item.get("key")
+                v = item.get("value")
+                if k is not None and v is not None:
+                    res[str(k).strip()] = str(v).strip()
     else:
         cookie_str = str(cookie_raw).strip()
         if not cookie_str:
@@ -135,7 +127,6 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
                 pass
 
         if not res:
-
             for part in cookie_str.split(";"):
                 part = part.strip()
                 if "=" in part:
@@ -164,7 +155,6 @@ def parse_cookies_input(cookie_raw: Any, imei: Optional[str] = None) -> Dict[str
     return res
 
 def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
-    
     if not ZALO_AVAILABLE:
         raise RuntimeError("Thư viện zlapi chưa được cài đặt. Vui lòng cài: pip install zlapi")
 
@@ -184,7 +174,7 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
                 "Phiên đăng nhập Zalo không hợp lệ hoặc đã hết hạn!\n"
                 "👉 Nguyên nhân: Cookie bị hết hạn (do đã đăng xuất hoặc đổi thiết bị), "
                 "hoặc IMEI không khớp với phiên đăng nhập chat.zalo.me.\n"
-                "👉 Khắc phục: Vào lại chat.zalo.me trên trình duyệt, lấy lại Cookie mới (token zpw_sek) và IMEI (z_uuid) tương ứng."
+                "👉 Khắc phục: Quét lại mã QR hoặc lấy lại Cookie mới (token zpw_sek) và IMEI (z_uuid) từ chat.zalo.me."
             )
         raise RuntimeError(f"Lỗi đăng nhập Zalo: {err_msg}")
 
@@ -194,7 +184,7 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
     except Exception as e:
         err_msg = str(e)
         if "NoneType" in err_msg:
-            raise RuntimeError("Phiên đăng nhập Zalo đã hết hạn. Vui lòng lấy lại Cookie mới từ chat.zalo.me")
+            raise RuntimeError("Phiên đăng nhập Zalo đã hết hạn. Vui lòng quét lại mã QR hoặc lấy lại Cookie mới từ chat.zalo.me")
         raise RuntimeError(f"Lỗi kết nối Zalo khi lấy danh sách nhóm: {err_msg}")
 
     grid_map = getattr(all_groups, "gridVerMap", None)
@@ -223,7 +213,6 @@ def fetch_groups_from_acc(imei: str, cookie_raw: Any) -> List[Dict[str, str]]:
     return groups
 
 class SingleTabRunner:
-    
     def __init__(self, tab_id: str, name: str):
         self.tab_id = tab_id
         self.name = name
@@ -300,7 +289,7 @@ class SingleTabRunner:
             err_msg = str(e)
             if "NoneType" in err_msg or "logging in" in err_msg or "secret key" in err_msg:
                 self.add_log(
-                    f"[{acc_label}] Lỗi đăng nhập: Cookie/IMEI không hợp lệ hoặc phiên đăng nhập đã hết hạn! Vui lòng lấy lại Cookie (zpw_sek) mới trên chat.zalo.me",
+                    f"[{acc_label}] Lỗi đăng nhập: Cookie/IMEI không hợp lệ hoặc phiên đăng nhập đã hết hạn! Vui lòng quét lại QR hoặc nhập Cookie mới.",
                     "error"
                 )
             else:
@@ -433,7 +422,6 @@ class SingleTabRunner:
         return True
 
 class MultiTabBotManager:
-    
     def __init__(self):
         self.tabs: Dict[str, SingleTabRunner] = {}
         self.lock = threading.Lock()
@@ -508,7 +496,6 @@ class MultiTabBotManager:
 
 bot_manager = MultiTabBotManager()
 
-
 class ZaloQRManager:
     def __init__(self):
         self.sessions = {}
@@ -517,48 +504,82 @@ class ZaloQRManager:
     def create_qr_session(self, acc_index=0):
         with self.lock:
             now_ts = time.time()
-            self.sessions = {k: v for k, v in self.sessions.items() if now_ts - v.get('created_at', 0) < 600}
+            self.sessions = {k: v for k, v in self.sessions.items() if now_ts - v.get("created_at", 0) < 600}
         session_id = secrets.token_hex(16)
         http_session = requests.Session()
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Referer': 'https://id.zalo.me/account/login?continue=https%3A%2F%2Fchat.zalo.me%2F',
-            'Origin': 'https://id.zalo.me',
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-        http_session.headers.update(headers)
+        ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        imei = f"{uuid.uuid4()}-{hashlib.md5(ua.encode('utf-8')).hexdigest()}"
+        http_session.headers.update({
+            "User-Agent": ua,
+            "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        })
+        version = "2606161423"
         try:
-            http_session.get('https://id.zalo.me/account/login', timeout=10)
+            r_page = http_session.get(
+                "https://id.zalo.me/account?continue=https%3A%2F%2Fchat.zalo.me%2F",
+                headers={
+                    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                    "Referer": "https://chat.zalo.me/",
+                },
+                timeout=10
+            )
+            m = re.search(r"https://stc-zlogin\.zdn\.vn/main-([\d.]+)\.js", r_page.text)
+            if m:
+                version = m.group(1)
         except Exception:
             pass
-        res = http_session.post('https://id.zalo.me/account/authen/qr/generate', data={'cliGenQR': 0}, timeout=10)
+
+        post_headers = {
+            "accept": "*/*",
+            "content-type": "application/x-www-form-urlencoded",
+            "Origin": "https://id.zalo.me",
+            "Referer": "https://id.zalo.me/account?continue=https%3A%2F%2Fzalo.me%2Fpc",
+            "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+        }
+
+        try:
+            http_session.post("https://id.zalo.me/account/logininfo", data={"continue": "https://zalo.me/pc", "v": version}, headers=post_headers, timeout=10)
+            http_session.post("https://id.zalo.me/account/verify-client", data={"type": "device", "continue": "https://zalo.me/pc", "v": version}, headers=post_headers, timeout=10)
+        except Exception:
+            pass
+
+        res = http_session.post("https://id.zalo.me/account/authen/qr/generate", data={"continue": "https://zalo.me/pc", "v": version}, headers=post_headers, timeout=10)
         res_data = res.json()
-        if res_data.get('error_code') != 0:
-            raise Exception(res_data.get('error_message', 'Không thể tạo mã QR từ Zalo'))
-        qr_data = res_data.get('data', {})
-        code = qr_data.get('code')
-        image = qr_data.get('image')
+        if res_data.get("error_code") != 0:
+            raise Exception(res_data.get("error_message", "Không thể tạo mã QR từ Zalo"))
+        qr_data = res_data.get("data", {})
+        code = qr_data.get("code")
+        image = qr_data.get("image")
+
         session_obj = {
-            'session_id': session_id,
-            'acc_index': acc_index,
-            'code': code,
-            'image': image,
-            'status': 'waiting-scan',
-            'user_info': {},
-            'credentials': {},
-            'created_at': time.time(),
-            'http_session': http_session
+            "session_id": session_id,
+            "acc_index": acc_index,
+            "code": code,
+            "image": image,
+            "version": version,
+            "imei": imei,
+            "ua": ua,
+            "post_headers": post_headers,
+            "status": "waiting-scan",
+            "user_info": {},
+            "credentials": {},
+            "created_at": time.time(),
+            "http_session": http_session
         }
         with self.lock:
             self.sessions[session_id] = session_obj
         worker = threading.Thread(target=self._poll_worker, args=(session_id,), daemon=True)
         worker.start()
         return {
-            'session_id': session_id,
-            'image': image,
-            'code': code,
-            'status': 'waiting-scan'
+            "session_id": session_id,
+            "image": image,
+            "code": code,
+            "status": "waiting-scan"
         }
 
     def _poll_worker(self, session_id):
@@ -566,89 +587,166 @@ class ZaloQRManager:
             session_obj = self.sessions.get(session_id)
         if not session_obj:
             return
-        http_session = session_obj['http_session']
-        code = session_obj['code']
+        http_session = session_obj["http_session"]
+        code = session_obj["code"]
+        version = session_obj.get("version", "2606161423")
+        post_headers = session_obj.get("post_headers", {})
+        imei = session_obj.get("imei", "")
+        ua = session_obj.get("ua", "")
+
+        scan_headers = dict(post_headers)
+        scan_headers["Referer"] = "https://id.zalo.me/account?continue=https%3A%2F%2Fchat.zalo.me%2F"
+
         scan_start = time.time()
         while time.time() - scan_start < 150:
             try:
-                r_scan = http_session.post('https://id.zalo.me/account/authen/qr/waiting-scan', data={'code': code}, timeout=30)
+                r_scan = http_session.post(
+                    "https://id.zalo.me/account/authen/qr/waiting-scan",
+                    data={"code": code, "continue": "https://chat.zalo.me/", "v": version},
+                    headers=scan_headers,
+                    timeout=30
+                )
                 scan_res = r_scan.json()
-                scan_err = scan_res.get('error_code')
+                scan_err = scan_res.get("error_code")
                 if scan_err == 0:
-                    scan_data = scan_res.get('data') or {}
-                    session_obj['status'] = 'scanned'
-                    session_obj['user_info'] = {
-                        'name': scan_data.get('display_name') or scan_data.get('name') or 'Tài khoản Zalo',
-                        'avatar': scan_data.get('avatar') or ''
+                    scan_data = scan_res.get("data") or {}
+                    session_obj["status"] = "scanned"
+                    session_obj["user_info"] = {
+                        "name": scan_data.get("display_name") or scan_data.get("name") or "Tài khoản Zalo",
+                        "avatar": scan_data.get("avatar") or ""
                     }
                     break
                 elif scan_err == 8:
                     continue
                 else:
-                    session_obj['status'] = 'expired'
+                    session_obj["status"] = "expired"
                     return
             except Exception:
                 continue
-        if session_obj.get('status') != 'scanned':
-            session_obj['status'] = 'expired'
+
+        if session_obj.get("status") != "scanned":
+            session_obj["status"] = "expired"
             return
+
         conf_start = time.time()
         while time.time() - conf_start < 120:
             try:
-                r_conf = http_session.post('https://id.zalo.me/account/authen/qr/waiting-confirm', data={'code': code}, timeout=30)
+                r_conf = http_session.post(
+                    "https://id.zalo.me/account/authen/qr/waiting-confirm",
+                    data={"code": code, "gToken": "", "gAction": "CONFIRM_QR", "continue": "https://chat.zalo.me/", "v": version},
+                    headers=scan_headers,
+                    timeout=30
+                )
                 conf_res = r_conf.json()
-                conf_err = conf_res.get('error_code')
+                conf_err = conf_res.get("error_code")
                 if conf_err == 0:
-                    conf_data = conf_res.get('data') or {}
-                    redirect_url = conf_data.get('url')
+                    conf_data = conf_res.get("data") or {}
+                    redirect_url = conf_data.get("url")
                     if redirect_url:
                         try:
-                            http_session.get(redirect_url, allow_redirects=True, timeout=15)
+                            http_session.get(redirect_url, headers=scan_headers, allow_redirects=True, timeout=15)
                         except Exception:
                             pass
-                    cookie_dict = http_session.cookies.get_dict()
-                    cookie_json = json.dumps(cookie_dict)
-                    imei = uuid.uuid4().hex
-                    user_name = session_obj['user_info'].get('name') or 'Zalo User'
-                    user_avatar = session_obj['user_info'].get('avatar') or ''
+
+                    check_headers = {
+                        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                        "Referer": "https://id.zalo.me/account?continue=https%3A%2F%2Fchat.zalo.me%2F",
+                        "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": '"Windows"',
+                        "sec-fetch-dest": "document",
+                        "sec-fetch-mode": "navigate",
+                        "sec-fetch-site": "same-origin",
+                        "upgrade-insecure-requests": "1"
+                    }
                     try:
-                        ts = int(time.time() * 1000)
-                        test_url = f'https://wpa.chat.zalo.me/api/login/getLoginInfo?imei={imei}&type=30&client_version=645&computer_name=Web&ts={ts}'
-                        t_res = http_session.get(test_url, timeout=10)
-                        t_data = t_res.json().get('data', {})
-                        if t_data and isinstance(t_data, dict):
-                            t_name = t_data.get('name') or t_data.get('display_name')
-                            if t_name:
-                                user_name = t_name
+                        http_session.get(
+                            "https://id.zalo.me/account/checksession?continue=https%3A%2F%2Fchat.zalo.me%2Findex.html",
+                            headers=check_headers,
+                            allow_redirects=True,
+                            timeout=15
+                        )
                     except Exception:
                         pass
-                    session_obj['credentials'] = {
-                        'imei': imei,
-                        'cookie': cookie_json,
-                        'name': user_name,
-                        'avatar': user_avatar
+
+                    try:
+                        http_session.get("https://chat.zalo.me/index.html", headers={"Referer": "https://id.zalo.me/"}, allow_redirects=True, timeout=10)
+                    except Exception:
+                        pass
+
+                    user_info_headers = {
+                        "accept": "*/*",
+                        "Referer": "https://chat.zalo.me/",
+                        "Origin": "https://chat.zalo.me",
+                        "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": '"Windows"',
+                        "sec-fetch-dest": "empty",
+                        "sec-fetch-mode": "cors",
+                        "sec-fetch-site": "same-site"
                     }
-                    session_obj['status'] = 'confirmed'
+                    user_name = session_obj["user_info"].get("name") or "Zalo User"
+                    user_avatar = session_obj["user_info"].get("avatar") or ""
+                    try:
+                        r_user = http_session.get("https://jr.chat.zalo.me/jr/userinfo", headers=user_info_headers, timeout=10)
+                        u_json = r_user.json()
+                        u_data = u_json.get("data") or {}
+                        if isinstance(u_data, dict):
+                            u_info = u_data.get("info") or {}
+                            if u_info:
+                                user_name = u_info.get("name") or u_info.get("display_name") or user_name
+                                user_avatar = u_info.get("avatar") or user_avatar
+                    except Exception:
+                        pass
+
+                    all_cookies = {c.name: c.value for c in http_session.cookies}
+                    all_cookies["z_uuid"] = imei
+
+                    ts = int(time.time() * 1000)
+                    test_url = f"https://wpa.chat.zalo.me/api/login/getLoginInfo?imei={imei}&type=30&client_version=645&computer_name=Web&ts={ts}"
+                    test_headers = {
+                        "User-Agent": ua,
+                        "Accept": "application/json, text/plain, */*",
+                        "origin": "https://chat.zalo.me",
+                        "referer": "https://chat.zalo.me/"
+                    }
+                    try:
+                        t_res = http_session.get(test_url, headers=test_headers, cookies=all_cookies, timeout=10)
+                        t_data = t_res.json().get("data")
+                        if t_data and isinstance(t_data, dict):
+                            t_name = t_data.get("name") or t_data.get("display_name") or t_data.get("phone_number")
+                            if t_name and user_name == "Zalo User":
+                                user_name = str(t_name)
+                    except Exception:
+                        pass
+
+                    session_obj["credentials"] = {
+                        "imei": imei,
+                        "cookie": json.dumps(all_cookies),
+                        "name": user_name,
+                        "avatar": user_avatar
+                    }
+                    session_obj["status"] = "confirmed"
                     return
                 elif conf_err == 8:
                     continue
                 else:
-                    session_obj['status'] = 'expired'
+                    session_obj["status"] = "expired"
                     return
             except Exception:
                 continue
-        session_obj['status'] = 'expired'
+        session_obj["status"] = "expired"
 
     def get_status(self, session_id):
         with self.lock:
             session_obj = self.sessions.get(session_id)
             if not session_obj:
-                return {'status': 'not_found', 'user_info': {}, 'credentials': {}}
+                return {"status": "not_found", "user_info": {}, "credentials": {}}
             return {
-                'session_id': session_id,
-                'status': session_obj.get('status', 'unknown'),
-                'user_info': session_obj.get('user_info', {}),
-                'credentials': session_obj.get('credentials', {})
+                "session_id": session_id,
+                "status": session_obj.get("status", "unknown"),
+                "user_info": session_obj.get("user_info", {}),
+                "credentials": session_obj.get("credentials", {})
             }
 
 qr_manager = ZaloQRManager()
