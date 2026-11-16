@@ -271,7 +271,7 @@ async function xuLyXacThuc(e) {
         hienThiThongBaoGlass("Thiếu Thông Tin", "Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!", "error");
         return;
     }
-    const endpoint = cheDoAuth === "login" ? "/api/auth/login" : "/api/auth/register";
+    const endpoint = cheDoAuth === "login" ? "/api/login" : "/api/register";
     try {
         const res = await fetch(endpoint, {
             method: "POST",
@@ -279,15 +279,16 @@ async function xuLyXacThuc(e) {
             body: JSON.stringify({ username: u, password: p })
         });
         const data = await res.json();
-        if (data.success) {
+        if (res.ok && data.success) {
             maToken = data.token;
             tenNguoiDung = data.username;
             localStorage.setItem("zalo_web_token", maToken);
             localStorage.setItem("zalo_web_user", tenNguoiDung);
             hienThiAppChinh();
-            hienThiThongBaoGlass("Thành Công", data.message || "Đăng nhập thành công!", "success");
+            hienThiThongBaoGlass("Thành Công", data.message || (cheDoAuth === "login" ? "Đăng nhập thành công!" : "Đăng ký thành công!"), "success");
         } else {
-            hienThiThongBaoGlass("Xác Thực Thất Bại", data.message || "Tài khoản hoặc mật khẩu không chính xác!", "error");
+            const loi = data.message || data.detail || (cheDoAuth === "login" ? "Tài khoản hoặc mật khẩu không chính xác!" : "Đăng ký tài khoản thất bại!");
+            hienThiThongBaoGlass("Xác Thực Thất Bại", loi, "error");
         }
     } catch(err) {
         hienThiThongBaoGlass("Lỗi Kết Nối", "Không thể kết nối máy chủ: " + err, "error");
@@ -297,7 +298,7 @@ async function xuLyXacThuc(e) {
 async function xuLyDangXuat() {
     try {
         if (maToken) {
-            await fetch("/api/auth/logout", {
+            await fetch("/api/logout", {
                 method: "POST",
                 headers: { "Authorization": "Bearer " + maToken }
             });

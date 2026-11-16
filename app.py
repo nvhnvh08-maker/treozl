@@ -100,6 +100,7 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, A
     raise HTTPException(status_code=401, detail="Phiên đăng nhập đã hết hạn hoặc không hợp lệ")
 
 @app.post("/api/register")
+@app.post("/api/auth/register")
 async def api_register(payload: Dict[str, Any]):
     username = str(payload.get("username", "")).strip()
     password = str(payload.get("password", "")).strip()
@@ -122,6 +123,7 @@ async def api_register(payload: Dict[str, Any]):
     }
 
 @app.post("/api/login")
+@app.post("/api/auth/login")
 async def api_login(payload: Dict[str, Any]):
     username = str(payload.get("username", "")).strip()
     password = str(payload.get("password", "")).strip()
@@ -142,6 +144,7 @@ async def api_login(payload: Dict[str, Any]):
     }
 
 @app.post("/api/logout")
+@app.post("/api/auth/logout")
 async def api_logout(authorization: Optional[str] = Header(None)):
     if authorization:
         token = authorization.replace("Bearer ", "").strip()
