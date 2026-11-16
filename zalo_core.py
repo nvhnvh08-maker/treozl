@@ -296,7 +296,7 @@ class SingleTabRunner:
                 self.add_log(f"[{acc_label}] Lỗi khởi tạo ZaloAPI: {err_msg}", "error")
             return
 
-        lines = [ln for ln in message_text.splitlines() if ln]
+        lines = message_text.strip().splitlines()
         if not lines:
             lines = [message_text]
 
@@ -317,20 +317,21 @@ class SingleTabRunner:
                     line_text = line + "\n"
                     formatted_text += line_text
 
-                    styles.append(MessageStyle(
-                        offset=offset,
-                        length=len(line_text),
-                        style="color",
-                        color=line_color,
-                        auto_format=False
-                    ))
-                    styles.append(MessageStyle(
-                        offset=offset,
-                        length=len(line_text),
-                        style="font",
-                        size=str(font_size),
-                        auto_format=False
-                    ))
+                    if len(line.strip()) > 0:
+                        styles.append(MessageStyle(
+                            offset=offset,
+                            length=len(line_text),
+                            style="color",
+                            color=line_color,
+                            auto_format=False
+                        ))
+                        styles.append(MessageStyle(
+                            offset=offset,
+                            length=len(line_text),
+                            style="font",
+                            size=str(font_size),
+                            auto_format=False
+                        ))
                     offset += len(line_text)
 
                 multi_style = MultiMsgStyle(styles)
@@ -340,7 +341,8 @@ class SingleTabRunner:
                 bot.send(msg_payload, thread_id=group_id, thread_type=ThreadType.GROUP, ttl=ttl_to_send)
 
                 self.stats["total_sent"] += 1
-                preview = lines[0][:26] + ("..." if len(lines[0]) > 26 else "")
+                first_non_empty = next((ln for ln in lines if ln.strip()), "Ngôn")
+                preview = first_non_empty[:26] + ("..." if len(first_non_empty) > 26 else "")
                 self.add_log(
                     f"[{acc_label}] Lượt #{loop_count}: Đã gửi toàn bộ ngôn ({len(lines)} dòng) vào {group_name} ({group_id}) [Size: {font_size} | Màu: {line_color}] - \"{preview}\"",
                     "success"
